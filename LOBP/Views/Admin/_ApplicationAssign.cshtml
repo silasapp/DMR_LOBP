@@ -1,0 +1,56 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title text-center">
+        Assign "@ViewBag.ApplicantName" Application
+    </h4>
+</div>
+
+
+<div class="modal-body">
+    <form action="@Url.Action("ApplicationAssign")" method="post" class="form-horizontal">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ApplicationId" id="ApplicationId" value="@ViewBag.ApplicationId" />
+        <input type="hidden" name="AssignedReason" id="AssignedReason" value="@ViewBag.AssignReason" />
+
+        <div class="form-group">
+            <label class="control-label col-md-3">License Type</label>
+            <div class="col-md-9">
+                <input type="text" class="form-control" value="@ViewBag.AppDescription" readonly style="border: 0px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-3">Application Reference</label>
+            <div class="col-md-9">
+                <input type="text" class="form-control" value="@ViewBag.ApplicationId" readonly style="border: 0px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-3">Assign to User</label>
+            <div class="col-md-9">
+                <select id="User" name="User" required="required" class="form-control">
+                    @foreach (SelectListItem item in ViewBag.Assign)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3">Comment</label>
+            <div class="col-md-9">
+                <textarea class="form-control" rows="3" name="assigncomment" id="assigncomment" style="resize:none"></textarea>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" value="Assign Inspection" class="btn btn-success">
+            <i class="fa fa-exchange" aria-hidden="true" />
+        </div>
+    </form>
+</div>
+

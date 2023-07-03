@@ -1,0 +1,302 @@
+﻿@using LOBP.DbEntities
+@model List<ApplicationRequest>
+
+
+@{
+    int count = 0;
+    ViewBag.Title = "MyDesk";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string userRole = ((LOBP.DbEntities.UserMaster)(Session["UserID"])).UserRoles;
+    var dbCtxt = new LubeBlendingDBEntities();
+
+}
+
+
+<div class="content">
+
+    <hr class="clear" />
+
+    <form action="#" method="post" id="frmPush">
+        @Html.AntiForgeryToken()
+
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border" style="color:green">Applications On My Desk</legend>
+
+
+            <table class="table table-responsive table-bordered table-condensed dataTable" id="pushTable">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Application Id</th>
+                        <th>License</th>
+                        <th>Company</th>
+                        <th>State</th>
+                        <th>Stage</th>
+                        <th>Capacity</th>
+                        <th>Date</th>
+                        <th>Legacy</th>
+                        <th>Progress</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                @foreach (ApplicationRequest req in Model)
+                {
+                    if (req.CurrentStageID != 5)
+                    {
+                         string rate = dbCtxt.WorkFlowStates.Where(w => w.StateID == req.CurrentStageID).FirstOrDefault().Progress; 
+
+                        <tr>
+                            <td>@(count += 1)</td>
+                            <td>@req.ApplicationId</td>
+                            <td>@req.LicenseType.Description</td>
+                            <td>@req.ApplicantName</td>
+                            <td>@req.StateMasterList.StateName</td>
+                            <td>@req.WorkFlowState.StateName</td>
+                            <td>@Convert.ToDecimal(req.AnnualCumuBaseOilRequirementCapacity).ToString("N")</td>
+                            <td>@req.AddedDate</td>
+                            <td>@req.IsLegacy</td>
+                            <td class="txtright"><div class="badge"><b style="font-size:large">@rate</b></div></td>
+                            <td class="txtright" style="padding-top:25px">
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <a href="@Url.Action("ViewApplication", new { applicationId = req.ApplicationId })" class="btn btn-xs btn-success">View Application</a>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <a href="@Url.Action("TransitionHistory", new { applicationId = req.ApplicationId })" class="btn btn-xs btn-primary">History</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </fieldset>
+    </form>
+
+    <hr style="border: 1px solid white" />
+    <div class="modal fade" id="TaskDelegationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-center" id="modalhdid">
+                        Assign Application
+                    </h4>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id="AssignTaskForm" action="@Url.Action("AssignTaskModal")" method="post" class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Assign Task To:</label>
+                            <div class="col-md-9">
+                                <select id="Newtask" name="Newtask" class="form-control UserRoles" required="" style="width: 100%"></select>
+                            </div>
+                            <input id="arrayitem" type="hidden" name="arrayitem" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Comment</label>
+                            <div class="col-md-9">
+                                <textarea id="adcomment" type="text" name="adcomment" class="form-control" style="resize:none"></textarea>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="SaveBtn" class="btn btn-info round"><span class="glyphicon glyphicon-transfer"></span> Assign</button>
+                            <button type="button" class="btn btn-danger  round" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.Loggedinuser == "AD RBP" && ViewBag.StaffAppCount > 0)
+    {
+        <fieldset class="scheduler-border">
+            <legend class="scheduler-border">Applications to be Assigned to Supervisor/Reviewer</legend>
+            @if (ViewBag.Message != null)
+            {
+                <div class="col-md-12">
+                    <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <i class="fa fa-exclamation-triangle fa-border fa-spin" aria-hidden="true"></i>
+                        @ViewBag.Message
+                    </div>
+                </div>
+            }
+            <button type="button" class="btn btn-success assignuser col-md-offset-4" id="assignuser"> <span class="glyphicon glyphicon-transfer"></span> Assign to Supervisor/Reviewer</button><br />
+            <table class="table table-responsive mydataTable" id="pushTable">
+                <thead class="thead">
+                    <tr>
+                        <th></th>
+                        <th>Reference Number</th>
+                        <th>Company Name</th>
+                        <th>Category</th>
+                        <th>Company Email</th>
+                        <th>Current Desk</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </fieldset>
+    }
+
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(".assignuser").hide('fast');
+        $(function () {
+            $("#lnk-Branches > a").addClass("selected").find(".act").addClass("selected");
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+
+
+
+            var table = $(".mydataTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                ajax: {
+                    url: "/Admin/TaskDelegation",
+                    type: "POST",
+                    async: true,
+                    "sDom": "rtipl",
+                    "deferRender": true,
+                    "deferLoading": 5,
+                    "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]]
+                },
+                buttons: [
+                    'csv', 'excel', 'pdf', 'print'
+                ],
+                columns: [
+                    { data: "ApplicationId" }, { data: "ApplicationId" }, { data: "ApplicantName" }, { data: "category" }, { data: "ApplicantUserId" }, { data: "CurrentAssignedUser" }
+                ],
+
+
+                "columnDefs": [
+                    {
+                        'targets': 0,
+                        'checkboxes': {
+                            'selectRow': true
+                        },
+                    },
+
+
+                     {
+                        "targets": 6,
+                        "data": null,
+                        "defaultContent":
+                            '<p id="Viewapp" class="btn btn-xs btn-success payment"><span class="glyphicon glyphicon-eye-open"></span> View</p>'
+                    }
+
+
+
+                ],
+                'select': {
+                    'style': 'multi'
+                },
+                'order': [[1, 'asc']]
+            });
+
+
+
+
+            $('.mydataTable').on('click', 'p', function () {
+                var data = table.row($(this).parents('tr')).data();
+                window.location.href = "/Admin/ViewApplication?applicationId="+ data.ApplicationId;
+            });
+
+
+
+
+            $('.mydataTable tbody, thead').on('click', 'input[type="checkbox"]', function (e) {
+                debugger;
+                var $row = $(this).closest('tr');
+                // Get row data
+                var data = table.row($row).data();
+                if (data !== null) {
+                    $(".assignuser").show('fast');
+                }
+            });
+            $("#assignuser").click(function (e) {
+                debugger;
+                var rows_selected = table.column(0).checkboxes.selected();
+                // Iterate over all selected checkboxes
+                $.each(rows_selected, function (index, rowId) {
+                    $('#arrayitem').val(rows_selected.join(","));
+                });
+                $("#TaskDelegationModal").modal('show');
+            });
+
+            $("#Newtask").ready(function () {
+                var html = "";
+                $("#Newtask").html("");
+                $.getJSON("/Admin/TaskDelegationUsers", {}, function (datas) {
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.role + ">" + val.role + "</option>";
+                        });
+                    $("#Newtask").append(html);
+                });
+            });
+
+
+
+
+              $(".select2").select2();
+
+
+            $("#selectAll").click(function () {
+                $('.allowPush').prop('checked', this.checked);
+            });
+
+            $(".allowPush").click(function () {
+                if ($(".allowPush").length == $(".allowPush:checked").length) {
+                    $("#selectAll").attr("checked", "checked");
+                } else {
+                    $("#selectAll").removeAttr("checked");
+                }
+            });
+
+           
+
+
+        });
+
+        function CheckPushCount() {
+            var count = 0;
+            $("#pushTable tbody [type=checkbox]").each(function () {
+                if ($(this).is(":checked")) {
+                    count += 1;
+                };
+            });
+            if (count > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    </script>
+}
+
+

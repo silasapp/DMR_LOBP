@@ -1,0 +1,329 @@
+﻿
+@{
+    ViewBag.Title = "MyApplicationForm";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+
+        @*@if (ViewBag.LicenseType == "MOD")
+        {
+            <h3 class="lefty">LPG Storage (Catagory A) Modification</h3>
+        }
+        else if (ViewBag.LicenseType == "TAKE OVER")
+        {
+            <h3 class="lefty">LPG Storage (Catagory A) Take Over</h3>
+        }*@
+        <h3 class="lefty">@ViewBag.Description</h3>
+       
+        <div class="clear"></div>
+    </div>
+</div>
+
+
+<div class="padd-t form-horizontal">
+
+    <input type="hidden" id="apptype" value="@ViewBag.AppType" />
+    <input type="hidden" id="Application" name="Application"/>
+
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <label>Takeover Category</label>
+            <select class="form-control" id="selectedpermitvalue" required="">
+                <option></option>
+                @if (ViewBag.AppType != "ATM")
+                {
+                    @*<option value="SSA">SITE SUITABILITY </option>*@
+                    <option value="PTE">PERMIT TO ESTABLISH</option>
+                    <option value="ATC">APPROVAL TO CONSTRUCT</option>
+                    <option value="LTO">LICENSE TO OPERATE</option>
+                }
+                else
+                {
+                    <option value="ATM">APPROVAL TO MODIFY (MODIFICATION)</option>
+                }
+            </select>
+
+            <br />
+            <div style="display:none" id="showverifypermittextbox">
+                @*<hr />
+                <b class="alert alert-info" style="min-height:inherit"><span style="font-size:20px;" class="glyphicon glyphicon-hand-down"></span> Kindly enter PermitNO of the facility you Taking Over.</b>
+                <hr />*@
+
+                <label>
+
+                    @if (ViewBag.AppType != "ATM")
+                    {
+                        <span>
+                            Enter <span id="selectpermit" class="text-success"></span> <span>Number for Take Over</span>
+                        </span>
+                    }
+                    else
+                    {
+                        <span><b>Enter <span class="text-success">Current ATC or LTO</span> Number for Modification</b></span>
+
+                    }
+                </label>
+
+
+
+                <div class="input-group">
+                    <div><input type="text" id="TpRef" name="TpRef" autocomplete="off" required="" class="form-control" /></div>
+                    <div class="input-group-addon" style="background-color:orange; cursor:pointer" id="verifypermitbtn"><span class="glyphicon glyphicon-search"></span> Search</div>
+                </div>
+
+
+                <div id="verified" class="alert-success" style="display:none">
+                    <span>Facility Name: <span id="fname"></span></span><br />
+                    <span>Facility Location: <span id="flocation"></span></span>
+                </div>
+
+
+                <div id="failed" class="alert-danger" style="display:none">
+                    <span><span class="glyphicon glyphicon-ban-circle"></span> Permit/License does not exist</span>
+                </div>
+                <div id="samefacilityerror" class="alert-danger" style="display:none">
+                    <span><span class="glyphicon glyphicon-ban-circle"></span> You can not Takeover your own facility</span>
+                </div>
+                <div id="notsamecompanymod" class="alert-danger" style="display:none">
+                    <span><span class="glyphicon glyphicon-ban-circle"></span> You can only Modify your own facility</span>
+                </div>
+                <div style="display:none" id="submitbtn">
+                    <br />
+                    <button class="btn btn-success" id="proceed">Okay, Proceed</button>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    @*</form>*@
+</div>
+
+        @section scripts{
+
+            <script type="text/javascript">
+                function getContextPath() {
+                    return window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+                }
+                function toTitleCase(str) {
+                    return str.replace(/(?:^|\s)\w/g, function (match) {
+                        return match.toUpperCase();
+                    });
+                }
+        $(document).ready(function () {
+
+
+
+            $("#selectedpermitvalue").change(function () {
+                debugger;
+                var permittext = $("#selectedpermitvalue option:selected").text();
+                $("#selectpermit").text(permittext);
+                $("#showverifypermittextbox").show();
+
+
+            });
+
+
+            $("#verifypermitbtn").click(function (e) {
+                e.preventDefault();
+                debugger;
+
+                var html = "";
+                var permitvalue = $("#selectedpermitvalue").val();
+                var LicenseName = $("#TpRef").val();
+
+                $.getJSON("/Company/ModTODetails",
+                    { "LicenseName": LicenseName, "CodeType": permitvalue},
+                    function (response) {
+                        debugger;
+                        if (response.length > 0) {
+
+                            var loginelpsid = '@ViewBag.LoginElpsId';
+                            var takeover = '@ViewBag.AppType';
+                            console.log(response);
+                            $.each(response, function (key, val) {
+                                debugger;
+                                //var sDate = new Date(Date.parse(val.ExpiryDate, "MM/dd/yyyy")); 
+                                var licenseexpiry = val.ExpiryDate;
+                                var todaydate = '@ViewBag.Todaydate';
+
+                                if (new Date(licenseexpiry) < new Date(todaydate)) {
+                                    alert("The License/Approval reference number " + LicenseName + " you want to Takeover expired " +  Date(licenseexpiry)+". The facility you are taking over from have to renew the License/Approval");
+                                }
+                                else {
+                                    var elpsid = val.ElpsID;
+                                    if (elpsid === loginelpsid && takeover === "ATO") {
+                                        $("#samefacilityerror").show();
+                                        $("#notsamecompanymod").hide();
+                                        $("#Application").val(val.Application);
+                                        $("#failed").hide();
+                                        $("#verified").hide();
+                                        $("#submitbtn").hide();
+                                    }
+                                    else if (elpsid !== loginelpsid && takeover === "ATM") {
+                                        $("#notsamecompanymod").show();
+                                        $("#samefacilityerror").hide();
+                                        $("#Application").val(val.Application);
+                                        $("#failed").hide();
+                                        $("#verified").hide();
+                                        $("#submitbtn").hide();
+
+                                    }
+                                    else {
+                                        $("#flocation").text(val.LocationAddress);
+                                        $("#fname").text(val.FacilityName);
+                                        $("#Application").val(val.Application);
+                                        $("#failed").hide();
+                                        $("#verified").show();
+                                        $("#submitbtn").show();
+                                        $("#notsamecompanymod").hide();
+                                        $("#samefacilityerror").hide();
+                                    }
+                                }
+
+
+                            });
+
+                        } else {
+                            $("#failed").show();
+                            $("#verified").hide();
+                            $("#submitbtn").hide();
+                            $("#samefacilityerror").hide();
+                            $("#notsamecompanymod").hide();
+                        }
+
+                    }).fail(function (jqxhr, textStatus, error) { $("#failed").show(); $("#verified").hide(); $("#submitbtn").hide(); $("#samefacilityerror").hide(); $("#notsamecompanymod").hide();});
+            });
+
+
+
+            $("#proceed").click(function (e) {
+
+                debugger;
+                var LicenseName = $("#TpRef").val();
+                //var licensetype = $("#apptype").val();
+                //var permittxt = $("#selectedpermitvalue option:selected").text();
+                var permitvalue = $("#selectedpermitvalue option:selected").val();
+                var appid = $("#Application").val();
+
+
+                 $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'success') {
+                                if ((permitvalue === "PTE" || permitvalue === "SSA")) {
+                                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=ATO&ApplicationId=" + appid;
+                                } else if (permitvalue === "ATC") {
+                                    window.location.href = "/Company/ApprovalToConstruct?LicenseTypeId=ATO&ApplicationId=" + data.applicationId + "&PTEReference=" + LicenseName;
+
+                                } else if (permitvalue === "LTO") {
+                                    window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=NEW&LicenseTypeId=ATO&ApplicationId=" + data.applicationId + "&LinkedReference=" + LicenseName;;
+
+                                    //window.location.href = "/Company/LicenseToOperate?LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&PTEReference=" + PTEReference;
+
+                                }
+
+                            } else {
+                                bootbox.alert({
+                                    message: data.Message,
+                                    size: 'small',
+                                    callback: function () { }
+                                });
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+
+
+
+
+            });
+
+
+        });
+
+
+
+
+        function MoveToATM(PTEReference, licensetype, apptype, appid) {
+
+            bootbox.confirm({
+                message: "Apply For Approval To Modify using the Reference " + PTEReference + " ?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    @*$.get('@Url.Action("CheckForUnsubmittedApplication")', { LicenseTypeCode: "ATM" })
+                    .done(function (data) {
+
+                        var status = data.Status;
+                        if (status == 'expiredpte') {
+                                bootbox.alert({
+                                    message: "Your Permit To Establish has expired, please apply for Permit To Establish before proceeding to Approval To Construct(ATC)",
+                                    size: 'small',
+                                    callback: function () {
+                                        return false;
+                                    }
+                                });
+                                //window.location.href = "/Company/MyApplications";
+                            }*@
+                    //else {
+
+
+                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'success') {
+                                if (licensetype === "PTE") {
+                                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=ATM&ApplicationId=" + appid;
+                                } else if (licensetype === "ATC") {
+                                    window.location.href = "/Company/ApprovalToConstruct?LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&PTEReference=" + PTEReference;
+
+                                } else if (licensetype === "LTO") {
+                                    window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=NEW&LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&LinkedReference=" + PTEReference;;
+
+                                    //window.location.href = "/Company/LicenseToOperate?LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&PTEReference=" + PTEReference;
+
+                                }
+
+                            } else {
+                                bootbox.alert({
+                                    message: data.Message,
+                                    size: 'small',
+                                    callback: function () { }
+                                });
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+
+
+                    }
+            });
+        }
+
+
+
+
+
+
+            </script>
+
+        }
+

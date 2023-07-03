@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[UserMaster] (
+    [UserId]              VARCHAR (150)   NOT NULL,
+    [UserType]            VARCHAR (30)    NULL,
+    [ElpsId]              VARCHAR (30)    NULL,
+    [CACNumber]           VARCHAR (30)    NULL,
+    [FirstName]           VARCHAR (100)   NULL,
+    [LastName]            VARCHAR (100)   NULL,
+    [UserLocation]        VARCHAR (3)     NULL,
+    [UserRoles]           VARCHAR (150)   NULL,
+    [UserDesignation]     VARCHAR (50)    NULL,
+    [UserImage]           VARBINARY (MAX) NULL,
+    [CreatedBy]           VARCHAR (50)    NULL,
+    [CreatedOn]           DATETIME        NULL,
+    [UpdatedBy]           VARCHAR (50)    NULL,
+    [UpdatedOn]           DATETIME        NULL,
+    [Status]              VARCHAR (10)    NULL,
+    [LastLogin]           DATETIME        NULL,
+    [LoginCount]          INT             NULL,
+    [NotificationAllowed] VARCHAR (1)     NULL,
+    [LastComment]         VARCHAR (350)   NULL,
+    [SignatureID]         INT             NULL,
+    [SignatureImage]      VARCHAR (100)   NULL,
+    [UserMasterId]        INT             IDENTITY (1, 1) NOT NULL,
+    CONSTRAINT [PK_UserMaster] PRIMARY KEY CLUSTERED ([UserMasterId] ASC),
+    CONSTRAINT [FK_UserMaster_FieldLocation] FOREIGN KEY ([UserLocation]) REFERENCES [dbo].[FieldLocation] ([FieldLocationID])
+);
+

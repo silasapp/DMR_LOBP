@@ -1,0 +1,239 @@
+﻿@model List<LOBP.DbEntities.Appointment>
+
+    @{
+        ViewBag.Title = "Schedule History";
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+    }
+
+
+
+    @section css{
+        <style>
+            #calendar {
+                max-width: 90%;
+                margin: 0 auto;
+            }
+        </style>
+    }
+
+    <div class="content">
+        <h2 class="lefty">Schedules</h2>
+        <div class="righty">
+            <a href="@Url.Action("MyDesk")" class="btn btn-default">Back to My Desk <i class="icon-arrow-left"></i></a>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="options" id="calView" autocomplete="off" checked><i class="fa fa-calendar"></i> Calendar View
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="options" id="listView" autocomplete="off"><i class="fa fa-bars"></i> List View
+                </label>
+            </div>
+
+        </div>
+        <hr class="clear" />
+        <div class="row" id="CalBox">
+            <div class="col-md-12">
+                <div id='calendar'></div>
+            </div>
+        </div>
+        <div class="row hide" id="ListBox">
+            <div class="col-md-12">
+                <table class="table table-hover table-bordered table-striped table-condensed dataTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>
+                                Company Name
+                            </th>
+                            <th>Scheduled Date</th>
+                            <th>
+                                Reference No.
+                            </th>
+                            <th>
+                                Application Type
+                            </th>
+                            <th>
+                                Markerter Comment
+                            </th>
+                            <th>
+                                Markerter Accepted
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{int i = 1;}
+                        @foreach (LOBP.DbEntities.Appointment ap in Model)
+                        {
+
+                            <tr>
+                                <td>@(i++)</td>
+                                <td>
+                                @{
+                                    var applicantname = @ap.ApplicationRequest == null ? "" : ap.ApplicationRequest.ApplicantName;
+
+                                 }
+                                @applicantname
+                                </td>
+                                <td>@ap.ScheduledDate</td>
+                                <td>@ap.ApplicationId</td>
+                                <td>
+                                     @{
+                                    var applicationid = @ap.ApplicationRequest == null ? "" : ap.ApplicationRequest.ApplicationTypeId;
+
+                                 }
+                                    @applicationid
+                                
+                                </td>
+                                <td>@ap.LastCustComment</td>
+                                @if (ap.Status != null && ap.Status.Contains("AUTH"))
+                                {
+                                    <td id="app_1" data-val="True" data-appdate="@ap.LastApprovedCustDate">
+                                        <span class="label label-success">YES</span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td id="acc_2" data-val="False" data-accdate="">
+                                        <span class="label label-danger">NO</span>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row container" style="background-color:white; margin-top:30px">
+        <div id="calendar"></div>
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog" style=" margin:auto 40%; margin-top:100px; display:block; width:350px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><span class=""></span><span class="glyphicon glyphicon-hand-down"></span> <span id="eventTitle"></span></h4>
+                    </div>
+                    <div class="modal-body modal-sm">
+                        <p id="pDetails">
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade adminPopup" id="modalPopup">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3 class="modal-title">Modal header</h3>
+                </div>
+                <div id="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @section scripts{
+        
+        <script type="text/javascript">
+
+
+            $(document).ready(function () {
+                debugger;
+                var events = [];
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/GetAppointment",
+                    success: function (data) {
+                       
+
+                        $.each(data, function (i, v) {
+                            events.push({
+                               
+                                id: v.appid,
+                                title: v.companyname,
+                               start: moment(v.appdate).format('YYYY/MM/DD hh:mm a'),
+                                description: v.contact,
+                                backgroundColor: '#378006',
+                            });
+                        })
+                        debugger;
+                        GenerateCalender(events);
+                    },
+
+
+                })
+
+                function GenerateCalender(events) {
+                    debugger;
+
+
+
+                    $("#calendar").fullCalendar("destroy");
+                    $("#calendar").fullCalendar({
+                        contentHeight: 400,
+                        defaultDate: new Date(),
+                        timeFormat: 'h(:mm )a',
+                        header: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'month,basicWeek,basicDay,agenda'
+                        },
+                        eventLimit: true,
+                        //eventColor: '#378006',
+                        events: events,
+                        eventClick: function (calEvent, jsEvent, view) {
+                            selectedEvent = calEvent;
+                            $('#myModal #eventTitle').text('Inspection Schedule');
+                            var $description = $('<div/>');
+                            if (calEvent.description != undefined) {
+                                $description.append($('<p/>').html('<b>Company Name:</b> ' + calEvent.title));
+                                $description.append($('<p/>').html('<b>Scheduled Date:</b> ' + calEvent.start.format("DD-MMM-YYYY HH:mm a")));
+                                $description.append($('<p/>').html('<b>Company Contact:</b> ' + calEvent.description));
+                                $('#myModal #pDetails').empty().html($description);
+                                $('#myModal').modal();
+                            }
+                        }
+                    }
+                    )
+                }
+
+
+
+                $("#calView").parent("label").on("click", function () {
+                    $("#ListBox").removeClass("hide").addClass("hide");
+                    $("#CalBox").removeClass("hide");
+                });
+                $("#listView").parent("label").on("click", function () {
+                    $("#CalBox").removeClass("hide").addClass("hide");
+                    $("#ListBox").removeClass("hide");
+                });
+
+            });
+
+            function sleep(milliseconds) {
+                var start = new Date().getTime();
+                for (var i = 0; i < 1e7; i++) {
+                    if ((new Date().getTime() - start) > milliseconds) {
+                        break;
+                    }
+                }
+                /**/
+            }
+                        /**/
+
+        </script>
+    }

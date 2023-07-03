@@ -1,0 +1,432 @@
+﻿@model LOBP.Models.CompanyInformationModel
+
+@{
+    ViewBag.Title = "CompanyProfile";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h2 class="lefty">Company Profile</h2>
+        <div class="righty">
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+@if (ViewBag.FirstTimeLogin != null || ViewBag.Emptyregaddress == null)
+{
+    <div id="success" class="alert alert-danger alert-mini alert-dismissable" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign"></span> Please Update Both Your <b>COMPANY PROFILE</b> and <b>COMPANY ADDRESS</b> Before Applying For License. <b>This is Compulsory!</b>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <br />
+}
+<br />
+<br />
+<div role="tabpanel">
+
+    <ul class="nav nav-tabs" role="tablist" style="margin-left: 10px;">
+        <li role="presentation" id="liProfile" class=""><a href="#Profile" aria-controls="Profile" role="tab" data-toggle="tab">Company Profile</a></li>
+        <li role="presentation" id="liAddress" class=""><a href="#Address" aria-controls="Address" role="tab" data-toggle="tab">Company Address</a></li>
+        <li role="presentation" id="liDocument" class=""><a href="#Document" aria-controls="Document" role="tab" data-toggle="tab">Company Document</a></li>
+        <li class="btn btn-default btn-xs pull-right"><a href='javascript:history.go(-1)' class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span> Go Back</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane" id="Profile">
+
+            <form enctype="multipart/form-data" method="post" id="profileform">
+
+                @*action="@Url.Action("UpdateCompanyRecord")"*@
+                <input type="hidden" name="actionType" id="actionType" value="UPDATE_PROFILE" />
+                <input type="hidden" name="companyId" id="companyId" value="@Model.company.id" />
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.company.user_Id)
+                @Html.HiddenFor(model => model.company.id)
+                @Html.HiddenFor(model => model.company.registered_Address_Id)
+                @Html.HiddenFor(model => model.company.operational_Address_Id)
+
+
+                <div class="row xrow og_form">
+                    <div class="pad company">
+                        <h3>Company Information</h3>
+                        <hr />
+                        <div class="col-md-12">
+                            <p>Fields with <span class="req">*</span> are required</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Name">Company Name</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.name, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Contact_FirstName">Contact Person&#39;s First Name</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.contact_FirstName, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Year_Incorporated">Year Incorporated</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.company.year_Incorporated, new { @class = "form-control", required = "required" })
+                                        <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Business_Type">Business Type</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.business_Type, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Contact_LastName">Contact Person&#39;s Last Name</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.contact_LastName, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_RC_Number">Registration Number</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.rC_Number, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Nationality">Nationality</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+
+                                    <select id="company_nationality" name="company.nationality" class="form-control select2" required="required">
+                                        @foreach (SelectListItem item in ViewBag.Nationality)
+                                        {
+                                            <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                        }
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Contact_Phone">Contact Person&#39;s Telephone</label>
+                                &nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.contact_Phone, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label" for="Company_Tin_Number">TIN</label>
+                                &nbsp;<span class="req">*</span>
+                                <small><i>(Tax Identification Number)</i></small>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.company.tin_Number, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr class="clear" />
+
+                    <div class="form-group">
+                        <div class="txtcenter">
+                            <button value="Update Profile" class="btn btn-success" tabindex="10" style="width: 200px;" id="updateProfile">Update Profile</button>
+                            @*<input type="button" value="Update Profile" id="updateProfile" class="btn btn-success" tabindex="10" style="width: 200px;" />*@
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+
+        <div role="tabpanel" class="tab-pane" id="Document">
+
+            <form action="@Url.Action("DocumentLibrary", new { CompanyId=Model.company.user_Id})" enctype="multipart/form-data" method="post" id="documentform">
+                <div class="row xrow">
+                    <div class="col-sm-11">
+                        <div class="">
+                            <table class="table dataTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50%;">Document Type</th>
+                                        <th style="width: 10%;">Document Image</th>
+                                        <th style="width: 15%;">Date Added</th>
+                                        <th style="width: 15%;">Date Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.AllDocument != null)
+                                    {
+                                    foreach (LOBP.Models.DocumentModel d in ViewBag.AllDocument)
+                                    {
+                                        string source = d.Source.Contains("https") ? d.Source : "http://elps.dpr.gov.ng/" + d.Source;
+
+                                        <tr>
+                                            <td>
+                                                @d.DocumentTypeName
+
+                                            </td>
+                                            @if (d.DocumentName.Contains(".pdf"))
+                                            {
+                                                <td>
+                                                    @*<a href='@(d.UploadDocumentUrl + d.Source)' target="_blank">
+                            <img src="@Url.Content("~/Images/pdficon.png")" style="height: 40px;" class="thumbnail" />
+                        </a>*@
+                                                    <a href='@(source)' target="_blank">
+                                                        <img src="@Url.Content("~/Images/pdficon.png")" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                                             style="max-height: 40px; max-width: 40px; display: inline-block;" />
+                                                    </a>
+
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+
+                                                    <a href='@(source)' target="_blank" data-name="@d.DocumentTypeName">
+                                                        <img src="@(source)" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                                             style="max-height: 40px; max-width: 40px; display: inline-block" />
+                                                    </a>
+                                                </td>
+                                            }
+                                            <td>@d.DateAdded.ToString("dd-MMM-yyyy")</td>
+                                            <td>
+                                                @if (d.DateModified.ToString("dd-MMM-yyyy") != "01-Jan-1753")
+                                                {@d.DateModified.ToString("dd-MMM-yyyy")}
+                                            </td>
+                                            @*<td><a href="@Url.Action("UpdateDocument", new { fileId = d.FileId, docId = d.DocId })" class="btn btn-default btn-xs">Update</a></td>*@
+                                        </tr>
+                                    }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+
+        <div role="tabpanel" class="tab-pane" id="Address">
+
+            <form action="@Url.Action("UpdateCompanyRecord")" enctype="multipart/form-data" method="post" id="addressform">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.company.registered_Address_Id)
+                <input type="hidden" name="companyId" id="companyId" value="@Model.company.id" />
+                <input type="hidden" name="actionType" id="actionType" value="ADDRESS" />
+
+                <div class="row xrow og_form">
+                    <div class="pad">
+                        <h3>Company Registered Address</h3>
+                        <hr />
+                        <div class="col-md-12">
+                            <p>Fields with <span class="req">*</span> are required</p>
+                        </div>
+
+                        <div class="col-md-12 company">
+                            <div class="form-group">
+                                <label class="control-label">Street Address</label>&nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.registeredAddress.address_1, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 company">
+
+                            <div class="form-group">
+                                <label class="control-label">City</label>&nbsp;<span class="req">*</span>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.registeredAddress.city, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-6 company">
+                            <div class="form-group">
+                                <label class="control-label">Postal Code</label>
+                                <div class="">
+                                    @Html.TextBoxFor(model => model.registeredAddress.postal_code, new { @class = "form-control", required = "required" })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+
+
+                    <hr class="clear" />
+
+
+                    <div class="clear"></div>
+                    <div class="form-group">
+                        <div class="txtcenter">
+                            <input type="submit" value="Update Address" id="updateAddress" class="btn btn-success" style="width: 200px;" tabindex="14" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+
+    </div>
+
+</div>
+<br />
+<br />
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#updateProfile").click(function (e) {
+                debugger;
+                e.preventDefault();
+                //if ($("#profileform").valid()) {
+                    debugger;
+                    var r = confirm("Do you want to continue With the Update ?");
+                    if (r == true) {
+                        //$("#profileform").attr('action')
+                        $.post("/Company/UpdateCompanyRecord", $("#profileform").serialize())
+                            .done(function (data) {
+                                if (data.Status == "success") {
+                                    alert("Profile Update Was Successfull");
+                                    window.location.href = "/Company/CompanyProfile";
+                                }
+                                else {
+                                    alert(data.Status);
+                                }
+                            })
+                            .fail(function (data) {
+                                alert('Network  Error, Restore Connection and Try again');
+                            })
+                            .always(function (data) {
+                            });
+                    }
+                //}
+            });
+
+
+            $('#updateAddress').click(function (e) {
+                e.preventDefault();
+                if ($("#addressform").valid()) {
+
+                    var r = confirm("Are you Sure the Profile Informations are Correct ?");
+                    if (r == true) {
+                        $.post($("#addressform").attr('action'), $("#addressform").serialize())
+                            .done(function (data) {
+
+                                alert(data.Status);
+                                window.location.href = "/Company/CompanyProfile";
+                            })
+                            .fail(function (data) {
+                                alert('Network Communication Error, Restore Connection and Try again');
+                            })
+                            .always(function (data) {
+                            });
+                    }
+                }
+            });
+        });
+
+
+        $(function () {
+            if (''.length > 0) {
+                $("ul.nav-tabs > li").addClass("disabled").find("a").attr("disabled", "disabled");
+                if ('Directors'.length > 0) {
+                    //Remove all active views 1st
+
+                    $(".tab-content div").each(function () {
+                        $(this).removeClass("active");
+                    });
+
+                    $("ul.nav-tabs li").each(function () {
+                        $(this).removeClass("active");
+                    });
+
+                    var view = 'div#Directors';
+                    var lnk = '#li' + 'Directors';
+                    $(lnk).addClass("active").removeClass("disabled").find("a").removeAttr("disabled");
+                    $(view).addClass("active");
+
+                    switch ('Directors') {
+                        case "Profile":
+                            break;
+                        case "Address":
+                            $("#liProfile").addClass("tab-done").removeClass("disabled").find("a").removeClass("disabled").append(' <i class="fa fa-check-circle"></i>');
+                            break;
+                        case "KeyStaffs":
+                            $("#liProfile").addClass("tab-done").removeClass("disabled").find("a").removeClass("disabled").append(' <i class="fa fa-check-circle"></i>');
+                            $("#liAddress").addClass("tab-done").removeClass("disabled").find("a").removeClass("disabled").append(' <i class="fa fa-check-circle"></i>');
+                            $("#liDocument").addClass("tab-done").removeClass("disabled").find("a").removeClass("disabled").append(' <i class="fa fa-check-circle"></i>');
+                            break;
+                        default:
+
+                    }
+                }
+                else {
+                    $("div#Profile").addClass("active");
+                    $("#liProfile").addClass("active").removeClass("disabled").find("a").removeAttr("disabled");
+                }
+            }
+            else {
+                $("div#Profile").addClass("active");
+                $("#liProfile").addClass("active").removeClass("disabled").find("a").removeAttr("disabled");
+            }
+
+            $("ul.nav-tabs > li > a[disabled='disabled']").click(function (e) {
+                e.preventDefault();
+                if ($(this).parent("li").hasClass("tab-done")) {
+                    //Do nothing
+                }
+                else {
+                    $("#modalPopup").on('show.bs.modal', function () {
+                        var modal = $(this);
+                        modal.find('.modal-title').text('Alert');
+                        modal.find('.modal-body').text('Please Complete this step before proceeding. Use the button(s) below to Proceed.');
+                        modal.find('.modal-footer').html('<button class="btn btn-default" data-dismiss="modal">Close</button>');
+                    });
+                    $("#modalPopup").modal('show');
+
+                    return false;
+                }
+            });
+
+            $(".imgSilent").click(function (e) {
+                e.preventDefault();
+                var url = $(this).data("url");
+
+                $(".modal-content").html(Loading());
+                $.get(url, function (data) {
+                    $(".modal-content").html(data);
+                });
+            });
+        });
+    </script>
+}

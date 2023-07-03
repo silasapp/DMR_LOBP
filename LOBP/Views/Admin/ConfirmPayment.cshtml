@@ -1,0 +1,244 @@
+﻿@{
+    ViewBag.Title = "Confirm Payment";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content">
+
+    <div class="modal fade VerifyPayment" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+        <div class="modal-dialog" style="display:inline-block; vertical-align:middle; margin:0 auto 0 30%; margin-top:100px" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Payment Information</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <div class="container">
+                            <div class="row">
+                                <div class="paid">
+                                    <div class="col-sm-6">
+                                        <div class="jumbotron">
+                                            <label style="color:green; font-size:30px; font-family:Cambria"><span class="glyphicon glyphicon-ok"></span> Payment Has Been Made</label><br /><br />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-envelope"></span><span style="color:red"> Application Ref:</span> <label id="applicationref"></label></label><br />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-home"></span><span style="color:red"> RRR Ref:</span> <label id="rrrref"></label></label><br />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-envelope"></span><span style="color:red"> Amount:</span> <label id="amount"></label></label><br />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-transfer"></span><span style="color:red"> Transaction Date:</span> <label id="transdate"></label></label><br />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pendingpayment">
+                                    <div class="col-sm-6">
+                                        <div class="jumbotron">
+                                            <label style="color:red; font-size:20px; font-family:Cambria"><span class="glyphicon glyphicon-ban-circle"></span> Payment Pending For Application With the Reference Number (<label id="appref"></label>)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer>
+                                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
+                            </footer>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("PaymentConfirmation", "Admin", FormMethod.Post))
+    {
+        <div class="modal fade GiveApplicationValue" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+            <div class="modal-dialog" style="display:inline-block; vertical-align:middle; margin:0 auto 0 35%; width:505px; margin-top:100px" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Confirm Payment For Application Below</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="paymentmade">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="jumbotron">
+                                            <input type="hidden" id="myrrr" name="myrrr" />
+                                            <input type="hidden" id="myappid" name="myappid" />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-book text-warning"></span><span style="color:red"> Application Ref No:</span> <label id="givevalueappref" class="text-success"></label></label><br />
+                                            <label style="font-family:Cambria; font-weight:bold; font-size:20px"><span class="glyphicon glyphicon-eye-open text-warning"></span><span style="color:red"> RRR Ref No:</span> <label id="givevaluerrref" class="text-success"></label></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="nopayment">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="jumbotron">
+                                            <label style="font-family:Cambria; color:red; font-size:30px"><span class="glyphicon glyphicon-ban-circle"></span> No payment Made Yet</label>
+                                        </div>
+                                    </div>
+
+                                </div></div>
+
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-offset-4">
+                                <div class="col-sm-6">
+                                    <div class="paymentmade"><button type="submit" class="btn btn-success">Confirm Payment</button></div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <fieldset class="scheduler-border">
+        <legend class="scheduler-border">Confirm Payment</legend>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-striped table-bordered mypayment" id="payment">
+                    <thead>
+                        <tr>
+                            <th><strong>Application Ref</strong>
+                            <th><strong>Company Name</strong>
+                            <th><strong>Remita Ref</strong> </th>
+                            <th><strong>Total Amount</strong> </th>
+                            <th><strong>Transaction Date</strong> </th>
+                            <th style="width:8px">Status</th>
+                            <th style="width:8px"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+        </div>
+    </fieldset>
+    <div style="display:none" id="loadingImage">
+        <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+            <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+        </div>
+    </div>
+</div>
+@section Scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var table = $(".mypayment").DataTable({
+                "processing": true,
+                "serverSide": true,
+                ajax: {
+                    url: "/Admin/GetConfirmPayment",
+                    type: "POST",
+                    "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+
+                },
+                dom: 'Blfrtip',
+                columns: [
+                    {
+                        data: "ApplicationId"
+                    },
+                    {
+                        data: "ApplicantName"
+                    },
+                    {
+                        data: "RRReference"
+                    },
+                   
+
+                    {
+                        data: "amt"
+
+                    },
+                    {
+                        data: "transdate"
+
+                    },
+
+                ],
+                "columnDefs": [
+
+                    {
+                        "targets": 5,
+                        "data": "Status",
+                        "render": function (data, type, user) {
+                            return user.Status === "AUTH" ? '<strong class="btn btn-xs btn-success">' + 'Payment Completed' + '</strong>' : '<strong class="btn btn-xs btn-warning">' + 'Payment Pending' + '</strong>';
+                     }
+                    },
+                    {
+                        "targets": 6,
+                        "data": null,
+                        "defaultContent":
+                            '<span id="Givevalue" class="btn btn-xs btn-success Givevalue"><span class="glyphicon glyphicon-edit"></span> Confirm Payment</span>'
+                    }
+                ]
+            });
+            $('#payment').on('click', 'button', function () {
+                debugger;
+                $("#loadingImage").show('fast');
+                var data = table.row($(this).parents('tr')).data();
+                var appid = data.ApplicationId;
+                var rrr = data.RRReference;
+                $.post("/Admin/VerifyPayment", { Appid: appid, RRR: rrr }, function (result) {
+                    if (result.Status === "paid") {
+                        $("#applicationref").text(data.ApplicationId);
+                        $("#rrrref").text(data.RRReference);
+                        $("#amount").text(data.amt);
+                        $("#transdate").text(data.transdate);
+                        $(".paid").show('fast');
+                        $(".pendingpayment").hide('fast');
+                        $("#loadingImage").hide('fast');
+                        $(".GiveApplicationValue").modal('hide');
+                        $(".VerifyPayment").modal('show');
+                    } else if (result.Status === "pending") {
+                        $("#appref").text(data.ApplicationId);
+                        $(".paid").hide('fast');
+                        $(".pendingpayment").show('fast');
+                        $("#loadingImage").hide('fast');
+                        $(".GiveApplicationValue").modal('hide');
+                        $(".VerifyPayment").modal('show');
+                    } else { alert("SomeThing Went Wrong!!"); }
+
+                });
+            });
+            $('#payment').on('click', 'span', function () {
+                debugger;
+                $("#loadingImage").show('fast');
+                var confirmation = confirm("Are you sure you want to Confirm Payment?");
+                if (confirmation === true) {
+                    var data = table.row($(this).parents('tr')).data();
+                    $.post("/Admin/Checkpayment", { Appid: data.ApplicationId, RRR: data.RRReference }, function (result) {
+                        if (result.Status === "paid") {
+                            $(".nopayment").hide('fast');
+                            $(".paymentmade").show('fast');
+                            $("#myappid").val(data.ApplicationId);
+                            $("#myrrr").val(data.RRReference);
+                            $("#givevalueappref").text(data.ApplicationId);
+                            $("#givevaluerrref").text(data.RRReference);
+                            $("#loadingImage").hide('fast');
+                            $(".VerifyPayment").modal('hide');
+                            $(".GiveApplicationValue").modal('show');
+                        } else if (result.Status === "pending") {
+                            $(".nopayment").show('fast');
+                            $(".paymentmade").hide('fast');
+                            $("#loadingImage").hide('fast');
+                            $(".VerifyPayment").modal('hide');
+                            $(".GiveApplicationValue").modal('show');
+                            //alert("Payment has not been made for application with the reference number " + data.ApplicationID);
+                        } else { $("#loadingImage").hide('fast'); alert("SomeThing Went Wrong!!"); }
+
+                    })
+                } else {
+                    $("#loadingImage").hide('fast');
+                }
+            });
+        });
+    </script>
+}

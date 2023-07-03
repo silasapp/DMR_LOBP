@@ -1,0 +1,175 @@
+﻿@model IEnumerable<LOBP.Models.ScheduleModel>
+@{
+    ViewBag.Title = "Active Schedule";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="content">
+    <div class="row" style="margin-top:-23px">
+        <div class="pageTitle bg1">
+            <h3 class="lefty">My Schedules</h3>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <hr class="clear" />
+
+    @using (Html.BeginForm("EditMySchdule", "Admin", FormMethod.Post))
+    {
+        <div id="modalMapDialog" style="display: none">
+            <div id="MapContainer" class="mymodalMapDialog" style="height: 430px; width: 100%;border: 5px solid green;"></div>
+        </div>
+        <div class="modal fade EditSchedulemodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+            <div class="modal-dialog modal-lg" style="margin-top:100px; width:20%" role="document">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Edit Inspection Scheduled Date</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Application Ref Num</label>
+                            <input type="text" id="appref" name="appref" class="form-control" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label>Company Name</label>
+                            <input type="text" id="companyname" name="companyname" class="form-control" readonly="readonly" />
+
+                        </div>
+                        <div class="form-group">
+                            <label>Scheduled Date</label>
+                            <input type="text" id="appntdate" name="appntdate" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Save Update" class="btn btn-info form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    }
+
+
+
+
+
+
+
+    <div class="row">
+        <div class="col-md-12">
+            @{
+                if (TempData["Saved"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable text-center" role="alert">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        Your Update Was Successful
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+                else if (TempData["message"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissable text-center" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        Unable to Update Record Please Try Again Later!!!
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-condensed customDT">
+                <thead>
+                    <tr>
+                        <th>application Ref</th>
+                        <th>Company Name</th>
+                        <th>Scheduled By</th>
+                        <th>Application Type</th>
+                        <th>Appointment Date</th>
+                        <th>Scheduled Date</th>
+                        <th>Schedule Expiry Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (LOBP.Models.ScheduleModel appmaster in Model)
+                    {
+                        <tr>
+                            <td>@appmaster.ApplicationId</td>
+                            <td>@appmaster.CompanyName</td>
+                            <td>@appmaster.ScheduledBy</td>
+                            <td>
+                                @if (@appmaster.ApplicationType == "SUI")
+                                {
+                                   <div>Site Suitability</div>
+                                } else {@appmaster.ApplicationType}
+                            </td>
+                            <td>@appmaster.AppointmentDate</td>
+                            <td>@appmaster.ScheduledDate</td>
+                            <td>@appmaster.ScheduleExpiredDate</td>
+                            <td>
+                                @if (appmaster.ScheduleExpiredDate < DateTime.Now)
+                                {
+                                    <a href="javascript:EditMySchedule('@appmaster.ApplicationId','@appmaster.CompanyName','@appmaster.AppointmentDate')" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                                }
+                                else
+                                {
+                                    <div class="btn btn-xs btn-success">Active</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+    @section scripts{
+        <script type="text/javascript">
+            $(function () {
+                $("#appntdate").datepicker({
+                    "onSelect": function (date) {
+                    }, changeMonth: true, changeYear: true, dateFormat: "M d yy"
+                });
+
+
+                $(".customDT").dataTable({
+                    "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                    'iDisplayLength': 10,
+                    columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                    "language": {
+                        "lengthMenu": "Display  _MENU_ records",
+                        "zeroRecords": "No record found",
+                        "info": "Showing page _PAGE_ of _PAGES_",
+                        "infoEmpty": "No Record to Display Currently",
+                        "infoFiltered": "(filtered from _MAX_ total records)"
+                    },
+                    "order": [[1, "desc"]]
+                });
+            });
+            function EditMySchedule(Appid, companyname, appointmentdate) {
+                $("#appref").val(Appid);
+                $("#appntdate").val(appointmentdate);
+                $("#companyname").val(companyname);
+                $(".EditSchedulemodal").modal('show');
+            }
+
+        </script>
+
+
+
+    }

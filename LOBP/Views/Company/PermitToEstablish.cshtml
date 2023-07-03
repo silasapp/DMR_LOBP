@@ -1,0 +1,1141 @@
+﻿@model LOBP.Models.PermitToEstbalishModel
+@{
+    if (ViewBag.TPBAdescription != null)
+    {
+        ViewBag.Title = "Third Party Blending";
+    }
+    else if (ViewBag.TITAdescription != null)
+    {
+        ViewBag.Title = "Tank Integrity Test Approval";
+    }
+    else if (ViewBag.TCAdescription != null)
+    {
+        ViewBag.Title = "Tank Calibration Approval";
+    }
+    else if (ViewBag.ATCLFPdescription != null)
+    {
+        ViewBag.Title = "Approval To Construct Lubricant Filling Plant";
+    }
+   
+    else
+    {
+        ViewBag.Title = "Permit To Establish";
+
+    }
+
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">
+
+            @if (ViewBag.ATMTOdescription != null)
+            {
+                <span>
+                    @ViewBag.ATMTOdescription - Permit To Establish
+                </span>
+            }
+            else if (ViewBag.TPBAdescription != null)
+            {
+                <span>
+                    @ViewBag.TPBAdescription
+                </span>
+            }
+            else if (ViewBag.TITAdescription != null)
+            {
+                <span>
+                    @ViewBag.TITAdescription
+                </span>
+            }
+            else if (ViewBag.TCAdescription != null)
+            {
+                <span>
+                    @ViewBag.TCAdescription
+                </span>
+            }
+            else if (ViewBag.ATCLFPdescription != null)
+            {
+                <span>
+                    @ViewBag.ATCLFPdescription
+                </span>
+            }
+           
+            else
+            {
+                <span>
+                    Permit To Establish - Site Suitability Process
+                </span>
+            }
+
+
+        </h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+
+<div class="padd-t form-horizontal">
+
+    @using (Html.BeginForm("PermitToEstablish", "Company", FormMethod.Post, new { id = "formid", role = "form", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.LicenseTypeId)
+        @Html.HiddenFor(model => model.ApplicationId)
+        @Html.HiddenFor(model => model.AppRef)
+        @Html.HiddenFor(model => model.Status)
+        <input type="hidden" id="Lat1" data-value="@ViewBag.Latitude" />
+        <input type="hidden" id="Lon1" data-value="@ViewBag.Longitude" />
+        <input type="hidden" id="facid" name="facid" />
+
+        <div class="row">
+
+            <div class="text-danger validation-summary-valid" data-valmsg-summary="true">
+                <ul>
+                    <li style="display: none"></li>
+                </ul>
+            </div>
+
+
+            @if (ViewBag.ResponseMessage == "SUCCESS")
+            {
+
+
+
+                <div class="form-group form-group-sm">
+                    @if (Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+                    {
+                        <label class="col-md-2 control-label">Approval Category</label>
+                        <div class="col-md-4">
+                            @if (Model.ApprovalCategory == null)
+                            {
+                                <input type="hidden" id="approvalcat" name="approvalcat" />
+                                <select class="form-control approvalcategory" required id="approvalcategory" name="approvalcategory">
+                                    <option></option>
+                                    @if (Model.LicenseTypeId.Contains("TPBA"))
+                                    {
+                                        <option value="TPBA-PLW">Plant Owner</option>
+                                        <option value="TPBA-PRW">Product Owner</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="SSA">Site Suitability</option>
+                                        <option value="PTE">Permit To Establish</option>
+                                    }
+
+
+                                </select>
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(model => model.ApprovalCategory, new { @class = "form-control", required = "required", @readonly = "readonly" })
+
+                            }
+
+
+                        </div>
+                    }
+
+
+                    @if (Model.LicenseTypeId == "TITA" || Model.LicenseTypeId == "TCA")
+                    {
+                        <label class="col-md-2 control-label">Number of Tanks</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.NumberOfTanks, new { @class = "form-control", required = "required", @type = "number" })
+                        </div>
+
+                    }
+
+
+
+
+
+                    <label class="col-md-2 control-label">Registered Address</label>
+                    <div class="col-md-4">
+                        @Html.TextBoxFor(model => model.RegisteredAddress, new { @class = "form-control", required = "required", @readonly = "readonly" })
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="form-group form-group-sm" style="display:none" id="ssadiv">
+                    <label class="control-label col-md-2">Suitability Reference Number</label>
+                    <div class="col-md-4">
+                        <select class="form-control" id="SUIRef" name="SUIRef"></select>
+                    </div>
+
+
+
+                    <label class="col-md-2 control-label">Application Category</label>
+                    <div class="col-md-4">
+
+                        @if (Model.ApplicationCategory == null)
+                        {
+
+                        <select class="form-control" required id="appcategory" name="appcategory">
+                            <option></option>
+                            <option>Lube Oil Blending Plant</option>
+                            <option>Waste Recycling Plant</option>
+                            <option>Emulsion Blending Plant</option>
+                            <option>Lube Oil Blending Plant And Waste Recycling Plant</option>
+                        </select>
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(model => model.ApplicationCategory, new { @class = "form-control", required = "required", @readonly = "readonly" })
+
+                        }
+
+
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+                <div class="form-group form-group-sm">
+
+
+                    @Html.LabelFor(model => model.State, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-4">
+                        @Html.DropDownList("State", null, new { @class = "form-control select2", required = "required", onchange = "getLga(this.value)" })
+
+                    </div>
+
+
+
+                    @Html.LabelFor(model => model.LGA, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-4">
+
+                        @Html.DropDownList("LGA", null, new { @class = "form-control select2", required = "required", id = "LGA" })
+
+
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="form-group form-group-sm">
+                    @Html.LabelFor(model => model.SiteLocation, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-4">
+                        @Html.TextBoxFor(model => model.SiteLocation, new { @class = "form-control", required = "required", autocomplete = "off" })
+                    </div>
+
+
+
+
+                    @if (!Model.LicenseTypeId.Contains("TPBA") && Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+                    {
+                        @Html.LabelFor(model => model.GeneralFeatures.LandSize, new { @class = "col-md-2 control-label" })
+
+                        <div class="col-md-4">
+
+                            <div class="input-group">
+                                @Html.TextBoxFor(model => model.GeneralFeatures.LandSize, new { @class = "form-control", required = "required", type = "number" })
+                                <span class="input-group-addon"> M²</span>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+
+
+
+                    @if (Model.LicenseTypeId.Contains("TPBA"))
+                    {
+                        <label class = "col-md-2 control-label"> Quarter </label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                @if (Model.Quarter == null)
+                                {
+                                    <select class="form-control" style="width:308px" id="allquarter" name="allquarter">
+                                        <option></option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                        <option value="4">Four</option>
+                                    </select>
+                                }
+                                else
+                                {
+                                    <select class="form-control" style="width:308px" id="allquarter" name="allquarter">
+                                        <option value="@Model.Quarter">@Model.Quarter</option>
+                                    </select>
+                                }
+
+                            </div>
+
+                            </div>
+                    }
+
+                </div>
+
+
+
+
+
+                <div class=" form-group form-highlight">
+
+                    <label class="col-md-2 control-label" for="latitude"> GPS Cordinate </label>
+
+                    <div class="col-md-4">
+                        @Html.TextBoxFor(model => model.GeneralFeatures.GPS, new { @class = "form-control", @readonly = "readonly" })
+                    </div>
+
+                    <div style="display:none" id="plw_prw_name">
+                        <div style="display:none" id="prw_name"> <label class="col-md-2 control-label"> Product Owner Name </label></div>
+                        <div style="display:none" id="plw_name"> <label class="col-md-2 control-label"> Plant Owner Name </label></div>
+
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.PLW_PRW_Name, new { @class = "form-control", autocomplete = "off" })
+                        </div>
+                    </div>
+                </div>
+
+                if (!Model.LicenseTypeId.Contains("TPBA") && Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+                {
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Beacon Location</label>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.GeneralFeatures.BeaconLocations, new { @class = "form-control", required = "required", autocomplete = "off" })
+                        </div>
+                        @Html.LabelFor(model => model.GeneralFeatures.AccessRoad, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(model => model.GeneralFeatures.AccessRoad, new { @class = "form-control", required = "required", autocomplete = "off" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Land Topology</label>
+                        <div class="col-md-4">
+                            <select id="GeneralFeatures.LandTopology" name="GeneralFeatures.LandTopology" class="form-control select2" required="required">
+                                @foreach (SelectListItem item in ViewBag.LandTopology)
+                                {
+                                    <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        @Html.LabelFor(model => model.GeneralFeatures.NatureOfArea, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            <select id="GeneralFeatures.NatureOfArea" name="GeneralFeatures.NatureOfArea" class="form-control select2" required="required">
+                                @foreach (SelectListItem item in ViewBag.NatureOfArea)
+                                {
+                                    <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+
+
+
+
+        <div class="form-group">
+            @if (!Model.LicenseTypeId.Contains("TPBA") && Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+            {
+                @Html.LabelFor(model => model.GeneralFeatures.ProposedPlantCapacity, new { @class = "col-md-2 control-label" })
+            }
+            else
+            {
+            <label class="col-md-2 control-label">Total Plant Processing Capacity</label>
+            }
+            <div class="col-md-4">
+                <div class="input-group">
+                    @Html.TextBoxFor(model => model.GeneralFeatures.ProposedPlantCapacity, new { @class = "form-control", required = "required", type = "number" })
+                    <span class="input-group-addon">Litres</span>
+                </div>
+            </div>
+
+
+
+            <div style="display:none" id="plw_prw_address">
+                <div style="display:none" id="prw_address"> <label class="col-md-2 control-label"> Product Owner Address </label></div>
+                <div style="display:none" id="plw_address"> <label class="col-md-2 control-label"> Plant Owner Address </label></div>
+
+                <div class="col-md-4">
+                    @Html.TextBoxFor(model => model.PLW_PRW_Address, new { @class = "form-control", autocomplete = "off" })
+                </div>
+            </div>
+
+
+
+
+
+            @if (!Model.LicenseTypeId.Contains("TPBA") && Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+            {
+                @Html.LabelFor(model => model.GeneralFeatures.PropAnnProd, new { @class = "col-md-2 control-label" })
+                <div class="col-md-4">
+                    <div class="input-group">
+                        @Html.TextBoxFor(model => model.GeneralFeatures.PropAnnProd, new { @class = "form-control", required = "required", type = "number" })
+                        <span class="input-group-addon">%</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+
+
+                if (!Model.LicenseTypeId.Contains("TPBA") && Model.LicenseTypeId != "TITA" && Model.LicenseTypeId != "TCA" && Model.LicenseTypeId != "ATCLFP" && Model.LicenseTypeId != "LTOLFP")
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ExistingFacilities.EquipmentOnSite, new { @class = "col-md-3 control-label", required = "required" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.StructuresName, "YES", new { @class = "ExistingFacilities_StructuresName" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.StructuresName, "NO", new { @class = "ExistingFacilities_StructuresNameNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                        @Html.LabelFor(model => model.ExistingFacilities.ROW, new { @class = "col-md-3 control-label", required = "required" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.ROWName, "YES", new { @class = "ExistingFacilities_ROWName" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.ROWName, "NO", new { @class = "ExistingFacilities_ROWNameNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ExistingFacilities.Streams, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.StreamName, "YES", new { @class = "ExistingFacilities_StreamName" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.StreamName, "NO", new { @class = "ExistingFacilities_StreamNameNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                        @Html.LabelFor(model => model.ExistingFacilities.PHCN, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.PhcnName, "YES", new { @class = "ExistingFacilities_PhcnName" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.PhcnName, "NO", new { @class = "ExistingFacilities_PhcnNameNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ExistingFacilities.RailwayLine, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.RailwayName, "YES", new { @class = "ExistingFacilities_RailwayName" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.RailwayName, "NO", new { @class = "ExistingFacilities_RailwayNameNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                        @Html.LabelFor(model => model.ExistingFacilities.SensitiveInstitution, new { @class = "col-md-3 control-label" })
+                        <div class="col-md-3">
+                            <div class="checkbox">
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.SensitiveInfo, "YES", new { @class = "ExistingFacilities_SensitiveInfo" })
+                                    YES &nbsp;&nbsp;
+                                </label>
+                                <label>
+                                    @Html.RadioButtonFor(model => model.ExistingFacilities.SensitiveInfo, "NO", new { @class = "ExistingFacilities_SensitiveInfoNO" })
+                                    NO
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                }
+
+
+
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Facility Name</label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.FacilityName, new { @class = "form-control", required = "required", autocomplete = "off" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Additional Information</label>
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.GeneralFeatures.AdditionalInfo, new { @class = "form-control", required = "required" })
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group">
+                    <div class="col-xs-12 col-sm-4 col-sm-offset-5">
+                        <button type="submit" class="btn btn-info btn-lg round" id="addbtn">&nbsp;&nbsp;Submit&nbsp;&nbsp;<i class="fa fa-upload" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                    <i class="fa fa-exclamation-triangle fa-2x fa-border fa-spin " aria-hidden="true"></i>
+                    <strong>@MvcHtmlString.Create(ViewBag.ResponseMessage)</strong>
+                </div>
+
+            }
+
+        </div>
+
+    }
+</div>
+<div id="modalMapDialog" style="display: none">
+    <div id="MapContainer" style="height: 430px; width: 100%;border: 5px solid green;"></div>
+</div>
+
+<div style="display:none" class="loadingImage">
+    <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+        <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+    </div>
+</div>
+
+@section scripts{
+    <script src="@Url.Content("~/Scripts/jquery.ui.widget.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.iframe-transport.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/select2.min.js")" type="text/javascript"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2df9i_A809q2eQQizBb7UqSGXASsQHVQ&libraries=places"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.min.js")" type="text/javascript"></script>
+    <link href="@Url.Content("~/Content/jquery-ui.css")" rel="stylesheet" />
+    <script src="@Url.Content("~/Scripts/UTMLatLng.js")" type="text/javascript"></script>
+    <script>
+        var utm = new UTMLatLng('WGS 84');
+    </script>
+    <script type="text/javascript">
+        google.maps.event.addDomListener(window, 'load', function () {
+            var options = {
+                componentRestrictions: { country: "ng" }
+            };
+            var places = new google.maps.places.Autocomplete(document.getElementById('RegisteredAddress'), options);
+            var places = new google.maps.places.Autocomplete(document.getElementById('SiteLocation'), options);
+            var places = new google.maps.places.Autocomplete(document.getElementById('PLW_PRW_Address'), options);
+            google.maps.event.addListener(places, 'place_changed', function () {
+                var place = places.getPlace();
+                var address = place.formatted_address;
+                var latitude = place.geometry.location.lat();
+                var longitude = place.geometry.location.lng();
+                var mesg = "Location Address Is : " + address;
+                mesg += "\nLocation Latitude Is : " + latitude;
+                mesg += "\nLocation Longitude Is: " + longitude;
+                showMap(address, latitude, longitude);
+            });
+        });
+
+    </script>
+    <script type="text/javascript">
+
+
+
+        function getContextPath() {
+            return window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        }
+        function showMap(locationaddress, latitude, longitude) {
+            var markers = [];
+            var utm = new UTMLatLng('WGS 84');
+            $("#modalMapDialog").dialog({
+                modal: true,
+                title: "Address Location on Map",
+                width: 450,
+                height: 500,
+                buttons: {
+                    Close: function () {
+                        $(this).dialog('close');
+                    },
+                    Okay: function () {
+                        $("#GeneralFeatures_GPS").val(latitude + ',' + longitude);
+                        //$("#GeneralFeatures_UTM").val(JSON.stringify(utm.convertLatLngToUtm(latitude, longitude)));
+                        $(this).dialog('close');
+                    }
+                },
+                open: function () {
+                    google.maps.visualRefresh = true;
+                    var myCenter = new google.maps.LatLng(latitude, longitude);
+                    var mapCanvas = document.getElementById("MapContainer");
+                    var mapOptions = {
+                        center: myCenter,
+                        zoom: 14,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        panControl: true,
+                        zoomControl: true,
+                        mapTypeControl: true,
+                        scaleControl: true,
+                        streetViewControl: true,
+                        overviewMapControl: true,
+                        rotateControl: true,
+                        zoomControl: true,
+                        zoomControlOptions: {
+                            style: google.maps.ZoomControlStyle.SMALL
+                        },
+                        mapTypeControl: true,
+                        mapTypeControlOptions: {
+                            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+                            position: google.maps.ControlPosition.TOP_CENTER,
+                            mapTypeIds: [
+                    google.maps.MapTypeId.ROADMAP,
+                    google.maps.MapTypeId.TERRAIN,
+                    google.maps.MapTypeId.SATELLITE,
+                    google.maps.MapTypeId.HYBRID
+                            ]
+                        }
+                    };
+                    var map = new google.maps.Map(mapCanvas, mapOptions);
+                    var marker = new google.maps.Marker({ position: myCenter, animation: google.maps.Animation.BOUNCE });
+                    marker.setMap(map);
+                    var infowindow = new google.maps.InfoWindow({
+                        content: locationaddress
+                    });
+                    infowindow.open(map, marker);
+                    google.maps.event.addListener(marker, 'click', function () {
+                        map.setZoom(13);
+                        map.setCenter(marker.getPosition());
+                    });
+                }
+            });
+        }
+        function placeMarker(map, location) {
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map
+            });
+            var infowindow = new google.maps.InfoWindow({
+                content: location.place() + '<br>Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()
+            });
+            infowindow.open(map, marker);
+        }
+
+        function getLga(stateCode) {
+            var strMethodUrl = '@Url.Action("GetLga")' + '?stateCode=' + stateCode;
+            $.getJSON(strMethodUrl, function (data) {
+                if (data != null) {
+                    // $("#LGA").children('option:not(:first)').remove();
+                    $("#LGA").html("");
+                    $("#GeneralFeatures_GPS").val("");
+                    //$("#GeneralFeatures_UTM").val("");
+
+                    for (var i = 0; i < data.length; i++) {
+                        $("#LGA").append('<option value="' + data[i].lga_code + '">' + data[i].lga_name + '</option>');
+                        $("#GeneralFeatures_GPS").val(data[i].latitude + ',' + data[i].longitude);
+                        //$("#GeneralFeatures_UTM").val(JSON.stringify(utm.convertLatLngToUtm(data[i].latitude, data[i].longitude)));
+                    }
+                }
+            }).fail(function (jqxhr, textStatus, error) { alert("fail =>> " + textStatus + ", " + error); });
+        }
+    </script>
+    <script type="text/javascript">
+
+        function isEmpty(str) {
+            return (!str || 0 === str.length);
+        }
+
+        function isBlank(str) {
+            return (!str || /^\s*$/.test(str));
+        }
+
+
+        $(document).ready(function () {
+            debugger;
+            licensetypeid = '@Model.LicenseTypeId';
+
+            if (licensetypeid === "TITA" || licensetypeid === "TCA") {
+                $("#NumberOfTanks").val('');
+            }
+
+            if (licensetypeid === "TPBA" || licensetypeid === "TPBA-PLW" || licensetypeid === "TPBA-PRW"){
+                $("#allquarter").attr('required', true);
+            } else {
+                $("#allquarter").attr('required', false);
+            }
+
+            var appcategories = $("#ApprovalCategory").val();
+            if (appcategories === "ATM" || appcategories === "ATO") {
+                
+                $("#FacilityName").attr("readonly", true);
+                $("#SiteLocation").attr("readonly", true);
+                var State = $("#State option:selected").val();
+                var LGA = $("#LGA option:selected").val();
+                var Statetxt = $("#State option:selected").text();
+                var LGAtxt = $("#LGA option:selected").text();
+
+                $("#LGA").html("");
+                $("#State").html("");
+                $("#LGA").append('<option value="' + LGA + '">' + LGAtxt + '</option>');
+                $("#State").append('<option value="' + State + '">' + Statetxt + '</option>');
+                document.getElementById("RegisteredAddress").style.pointerEvents = "none";
+                document.getElementById("SiteLocation").style.pointerEvents = "none";
+                debugger;
+                var sn = $(".ExistingFacilities_StructuresName:checked").length > 0 === false ? $(".ExistingFacilities_StructuresName").attr('disabled', false) : $(".ExistingFacilities_StructuresName").attr('disabled', true);
+                var sn = $(".ExistingFacilities_ROWName:checked").length > 0 === false ? $(".ExistingFacilities_ROWName").attr('disabled', false) : $(".ExistingFacilities_ROWName").attr('disabled', true);
+                var sn = $(".ExistingFacilities_StreamName:checked").length > 0 === false ? $(".ExistingFacilities_StreamName").attr('disabled', false) : $(".ExistingFacilities_StreamName").attr('disabled', true);
+                var sn = $(".ExistingFacilities_PhcnName:checked").length > 0 === false ? $(".ExistingFacilities_PhcnName").attr('disabled', false) : $(".ExistingFacilities_PhcnName").attr('disabled', true);
+                var sn = $(".ExistingFacilities_RailwayName:checked").length > 0 === false ? $(".ExistingFacilities_RailwayName").attr('disabled', false) : $(".ExistingFacilities_RailwayName").attr('disabled', true);
+                var sn = $(".ExistingFacilities_SensitiveInfo:checked").length > 0 === false ? $(".ExistingFacilities_SensitiveInfo").attr('disabled', false) : $(".ExistingFacilities_SensitiveInfo").attr('disabled', true);
+                var sn = $(".ExistingFacilities_StructuresNameNO:checked").length > 0 === false ? $(".ExistingFacilities_StructuresNameNO").attr('disabled', false) : $(".ExistingFacilities_StructuresNameNO").attr('disabled', true);
+                var sn = $(".ExistingFacilities_ROWNameNO:checked").length > 0 === false ? $(".ExistingFacilities_ROWNameNO").attr('disabled', false) : $(".ExistingFacilities_ROWNameNO").attr('disabled', true);
+                var sn = $(".ExistingFacilities_StreamNameNO:checked").length > 0 === false ? $(".ExistingFacilities_StreamNameNO").attr('disabled', false) : $(".ExistingFacilities_StreamNameNO").attr('disabled', true);
+                var sn = $(".ExistingFacilities_PhcnNameNO:checked").length > 0 === false ? $(".ExistingFacilities_PhcnNameNO").attr('disabled', false) : $(".ExistingFacilities_PhcnNameNO").attr('disabled', true);
+                var sn = $(".ExistingFacilities_RailwayNameNO:checked").length > 0 === false ? $(".ExistingFacilities_RailwayNameNO").attr('disabled', false) : $(".ExistingFacilities_RailwayNameNO").attr('disabled', true);
+                var sn = $(".ExistingFacilities_SensitiveInfoNO:checked").length > 0 === false ? $(".ExistingFacilities_SensitiveInfoNO").attr('disabled', false) : $(".ExistingFacilities_SensitiveInfoNO").attr('disabled', true);
+                var sn = $("#GeneralFeatures_BeaconLocations").val() === "" ? $("#GeneralFeatures_BeaconLocations").attr('readonly', false) : $("#GeneralFeatures_BeaconLocations").attr('readonly', true);
+                var sn = $("#GeneralFeatures_AccessRoad").val() === "" ? $("#GeneralFeatures_AccessRoad").attr('readonly', false) : $("#GeneralFeatures_AccessRoad").attr('readonly', true);
+
+                if (appcategories === "ATO") {
+                    var sn = $("#GeneralFeatures_LandSize").val() === "" ? $("#GeneralFeatures_LandSize").attr('readonly', false) : $("#GeneralFeatures_LandSize").attr('readonly', true);
+                    var sn = $("#GeneralFeatures_ProposedPlantCapacity").val() === "" ? $("#GeneralFeatures_ProposedPlantCapacity").attr('readonly', false) : $("#GeneralFeatures_ProposedPlantCapacity").attr('readonly', true);
+                    var sn = $("#GeneralFeatures_PropAnnProd").val() === "" ? $("#GeneralFeatures_PropAnnProd").attr('readonly', false) : $("#GeneralFeatures_PropAnnProd").attr('readonly', true);
+
+
+                }
+
+
+
+            }
+
+
+
+
+
+
+            $(".approvalcategory").change(function () {
+                debugger;
+                $(".loadingImage").show('fast');
+                var apptype = $("#approvalcategory option:selected").val();
+                $("#approvalcat").val(apptype);
+
+                if(apptype === "TPBA-PLW") {
+                    $("#plw_prw_address").show();
+                    $("#prw_address").show();
+                    $("#plw_address").hide();
+                    $("#PLW_PRW_Address").attr("required", true);
+
+                    $("#plw_prw_name").show();
+                    $("#prw_name").show();
+                    $("#plw_name").hide();
+                    $("#PLW_PRW_Name").attr("required", true);
+                }
+
+                if(apptype === "TPBA-PRW") {
+                    $("#plw_prw_address").show();
+                    $("#plw_address").show();
+                    $("#prw_address").hide();
+                    $("#PLW_PRW_Address").attr("required", true);
+
+                    $("#plw_prw_name").show();
+                    $("#plw_name").show();
+                    $("#prw_name").hide();
+                    $("#PLW_PRW_Name").attr("required", true);
+                }
+
+
+                if(apptype === "PTE") {
+
+
+                    var url = '@Url.Action("CheckForUnsubmittedApplication")';
+                    $.get(url, { LicenseTypeCode: apptype })
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'expiredssa') {
+                                bootbox.alert({
+                                    message: "Your site suitability has expired, please apply for site suitability before proceeding to Permit To Establish(PTE)",
+                                    size: 'small',
+                                    callback: function () {
+                                        window.location.href = "/Company/PermitToEstablish?LicenseTypeId=PTE";
+                                        $("#approvalcategory").attr('required', true);
+                                        $(".loadingImage").hide('fast');
+                                        document.getElementById("RegisteredAddress").style.pointerEvents = "none";
+                                        document.getElementById("SiteLocation").style.pointerEvents = "none";
+                                    }
+                                });
+
+
+                            } else {
+                                $("#ssadiv").show();
+                                $("#SUIRef").attr('required', true);
+                                $("#appcategory").attr('required', true);
+                                $(".loadingImage").hide('fast');
+                                document.getElementById("RegisteredAddress").style.pointerEvents = "none";
+                                document.getElementById("SiteLocation").style.pointerEvents = "none";
+                            }
+
+
+                        });
+
+                    }
+                else {
+                    $("#ssadiv").hide();
+                    $("#SUIRef").attr('required', false);
+                    $("#appcategory").attr('required', false);
+                    $(".loadingImage").hide('fast');
+                }
+            });
+
+
+
+
+
+
+             $("#SUIRef").change(function () {
+            debugger;
+                 $(".loadingImage").show('fast');
+            var html = "";
+
+                 var LicenseName = "";
+                 var apptype = $("#approvalcategory option:selected").val();
+
+                 if (apptype === "PTE") {
+                     LicenseName = $("#SUIRef option:selected").text();
+            }
+
+            //$("#LicenseRef").val(LicenseName);
+
+            $.getJSON("/Company/GetRenewLicenseDetails",
+                { "LicenseName": LicenseName },
+                function (response) {
+
+                    if (response != null) {
+
+                        console.log(response);
+
+                        $.each(response, function (key, val) {
+                            //$("#LicenseToRenew").html("");
+                            debugger;
+                            $("#LGA").html("");
+                            $("#State").html("");
+                            $("#facid").val(val.FacilityId);
+                            $("#SiteLocation").val(val.SiteLocationAddress);
+                            $("#FacilityName").val(val.FacilityName);
+                            $("#LGA").append('<option value="' + val.LgaCode + '">' + val.LGA + '</option>');
+                            $("#State").append('<option value="' + val.StateCode + '">' + val.State + '</option>');
+                            $("#RegisteredAddress").val(val.RegisteredAddress);
+                            $("#GeneralFeatures_GPS").val(val.GPSCordinates);
+                            $("#GeneralFeatures_BeaconLocations").val(val.BeaconLocations);
+                            $("#GeneralFeatures_AccessRoad").val(val.AccessRoadToFromSite);
+                            $("#GeneralFeatures_LandTopology").val(val.LandTopology);
+                            $("#GeneralFeatures_LandSize").val(val.LandSize);
+                            $("#GeneralFeatures_NatureOfArea").val(val.NatureOfArea);
+                            $("#GeneralFeatures_ProposedPlantCapacity").val(val.AnnualCumuBaseOilRequirementCapacity);
+                            $("#GeneralFeatures_PropAnnProd").val(val.AnnualProductionProjectionCapacity);
+                            $("#GeneralFeatures_AdditionalInfo").val(val.AdditionalInfo);
+
+
+                            if (val.AnyEquipmentOnSite === "YES") {
+                                $(".ExistingFacilities_StructuresName").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_StructuresNameNO").prop('checked', true);
+                            }
+                            if (val.RelationshipWithPipelineRightOfWay === "YES") {
+                                $(".ExistingFacilities_RowName").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_RowNameNO").prop('checked', true);
+                            }
+                            if (val.RelationshipWithStreams === "YES") {
+                                $(".ExistingFacilities_StreamName").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_StreamNameNO").prop('checked', true);
+                            }
+                            if (val.RelationshipWithPHCNTensionLines === "YES") {
+                                $(".ExistingFacilities_PhcnName").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_PhcnNameNO").prop('checked', true);
+                            }
+                            if (val.RelationshipWithRailwayLine === "YES") {
+                                $(".ExistingFacilities_RailwayName").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_RailwayNameNO").prop('checked', true);
+                            }
+                            if (val.RelationshipWithSensitiveInstitutions === "YES") {
+                                $(".ExistingFacilities_SensitiveInfo").prop('checked', true);
+                            } else {
+                                $(".ExistingFacilities_SensitiveInfoNO").prop('checked', true);
+                            }
+
+
+                            if (val.FacilityName === null || val.AccessRoadToFromSite === null || val.BeaconLocations === null) {
+
+                                $("#FacilityName").attr('readonly', false);
+                                $("#GeneralFeatures_AccessRoad").attr('readonly', false);
+                                $("#GeneralFeatures_BeaconLocations").attr('readonly', false);
+                            } else {
+                                $("#FacilityName").attr('readonly', 'readonly');
+                                $("#GeneralFeatures_AccessRoad").attr('readonly', true);
+                                $("#GeneralFeatures_BeaconLocations").attr('readonly', true);
+
+                            }
+                            $("#AdditionalInfo").val(val.AdditionalInfo);
+                            $("#State").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_GPS").attr('readonly', 'readonly');
+                            $("#LGA").attr('readonly', 'readonly');
+                            $("#SiteLocation").attr('readonly', 'readonly');
+                            $("#RegisteredAddress").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_LandSize").attr('readonly', 'readonly');
+
+                            $("#GeneralFeatures_LandTopology").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_NatureOfArea").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_ProposedPlantCapacity").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_PropAnnProd").attr('readonly', 'readonly');
+                            $("#GeneralFeatures_AdditionalInfo").attr('readonly', 'readonly');
+
+                            $(".ExistingFacilities_StructuresName").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_RowName").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_StreamName").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_PhcnName").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_RailwayName").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_SensitiveInfo").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_StructuresNameNO").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_RowNameNO").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_StreamNameNO").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_PhcnNameNO").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_RailwayNameNO").attr('disabled', 'disabled');
+                            $(".ExistingFacilities_SensitiveInfoNO").attr('disabled', 'disabled');
+                        });
+                        $(".loadingImage").hide('fast');
+                    } else {
+                        $(".loadingImage").hide('fast');
+                    }
+
+                })
+        });
+
+
+
+
+
+            $("#SUIRef").ready(function () {//get all Suitability Rference Number in the dropdownlist
+                var html = "";
+                $("#SUIRef").html("");
+
+                $.getJSON("/Company/GetSuitabilityRef",
+                    {},
+                    function (datas) {
+                        $("#SUIRef").append("<option></option>");
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.LicenseReference + ">" + val.LicenseReference + "</option>";
+                            });
+                        $("#SUIRef").append(html);
+                    });
+            });
+
+
+
+
+
+            var latitude = $("#Lat1").data("value");
+            var lontitude = $("#Lon1").data("value");
+            var appid = $("#ApplicationId").val();
+            // use the one on the database if its to edit document
+            if (!appid) {
+                $("#GeneralFeatures_GPS").val(latitude + ',' + lontitude);
+                $("#GeneralFeatures_UTM").val(JSON.stringify(utm.convertLatLngToUtm(latitude, lontitude)));
+            }
+
+            $('#addbtn').click(function (e) {
+                e.preventDefault();
+                debugger;
+                if ($("#formid").valid()) {
+                    if (licensetypeid === "TPBA" || licensetypeid === "TPBA-PLW" || licensetypeid === "TPBA-PRW") {
+                        var capacity = $("#GeneralFeatures_ProposedPlantCapacity").val();
+                        if (capacity < 500000) {
+                            alert("Total plant processing capacity can not be less than 500,000 Litres")
+                            $("#GeneralFeatures_ProposedPlantCapacity").focus();
+                            $("#GeneralFeatures_ProposedPlantCapacity").css("border-color", "red");
+
+                            return false;
+                        }
+                    }
+                    var isAnyStructureChecked = $('#ExistingFacilities_StructuresName:checked').val();
+                    var isRowNameChecked = $('#ExistingFacilities_ROWName:checked').val();
+                    var isStreamNameChecked = $('#ExistingFacilities_StreamName:checked').val();
+                    var isPhcnNameChecked = $('#ExistingFacilities_PhcnName:checked').val();
+                    var isRailWayChecked = $('#ExistingFacilities_RailwayName:checked').val();
+                    var isSensitiveInfoChecked = $('#ExistingFacilities_SensitiveInfo:checked').val();
+                    var typeid = '@Model.LicenseTypeId';
+
+
+                    if (typeid === "TITA" || typeid === "TCA") {
+                        var value = $("#NumberOfTanks").val();
+
+                        if (value === 0 || value.length === 0) {
+                            $("#NumberOfTanks").val('');
+                            $("#NumberOfTanks").attr("required", true);
+                        } else {
+                            $("#NumberOfTanks").attr("required", false);
+                        }
+                    }
+
+
+
+                    if (typeid !== "TPBA" && typeid !== "TPBA-PRW" && typeid !== "TPBA-PLW" && typeid !== "TITA" && typeid !== "TCA" && typeid !== "ATCLFP") {
+                        if (isAnyStructureChecked == null) {
+                            bootbox.alert({
+                                message: 'Any Structure on Site Field Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                        else if (isRowNameChecked == null) {
+                            bootbox.alert({
+                                message: 'Traverse PipeLine Right of Way Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                        else if (isStreamNameChecked == null) {
+                            bootbox.alert({
+                                message: 'Any Stream or River on Site Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                        else if (isPhcnNameChecked == null) {
+                            bootbox.alert({
+                                message: 'Any Electric High Tension Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                        else if (isRailWayChecked == null) {
+                            bootbox.alert({
+                                message: 'Any Railway Line Along Site Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                        else if (isSensitiveInfoChecked == null) {
+                            bootbox.alert({
+                                message: 'Any Sensitive Institution (School,Church,Mosque,Etc) Not Selected',
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            return;
+                        }
+                    }
+
+                    bootbox.confirm({
+                        message: "Are you Sure The Information Entered Are All Valid?",
+                        size: 'small',
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
+                            },
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+                                $(".loadingImage").show('fast');
+                                $(".ExistingFacilities_StructuresName").removeAttr('disabled');
+                                $(".ExistingFacilities_RowName").removeAttr('disabled');
+                                $(".ExistingFacilities_StreamName").removeAttr('disabled');
+                                $(".ExistingFacilities_PhcnName").removeAttr('disabled');
+                                $(".ExistingFacilities_RailwayName").removeAttr('disabled');
+                                $(".ExistingFacilities_SensitiveInfo").removeAttr('disabled');
+
+
+
+                                $.post($("#formid").attr('action'), $("#formid").serialize())
+                                       .done(function (data) {
+
+                                           var status = data.Status;
+                                           console.debug(status);
+                                           if (status != 'success') {
+                                               alert(data.Message);
+                                           }
+                                           else {
+
+                                               if (isEmpty(data.Message)) {
+                                                   window.location.href = "/Company/DocumentUpload?ApplicationId=" + data.applicationId;
+                                                   $(".loadingImage").hide('fast');
+                                               } else {
+
+                                                   bootbox.alert({
+                                                       message: data.Message,
+                                                       size: 'small',
+                                                       className: 'bb-alternate-modal',
+                                                       callback: function () {
+                                                           window.location.href = "/Company/DocumentUpload?ApplicationId=" + data.applicationId;
+                                                           $(".loadingImage").hide('fast');
+                                                       }
+                                                   });
+                                               }
+                                           }
+
+                                       })
+                                      .fail(function (data) {
+                                          bootbox.alert({
+                                              message: 'Network Communication Error, Restore Connection and Try again',
+                                              size: 'small',
+                                              className: 'bb-alternate-modal',
+                                              callback: function () { $(".loadingImage").hide('fast');}
+                                          });
+                                      })
+                                    .always(function (data) {
+                                        $(".loadingImage").hide('fast');
+                                     });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

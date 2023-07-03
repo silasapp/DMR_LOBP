@@ -1,0 +1,203 @@
+﻿@model IEnumerable<LOBP.Models.PermitModels>
+@using System.Globalization;
+
+@{
+    ViewBag.Title = "View TCA";
+    Layout = null;
+    DateTime date = DateTime.ParseExact("20/10/2021", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+}
+
+<html>
+<head>
+
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <style type="text/css">
+    </style>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+
+
+    <div style="padding:3px; color:black">
+
+        <div style="width:100%; height:98%;" class="divPermitPreview divPermitPreview2">
+
+            <div class="text-center">
+
+                <div style="font-family:'Times New Roman'; font-weight:bold; line-height:30px">
+                    @if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+                    {
+                        <img src="~/Images/nmdpra.png" alt="Logo" style="height: 110px; display: block; margin: 0 auto" /><br />
+                    }
+                    else
+                    {
+                        <img src="~/Images/Dpr_logo.png" style="height: 110px; display: block; margin: 0 auto" /><br />
+                    }
+                    <sanp style="font-weight:bold">TANK CALIBRATION APPROVAL BASE OIL STORAGE</sanp><br /><br />
+
+
+                    <div style="margin-left:300px">TCA No: @Model.FirstOrDefault().permitmodels.FirstOrDefault().PermitNumber </div>
+
+
+                </div>
+
+                <p></p>
+
+                <!--<div style="margin:0px 50px 0px 50px; padding:10px;" class="text-left">-->
+
+
+
+
+
+                <div style="font-family:'Times New Roman'; font-size:20px;">
+
+
+
+                    <div>
+                        <sanp style="font-weight:bold;">TANK CALIBRATION APPROVAL (TCA)</sanp>
+
+                        <p></p>
+
+                        <div style="line-height:30px; font-size:20px">
+                            <div style="text-align: justify">
+
+                                Sequel to a satisfactory calibration of @Model.FirstOrDefault().permitmodels.FirstOrDefault().NUmberOfTanksToWord (@Model.FirstOrDefault().permitmodels.FirstOrDefault().NUmberOfTanks) Base Oil storage tanks with @Model.FirstOrDefault().permitmodels.FirstOrDefault().Capacity litres, for the purpose of base oil storage and accounting only, approval of tank calibration tables is hereby granted to:
+
+                            </div><br />
+                            <div style=" border-bottom: 2px dotted #888;padding: 5px 0 0;" colspan="3">
+                                <div style="display: inline-block; margin-bottom:-3px; background-color:#fff; padding: 5px 10px 5px 0;">
+                                </div><span style="font-weight: bold;font-size: 22px;  text-align:center" id="facAddress1">@Model.FirstOrDefault().permitmodels.FirstOrDefault().CompanyName</span>
+
+                            </div>
+                            <div class="text-center">
+                                (Name of the Company)
+                            </div>
+                            <br /><br />
+
+                            <div style=" border-bottom: 2px dotted #888;padding: 5px 0 0;" colspan="3">
+                                <div style="display: inline-block; margin-bottom:-3px; background-color:#fff; padding: 5px 10px 5px 0;">
+                                </div><span style="font-weight: bold;font-size: 22px; text-align:center" id="facAddress1">@Model.FirstOrDefault().permitmodels.FirstOrDefault().LocationAddress</span>
+                            </div>
+                            <div class="text-center">
+                                (Site location Address)
+                            </div>
+                            <br /><br />
+                            <div style="text-align: justify">
+
+                                This approval is valid for a period of five (5) years from the date of the test if there is no alteration or maintenance to the tanks.
+                                <br /><br />
+
+                                <b>Calibration Date:</b> @Model.FirstOrDefault().permitmodels.FirstOrDefault().TestDate
+                                <br />
+                                <b>Expiry Date:</b> @Model.FirstOrDefault().permitmodels.FirstOrDefault().ExpiryDate
+                                <br /><br />
+                            </div>
+                            <table style="width: 100%; border-spacing: 0; position: relative; margin-top: 0px; font-size: 26px;">
+                                <tr>
+                                    <td style=" padding: 5px 0 0; border-bottom: 2px dotted #888;">
+                                        <div style="display: inline-block; margin-bottom: -3px; background-color:#fff; padding: 5px 10px 5px 0;">
+                                            Date this
+                                        </div>
+                                        <b style="font-weight: bold;font-size: 22px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDay</b>
+                                    </td>
+                                    <td style=" padding: 5px 0 0; border-bottom:2px dotted #888;">
+                                        <div style="display: inline-block; margin-bottom: -3px; background-color:#fff; padding: 5px 10px 5px 0;">
+                                            &nbsp; &nbsp; Day of
+                                        </div>
+                                        <b style="font-weight: bold;font-size: 22px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedMonth</b>
+                                    </td>
+                                    <td style=" padding: 5px 0 0; border-bottom:2px dotted #888;">
+                                        <span style="display: inline-block; margin-bottom: -3px; background-color:#fff; padding:5px 10px 5px 0; margin-right:90px">
+                                            Year
+                                        </span>
+                                        <b style="font-weight: bold;font-size:22px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedYear</b>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+
+
+                            <br />
+
+                        </div>
+                        <br />
+
+                        <table style="width: 100%; position: relative;">
+                            <tr style="height: 180px; margin-top: 0px;">
+                                <td style="vertical-align: bottom;">
+                                    Yours faithfully,
+
+                                    <br />
+                                    <img src="@Url.Content(Model.FirstOrDefault().permitmodels.FirstOrDefault().Signature)" style="height: 100px; width: 235px;" />
+                                    <br />
+                                    @if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+                                    {
+                                        <sanp style="float:left">Authority Chief Excutive, NMDPRA</sanp>
+                                    }
+                                    else
+                                    {
+                                        <sanp style="float:left">Director/CEO, Department of Petroleum Resources.</sanp>
+                                    }
+
+                                </td>
+                                <td>
+                                    <div class="center">
+                                        <img style="height:150px" src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.FirstOrDefault().permitmodels.FirstOrDefault().QrCode))" />
+                                    </div>
+                                    <div style="clear: both;"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+                <!--</div>-->
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+</body>
+</html>
+
+@if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+{
+    <style>
+        .divPermitPreview {
+            background-image: url('../../Images/waterMark2.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        #List1 li {
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+
+}
+else
+{
+    <style>
+        .divPermitPreview2 {
+            background-image: url('../../Images/waterMark.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        #List1 li {
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+}

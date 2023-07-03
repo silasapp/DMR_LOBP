@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+
+    var baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+    string ApplicationName = ViewBag.AppName;
+    string VerifyPermitLink = ViewBag.ElpsURL + "/Permit/VerifyPermit?appId=" + ViewBag.AppID;
+    string ResendEmailActivationLink = ViewBag.ElpsURL + "/Account/ResendEmailActivation?appId=" + ViewBag.AppID;
+    string LoginLink = ViewBag.ElpsURL + "/Account/Login?ReturnUrl=" + baseUrl + "/Account/Login?appId=" + ViewBag.AppID;
+    string RegisterLink = ViewBag.ElpsURL + "/Account/Register?ReturnUrl=" + baseUrl + "/Account/Register?appId=" + ViewBag.AppID;
+
+    string AccountLoginLink = ViewBag.ElpsURL + "/Account/Login?appId=" + ViewBag.AppID;
+    string AccountRegisterLink = ViewBag.ElpsURL + "/Account/Register?appId=" + ViewBag.AppID;
+    string ForgetPasswordLink = ViewBag.ElpsURL + "/Account/ForgotPassword?appId=" + ViewBag.AppID;
+}
+
+
+@if (ViewBag.ErrorMessage != "SUCCESS")
+{
+    <div class="col-md-12">
+        <br /><br /><br />
+        <div class="alert alert-danger alert-dismissible center-block" role="alert" align="center">
+            <i class="far fa-exclamation-triangle fa-2x" aria-hidden="true"></i>
+            <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-md-12">
+        <div class="col-md-5 form-signin extForm">
+            <div class="padd">
+
+                <div id="main1">
+                    <div id="first">
+                    </div>
+                    <div id="second">
+                        <img src="~/Images/nmdpra_logo.png" width="367" /><br /><br />
+                        <h4 class="txtcenter">@ApplicationName</h4>
+                        <a href="@VerifyPermitLink" class="btn btn-md btn-success btn-block buttonRadius1 textUpper round">Verify License</a>
+                        <br />
+                        <a href="@AccountLoginLink" class="btn btn-md btn-success btn-block textUpper buttonRadius1 round">Login</a>
+                        <br />
+                        <a href="@AccountRegisterLink" class="btn btn-md btn-success btn-block textUpper buttonRadius1 round">Register</a>
+                        <br />
+                        <!--<a href="@ForgetPasswordLink" class="btn-link">Forgot Password</a>-->
+                    </div>
+                </div>
+
+                <br />
+                <br />
+                <strong>Payment Processor for NMDPRA:</strong>
+                <br />
+                <div class="">
+                    <img src="@Url.Content("~/Images/remita-logo.png")" />
+                </div>
+                <br />
+                <strong>Payment Options:</strong>
+                <ul class="paymentOptions">
+                    <li><i class="fa fa-check"></i>&nbsp; Cash Deposit</li>
+                    <li><i class="fa fa-check"></i>&nbsp; Bank Draft</li>
+                    <li><i class="fa fa-check"></i>&nbsp; Card Payment: MasterCard, Verve Card</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-7 adv bg1">
+            <div class="col-md-12">
+                <h2 class="txtcenter">Getting Started</h2>
+            </div>
+            <div class="howto">
+                <div class="col-md-5">
+                    <div class="icon">
+                        <img src="@Url.Content("~/Images/icon-lg1.png")" />
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h3>Step by Step</h3>
+                    <a href="#" target="_blank" class="white">Online Application Guide</a><br />
+                    <a href="#" class="white">Online Permit Printing Guide</a><br />
+                    <a href="@ResendEmailActivationLink" class="white">Resend Activation Email</a><br />
+                    <a href="@VerifyPermitLink" class="white">Validating a Permit</a><br />
+                    <a href="#" class="white">FAQ</a><br />
+                </div>
+            </div>
+            <br class="clear" />
+            <br />
+            <div class="howto">
+                <div class="col-md-5">
+                    <div class="icon">
+                        <img src="@Url.Content("~/Images/icon-lg2.png")" />
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h3><a href="@AccountRegisterLink" class="white">Company Account Creation</a></h3>
+                    <p>
+                        Create account to use resources on this portal. Note that Account creation
+                        is not required to validate a permit.
+                    </p>
+                </div>
+            </div>
+            <br class="clear" />
+            <br />
+            <div class="howto">
+                <div class="col-md-5">
+                    <div class="icon">
+                        <img src="@Url.Content("~/Images/icon-lg3.png")" />
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h3><a href="@AccountLoginLink" class="white">Manage Permit</a></h3>
+                    <p>Login to apply for a new license, renew or manage your LOBP account</p>
+                </div>
+            </div>
+            <div class="clear">
+                <br />
+                <br />
+            </div>
+
+        </div>
+        <div class="clearfix"></div>
+    </div>
+}
+

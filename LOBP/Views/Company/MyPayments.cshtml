@@ -1,0 +1,100 @@
+﻿@model List<LOBP.DbEntities.PaymentLog>
+
+@{
+    int counter = 0;
+    ViewBag.Title = "MyPayments";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Payment Report</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+@if (ViewBag.ErrorMessage == "SUCCESS")
+{
+    <div class="row xrow">
+        <div class="col-md-12">
+            <table class="table dataTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ApplicationId</th>
+                        <th>Type</th>
+                        <th>Fee</th>
+                        <th>TxnDate</th>
+                        <th>Reference</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (LOBP.DbEntities.PaymentLog paymentlog in Model)
+                    {
+                        <tr>
+                            <td>@(counter += 1)</td>
+                            <td>@paymentlog.ApplicationId</td>
+                            <td>
+                                @{
+                                    var apptype = paymentlog.LicenseTypeId == null ? "" : paymentlog.LicenseTypeId;
+                                } 
+                                <div>@apptype</div>
+                            </td>
+                            <td>@paymentlog.TxnAmount</td>
+                            <td>@paymentlog.TransactionDate.Value.ToString("dd-MMM-yyyy HH:mm")</td>
+                            <td>@paymentlog.RRReference</td>
+                            @if (paymentlog.Status.Contains("INIT"))
+                            {
+                                <td><span class="label label-info">NEW</span></td>
+                            }
+                            else
+                            {
+                                if (paymentlog.Status.Contains("AUTH"))
+                                {
+                                    <td><span class="label label-success">PAID</span></td>
+                                }
+                                else if (paymentlog.Status.Contains("FAIL") || paymentlog.Status.Contains("ERROR"))
+                                {
+                                    <td><span class="label label-danger">paymentlog.Status</span></td>
+                                }
+                            }
+                            
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+        <div class="col-sm-12">
+            <div class="alert alert-warning alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                <i class="fas fa-exclamation-triangle fa-2x" aria-hidden="true"></i>
+                <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+            </div>
+        </div>
+}
+
+@section scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Payment Record on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}

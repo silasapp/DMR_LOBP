@@ -1,0 +1,27 @@
+﻿.display-horizontal
+{
+  .display-group {
+    .clearfix();
+  }
+  .display-label {
+    font-weight: bold;
+    float: left;
+    width: 140px;
+    padding-top: 5px;
+    text-align: right;
+  }
+  .display-values {
+    *display: inline-block;
+    *padding-left: 20px;
+    margin-left: 160px;
+    *margin-left: 0;
+        padding-top: 5px;
+    &:first-child {
+      *padding-left: 160px;
+    }
+  }
+  .display-help-block {
+    margin-top: @baseLineHeight / 2;
+    margin-bottom: 0;
+  }
+}

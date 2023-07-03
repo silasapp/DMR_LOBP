@@ -1,0 +1,721 @@
+﻿@model LOBP.DbEntities.UserMaster
+
+@{
+    ViewBag.Title = "Add Staff";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="content">
+    <div class="row">
+        <div class="col-md-12">
+            @using (Html.BeginForm("NewUser", "Admin", FormMethod.Post, new { @id = "newstaff" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal fade addstaffmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                    <div class="modal-dialog modal" style="vertical-align: middle; display:block;  margin:0 auto 0 30%; margin-top:65px; overflow-y:hidden; overflow-x:hidden;" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Register New User</h4>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="form-horizontal">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label>User Email</label>
+                                            <div class="form-group">
+                                                <div class="col-sm-10">
+                                                    <input id="locationid" name="locationid" type="hidden" />
+                                                    <input id="roleuser" name="roleuser" type="hidden" />
+                                                    @Html.TextBoxFor(model => model.UserId, new { @class = "form-control", @required = "", @placeholder = "Type Search User Email" })
+                                                    @Html.ValidationMessageFor(model => model.UserId, "", new { @class = "text-danger" })
+
+                                                </div>
+                                            </div>
+
+                                            <label>FullName</label>
+                                            <div class="form-group">
+                                                <div class="col-md-10">
+                                                    <input type="text" id="staffFullName" required="" name="staffFullName" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+
+                                            <label>Office Location</label>
+                                            <div class="form-group">
+                                                <div class="col-md-10">
+                                                    <select id="UserLocations" name="UserLocations" required="" class="form-control UserLocation"></select>
+                                                    @Html.ValidationMessageFor(model => model.FieldLocation, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+
+                                            <div><label class="control-label">User Role</label></div>
+                                            <div class="form-group">
+                                                <div class="col-md-10">
+                                                    <input id="staffrole" name="staffrole" type="hidden" />
+                                                    <select id="Userroles" name="Userroles" class="form-control roleuser" required="" style="width:220px"></select>
+                                                    @Html.ValidationMessageFor(model => model.UserRoles, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-10">
+                                                    <button class="btn btn-success btn-block"><span class="glyphicon glyphicon-save"></span> Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+            @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post))
+            {
+                <div class="modal fade DeleteUser" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                    <div class="modal-dialog modal-sm" style="display:inline-block; vertical-align:middle; margin:0 auto 0 40%; margin-top:100px" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title text-danger" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span>  Are you Sure You Want to Delete this User?</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <div><label><b>User Email</b></label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <input type="text" class="form-control useremail" id="useremail" readonly="readonly" name="useremail" style="width:280px" />
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <input type="submit" value="Delete" class="btn btn-danger" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @using (Html.BeginForm("ActivateUser", "Admin", FormMethod.Post))
+            {
+                <div class="modal fade ActivateUser" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                    <div class="modal-dialog modal-sm" style="display:inline-block; vertical-align:middle; margin:0 auto 0 40%; margin-top:100px" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span>  Are you Sure You Want to Activate this User?</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    <div class="container">
+                                        <div class="row">
+
+                                            <div class="col-sm-12">
+
+                                                <div><label>User FullName</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <input type="hidden" id="UserLocationActivate" name="UserLocationActivate" />
+                                                        <input type="hidden" id="userID" name="userID" />
+                                                        <input type="text" id="userfullName" name="userfullName" class="form-control" readonly="readonly" style="width:280px" />
+
+                                                    </div>
+                                                </div>
+                                                <div><label>Reason to Activate User</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <textarea cols="5" rows="5" id="activate" name="activate" required="" class="form-control" style="resize:none; width:280px"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <input type="submit" value="Save" class="btn btn-success" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @using (Html.BeginForm("DeactivateUser", "Admin", FormMethod.Post))
+            {
+                <div class="modal fade DeactivateUser" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                    <div class="modal-dialog modal-sm" style="display:inline-block; vertical-align:middle; margin:0 auto 0 40%; margin-top:100px" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title text-danger" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Are you Sure You Want to Deactivate this User?</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    <div class="container">
+                                        <div class="row">
+
+                                            <div class="col-sm-12">
+                                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                                <div><label>User FullName</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <input type="hidden" id="userid" name="userid" />
+                                                        <input type="hidden" id="userlocationDeactivate" name="userlocationDeactivate" />
+                                                        <input type="text" id="fullName" name="fullName" readonly="readonly" class="form-control" style="width:280px" />
+                                                    </div>
+                                                </div>
+
+                                                <input type="hidden" id="UserLocationid" name="UserLocationid" class="UserLocationid" />
+                                                <div><label>Reason to Deactivate User</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <textarea cols="5" id="DeactivateComment" rows="5" name="DeactivateComment" required="" class="form-control" style="resize:none; width:280px"></textarea>
+
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <input type="submit" value="Save " class="btn btn-success" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+            @using (Html.BeginForm("EditStaff", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="modal fade EditUsermodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                    <div class="modal-dialog modal" style="display:inline-block; margin:0 auto 0 25%; overflow-y:hidden; overflow-x:hidden; margin-top:100px; width:50%" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Edit User</h4>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-horizontal">
+                                    @*<div class="container">*@
+                                        <div class="row">
+
+                                            <div class="col-sm-4">
+                                                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                                                <input type="hidden" class="Fullname" id="Fullname" name="Fullname" />
+                                                <input type="hidden" id="UserLocationid" name="UserLocationid" class="UserLocationid" />
+                                                <div><label>FirstName</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control", @required = "" })
+                                                        @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div><label>LastName</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        @Html.TextBoxFor(model => model.LastName, new { @class = "form-control", @required = "" })
+                                                        @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div><label>User Location</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <select id="UserLocation" name="UserLocation" class="form-control UserLocation" required=""></select>
+
+                                                        @Html.ValidationMessageFor(model => model.UserLocation, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div><label>User Role</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <select id="Userrole" name="Userrole" class="form-control roleuser" required="" style="width:230px"></select>
+                                                    </div>
+                                                </div>
+                                                <div><label>User Email</label></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        @Html.TextBoxFor(model => model.UserId, new { @class = "form-control UserId", @readonly = "readonly" })
+                                                        @Html.ValidationMessageFor(model => model.UserId, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-md-10">
+                                                        <input type="submit" value="Save Update" class="btn btn-success" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="col-sm-4">
+
+                                                <div style="border:groove; height:120px; width:120px">
+                                                    <img id="signatureimg" src="" alt="Signature image" class="center-cropped" /><br />
+
+                                                </div>
+
+                                                <label for="imgInp" class="custom-file-upload">
+                                                    <i class="fa fa-cloud-upload"></i> Change Signature
+                                                </label>
+                                                <input id="imgInp" name="postedFile" type="file" style="display: none; width:120px" />
+
+                                            </div>
+                                        </div>
+                                    @*</div>*@
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel">
+                        <header class="panel-heading panel-border">
+                            <h3 class="text-primary"> Staff List </h3>
+                            <span class="tools pull-right">
+                                <button class="btn btn-xs btn-primary" data-toggle="modal" data-target=".addstaffmodal"><span class="glyphicon glyphicon-plus"></span> Add Staff</button>
+                            </span>
+                        </header>
+
+                        @if (TempData["success"] != null)
+                        {
+                            <div id="success" class="alert alert-success alert-dismissable" role="alert">
+
+                                <span class="glyphicon glyphicon-ok"></span> @TempData["success"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+                        @if (TempData["message"] != null)
+                        {
+                            <div id="message" class="alert alert-danger alert-dismissable" role="alert">
+
+                                <span class="glyphicon glyphicon-ok"></span> @TempData["message"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+                        @if (TempData["AlreadyExist"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissable" role="alert">
+
+                                <span class="glyphicon glyphicon-ban-circle"></span> @TempData["AlreadyExist"]
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        }
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="staff" style="font-size:small">
+                                    <thead>
+                                        <tr>
+                                            <th><strong>ID</strong>
+                                            <th><strong>FullName</strong> </th>
+                                            <th><strong>User Role</strong> </th>
+                                            <th><strong>User Location</strong> </th>
+                                            <th><strong>Status</strong> </th>
+                                            <th style="width:5%"></th>
+                                            <th style="width:5%"></th>
+                                            <th style="width:5%"></th>
+                                            <th style="width:5%"></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @if (ViewBag.SigninUser == "SUPERADMIN")
+    {
+    <br /><br />
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered table-condensed customDT">
+                <thead>
+                    <tr>
+                        <th>Company Email</th>
+                        <th>Company Name</th>
+                        <th>Elps Id</th>
+                        <th>Created By</th>
+                        <th>Date Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (LOBP.DbEntities.UserMaster u in ViewBag.AllCompany)
+                    {
+                        <tr>
+                            <td>@u.UserId</td>
+                            <td>@u.FirstName</td>
+                            <td>@u.ElpsId</td>
+                            <td>@u.CreatedBy</td>
+                            <td>@u.CreatedOn</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="DeleteAction('@u.UserId')">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+
+
+
+
+
+
+
+</div>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".customDT").dataTable({
+                "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                'iDisplayLength': 10,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Record to Display Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+
+
+
+
+            $("#Userroles").change(function () {
+                var selectedval = $("#Userroles option:selected").text();
+                $("#staffrole").val(selectedval);
+
+            });
+
+
+
+            $("#success, #message").fadeIn('fast').delay(10000).fadeOut('fast');
+            var table = $("#staff").DataTable({
+                "processing": true,
+                "serverSide": true,
+                ajax: {
+                    url: "/Admin/GetAllUser",
+                    type: "POST",
+                    "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]]
+                },
+                dom: 'Blfrtip',
+                buttons: [
+                    'csv', 'excel', 'pdf', 'print'
+                ],
+                columns: [
+                    {
+                        data: "UserId"
+                    },
+                    {
+                        data: "fullname"
+
+                    },
+                    {
+                        data: "UserRoles"
+                    },
+                    {
+                        data: "FieldLocation"
+                    },
+                    {
+                        data: "Status",
+                        render: function (data, type, user) {
+                            //var name = appointment.fullname;
+                            if (user.Status === "ACTIVE") {
+                                return '<strong class="badge" style="background-color:green"><span class="glyphicon glyphicon-ok"></span> Active</strong>';
+                            } else {
+                                return '<strong class="badge" style="background-color:red"><span class="glyphicon glyphicon-ban-circle"></span> DeActivated</strong>';
+                            }
+                            //return appointment.ApprovedStatus == true ? '<span class="label label-success"><span class="glyphicon glyphicon-ok" style="margin-top:-2px"></span> Approved</span>' : '<a href="#" class="btn btn-danger btn-xs" onclick="SetValue(\'' + Id + '\')">Approve Me</a>';
+                        }
+
+                    },
+
+                ],
+
+                "columnDefs": [
+                    {
+                        "targets": 5,
+                        "data": null,
+
+                        "render": function (data, type, row) {
+                            if (row.Status === "ACTIVE") {
+                                return '<div id="deactive" class="btn btn-xs btn-info"><span class="glyphicon glyphicon-ban-circle"></span> Deactivate</div>';
+                            }
+                            else {
+                                return '<span id="active" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-check"></span> Activate</span>';
+
+                            }
+                            //return '<a href="' + data + '">Download</a>';
+                        }
+                    },
+                    {
+                        "targets": 6,
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return (row.UserRoles === "OPSCON" || row.UserRoles === "ZOPSCON" || row.UserRoles === "HOOD") ? '<button id="EditUsers" class="btn btn-xs btn-warning EditUsers"><span class="glyphicon glyphicon-edit"></span>  Edit/Change Signature</button>' : '<button id="EditUsers" class="btn btn-xs btn-primary EditUsers"><span class="glyphicon glyphicon-edit"></span>  Edit</button>';
+
+                        }
+                    },
+
+                    {
+                        "targets": 7,
+                        "data": "UserLocation",
+                        "visible": false,
+                        "searchable": false,
+                    },
+                    {
+                        "targets": 8,
+                        "data": null,
+                        "defaultContent":
+                            '<p id="DeleteUsers" class="btn btn-xs btn-danger DeleteUsers"><span class="glyphicon glyphicon-trash"></span>  Delete</p>'
+                    },
+                    {
+                        "targets": 9,
+                        "data": "SignatureImage",
+                        "visible": false,
+                        "searchable": false,
+                    },
+                ]
+
+            });
+            $('#staff').on('click',
+                'p',
+                function () {
+                    $(".DeleteUser").modal('show');
+                    $(".EditUsermodal").modal('hide');
+                    $(".DeactivateUser").modal('hide');
+                    $(".ActivateUser").modal('hide');
+                    var data = table.row($(this).parents('tr')).data();
+                    $(".useremail").val(data.UserId);
+
+                });
+            $('#staff').on('click',
+                'button',
+                function () {
+                    $(".EditUsermodal").modal('show');
+                    $(".DeactivateUser").modal('hide');
+                    $(".ActivateUser").modal('hide');
+                    var data = table.row($(this).parents('tr')).data();
+                    debugger;
+                    $(".UserId").val(data.UserId);
+                    var full = $(".Fullname").val(data.fullname);
+                    var fullname = [];
+                    fullname = full.val().split(' ')
+                    $("#FirstName").val(fullname[0]);
+                    $("#LastName").val(fullname[1]);
+                    $("#UserLocation").val(data.FieldLocation);
+                    $(".UserLocationid").val(data.UserLocation);
+                    $(".roleuser").val(data.UserRoles);
+                    var str = data.SignatureImage;
+                    if (str !== null) {
+                        var signturesplit = str.split("~");
+                        $('#signatureimg').attr('src', signturesplit[1]);
+                    } else {
+                        $('#signatureimg').attr('src', "");
+                    }
+                });
+            $('#staff').on('click',
+                'div',
+                function () {
+                    $(".DeactivateUser").modal('show');
+                    $(".EditUsermodal").modal('hide');
+                    $(".ActivateUser").modal('hide');
+                    var data = table.row($(this).parents('tr')).data();
+                    $("#fullName").val(data.fullname);
+                    $("#userid").val(data.UserId);
+                    $("#userlocationDeactivate").val(data.UserLocation);
+
+                });
+            $('#staff').on('click',
+                'span',
+                function () {
+                    $(".ActivateUser").modal('show');
+                    $(".EditUsermodal").modal('hide');
+                    $(".DeactivateUser").modal('hide');
+                    var data = table.row($(this).parents('tr')).data();
+                    $("#userfullName").val(data.fullname);
+                    $("#userID").val(data.UserId);
+                    $("#UserLocationActivate").val(data.UserLocation);
+                });
+            $(".roleuser").ready(function () {//get all user role populated in the dropdownlist
+                var html = "";
+
+                $(".roleuser").html("");
+
+                $.getJSON("/Admin/GetUserRole",
+                    {},
+                    function (datas) {
+                        $(".roleuser").append("<option disabled selected>--Select Role--</option>");
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.role + ">" + val.role + "</option>";
+                            });
+                        $(".roleuser").append(html);
+                    });
+            });
+
+
+            $(".UserLocation").ready(function () {//get all user role populated in the dropdownlist
+
+                var html = "";
+
+                $(".UserLocation").html("");
+
+                $.getJSON("/Admin/GetUserLocation", {
+                },
+
+                    function (datas) {
+                        $(".UserLocation").append("<option disabled selected>--Select Location--</option>");
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.Fieldlocationid + ">" + val.Description + "</option>";
+                            });
+                        $(".UserLocation").append(html);
+                    });
+            });
+
+
+            $("#UserId").autocomplete({
+                source: function (request, response) {
+                    debugger;
+                    $.ajax({
+                        url: '/Admin/UserIdAutosearch',
+                        type: "GET",
+                        datatype: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data,
+                                function (val, item) {
+                                    return {
+                                        label: val.userid,
+                                        value: val.userid,
+                                        locationid: val.id,
+                                        staffFullName: val.name,
+                                        UserLocation: val.fieldlocation,
+                                        roleuser: val.role
+                                    }
+
+                                }));
+
+                        }
+
+                    });
+                },
+
+                select: function (event, ui) {
+                    debugger;
+                    $("#locationid").val(ui.item.locationid);
+                    $("#roleuser").val(ui.item.roleuser);
+                    $("#staffFullName").val(ui.item.staffFullName);
+                    var userid = $("#UserId").val();
+
+                }
+            });
+
+            $("#imgInp").change(function () {
+                readURL(this);
+            });
+
+        });
+
+
+
+
+        function DeleteAction(email) {
+            var msg = confirm("Are sure you want to delete company with the email " + email + "?");
+
+            if (msg === true) {
+                $.post("/Admin/DeleteCompany", { "Email": email }, function (data) {
+                    var status = data.Status;
+                    if (status === "success") {
+                        alert("Company with the email address " + email + " was successfully deleted from the LOBP portal")
+                        history.go(0);
+                    } else {
+                        alert(status);
+                    }
+                    
+                });
+               
+            }
+        }
+
+
+
+
+        function readURL(input) {
+            debugger;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#signatureimg').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
+}

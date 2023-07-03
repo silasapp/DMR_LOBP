@@ -1,0 +1,302 @@
+﻿@{
+    ViewBag.Title = "Index";
+    ViewBag.UserBranch = ViewBag.UserBranch;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content" style="background-color:whitesmoke">
+
+    <div class="page-title">
+        <div class="title_left">
+            <h3>DashBoard</h3>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <hr class="" style="margin: 0 0 15px;" />
+
+    <div class="row top_tiles">
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-info">
+
+                <div class="icon pull-right" style="font-size:xx-large"><i class="fa fa-briefcase" style="padding-right:5px"></i></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.OnMyDeskCount</div>
+                <span style="font-size:18px">Applications on my Desk</span>
+                <p>
+                    <a href="@Url.Action("MyDesk")" class="clear">
+                        Goto My Desk <i class="fa fa-chevron-right"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-success">
+                <div class="icon pull-right" style="font-size:xx-large"><i class="fa fa-cog" style="padding-right:5px"></i></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.PermitCount</div>
+                <span style="font-size:18px">Total Applications Approved</span>
+                <p>
+                    <a href="#" class="clear">
+                        @*See Applications... <i class="fa fa-chevron-right"></i>*@
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-danger">
+                <div class="icon pull-right" style="font-size:x-large"><span class="glyphicon glyphicon-envelope" style="padding-right:5px"></span></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.TotalRejection</div>
+                <span style="font-size:17px">Total Applications Rejected</span>
+                <p>
+                    <a href="#" class="clear">
+                        @*See Applications... <i class="fa fa-chevron-right"></i>*@
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-warning">
+                <div class="icon  pull-right" style="font-size:xx-large"><i class="fa fa-check-square-o" style="padding-right:5px"></i></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.TotalApplicationWorkedOn</div>
+                <span style="font-size:18px">Total Applications in Process</span>
+                <p>
+                    <a href="#" class="clear">
+                        @*See Applications... <i class="fa fa-chevron-right"></i>*@
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-danger">
+
+                <div class="icon pull-right" style="font-size:xx-large"><i class="fa fa-pencil" style="padding-right:5px"></i></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.TotalExpired</div>
+                <span style="font-size:18px">Total Expired Licenses/Approvals</span>
+                <p>
+                    <a href="#" class="clear">
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="animated flipInY col-lg-2 col-md-3 col-sm-3 col-xs-3">
+            <div class="alert alert-mini alert-success">
+                <div class="icon pull-right" style="font-size:xx-large"><i class="fa fa-book" style="padding-right:5px"></i></div>
+                <div class="count" style="font-size:xx-large; font-weight:bolder; padding-left:5px">@ViewBag.TotalNonExpired</div>
+                <span style="font-size:18px">Total Non Expired Licenses/Approvals</span>
+                <p>
+                    <a href="#" class="clear">
+                    </a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+
+    
+
+
+
+    <div class="row">
+        <div class="col-md-5" style="background-color:white">
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Apps in process for the past three weeks</legend>
+                <table class="table table-striped table-condensed table-responsive customDT">
+                    <thead>
+                        <tr>
+                            <th><strong>Application Ref</strong>
+                            <th><strong>Company Name</strong> </th>
+                            <th><strong>Category</strong></th>
+                            <th><strong>Date</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Pastwksapp != null)
+                        {
+                            foreach (var up in ViewBag.Pastwksapp)
+                            {
+                                <tr>
+                                    <td>@up.ApplicationId</td>
+                                    <td>@up.ApplicantName</td>
+                                    <td>@up.LicenseTypeId, @up.ApplicationTypeId</td>
+                                    <td>@up.ModifyDate</td>
+
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+
+
+
+        <div class="col-md-7" style="background-color:white">
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Apps on staff desk for the past five days</legend>
+                <table class="table table-striped table-condensed table-responsive customDT">
+                    <thead>
+                        <tr>
+                            <th><strong>Application Ref</strong>
+                            <th><strong>Company Name</strong> </th>
+                            <th><strong>Category</strong></th>
+                            <th><strong>Current Desk</strong> </th>
+                            <th><strong>Date</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Pastwksapp != null)
+                        {
+                            foreach (var up in ViewBag.Pastfivedays)
+                            {
+                                <tr>
+                                    <td>@up.ApplicationId</td>
+                                    <td>@up.ApplicantName</td>
+                                    <td>@up.LicenseTypeId, @up.ApplicationTypeId</td>
+                                    <td>@up.CurrentAssignedUser</td>
+                                    <td>@up.ModifyDate</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+    </div>
+
+
+
+
+
+
+    <hr style="border: 1px solid white" />
+    <div class="jumbotron" style="margin-top:-50px">
+        <div class="row">
+            <div class="col-md-6">
+                <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            </div><div class="col-md-6">
+                <div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clear"></div>
+@section scripts{
+
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.media.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.metadata.js")"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#Index > a").addClass("selected").find(".act").addClass("selected");
+
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+            $(".customDT").dataTable({
+                "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                'iDisplayLength': 10,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Record to Display Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+            $.getJSON("/Admin/GetChart", function (data) {
+                debugger;
+                var chart1 = Highcharts.chart({
+                    chart: {
+                        renderTo: 'container',
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie',
+                        options3d: {
+                            enabled: true,
+                            alpha: 45,
+                            beta: 0
+                        }
+                    },
+
+                    title: {
+                        text: 'Application Chart Ratio'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            depth: 35,
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                }
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Ratio',
+                        colorByPoint: true,
+                        data: [
+                            { name: 'Approved Application', y: data.Approved },
+                            { name: 'Rejected Application', y: data.Rejected, sliced: true, selected: true },
+                            { name: 'Application On Desk', y: data.OnDesk },
+                            { name: 'Online App in Process', y: data.OnlineInProgress },
+                            { name: 'Legacy App in Process', y: data.LegacyInProgress },
+                            { name: 'Application Completed', y: data.Processed },
+                        ],
+                        exporting: true
+                    }]
+                });
+
+                var chart2 = Highcharts.chart({
+                    chart: {
+                        renderTo: 'container1',
+                        type: 'column',
+                        margin: 75,
+                        options3d: {
+                            enabled: true,
+                            alpha: 15,
+                            beta: 15,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    title: {
+                        text: 'Application Bar Chart'
+                    },
+                    xAxis: {
+                        labels: {
+                            autoRotation: false
+                        },
+                        categories: ['Approved App', 'Rejected App', 'Application On Desk', 'Online App in Process', 'Legacy App in Process', 'Application Completed']
+                    },
+                    
+                    plotOptions: {
+                        column: {
+                            depth: 25
+                        }
+                    },
+                    series: [{
+                        name: 'Total',
+                        colorByPoint: true,
+                        data: [
+                            [data.Approved],
+                            [data.Rejected],
+                            [data.OnDesk],
+                            [data.OnlineInProgress],
+                            [data.LegacyInProgress],
+                            [data.Processed],
+
+                        ]
+                    }]
+                });
+
+            });
+        });
+    </script>
+}

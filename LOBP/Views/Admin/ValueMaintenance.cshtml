@@ -1,0 +1,415 @@
+﻿@{ int count = 0;
+ string userRole = ViewBag.UserRole;
+ ViewBag.Title = "Index";
+ Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="content">
+    <h3 class="lefty">Value Maintenance</h3>
+    @if (ViewBag.ErrorMessage == "SUCCESS")
+    {
+        <div class="righty">
+            <a href="#" class="btn btn-md btn-primary newbtn"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;&nbsp;New Value</a>
+        </div>
+    }
+    <hr class="clear" />
+        @if (ViewBag.ErrorMessage == "SUCCESS")
+{
+    <table class="table table-striped table-responsive table-bordered dataTable">
+        <thead>
+            <tr>
+                <th style="width:1%">SN</th>
+                <th style="width:11%">Id</th>
+                <th style="width:12%">Company</th>
+                <th style="width:13%">RRR</th>
+                <th style="width:10%">TxnAmount</th>
+                <th style="width:10%">ValType</th>
+                <th style="width:10%">AmountApplied</th>
+                <th style="width:10%">AmountDue</th>
+                <th style="width:4%">Status</th>
+                <th style="width:10%">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (LOBP.DbEntities.UserMaster u in ViewBag.AllUserList)
+            {
+                <tr>
+                    <td>@(count += 1)</td>
+                    <td>@u.UserId</td>
+                    <td>@u.FirstName</td>
+                    <td>@u.UserRoles</td>
+                    <td>@u.FieldLocation.Description</td>
+                    @if (u.Status == "ACTIVE")
+                    {
+                        <td><strong class="badge" style="background-color:green">@u.Status</strong></td>
+                        <td>
+                            @if (userRole.Contains("DMIN"))
+                            {
+                                <a class="btn btn-danger btn-xs" href="#" onclick="javascript:manageUser('@u.UserId','DeActivate')">DeActivate</a>
+                                <a class="btn btn-default btn-xs" href="#" onclick="javascript:editUser('@u.UserId','@u.FirstName','@u.UserRoles','@u.FieldLocation.FieldLocationID','@u.LastComment')">Edit</a>
+                            }
+
+                        </td>
+                    }
+                    else
+                    {
+                        <td><strong class="badge" style="background-color:red">@u.Status</strong></td>
+                        <td>
+                            @if (userRole.Contains("DMIN"))
+                            {
+                                <a class="btn btn-info btn-xs" href="#" onclick="javascript:manageUser('@u.UserId','Activate')">Activate</a>
+                                <a class="btn btn-default btn-xs" href="#" onclick="javascript:editUser('@u.UserId','@u.FirstName','@u.UserRoles','@u.FieldLocation.FieldLocationID','@u.LastComment')">Edit</a>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+            <div class="alert-mini alert-info alert-dismissible center-block" role="alert" align="center">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="modalhdid">
+                    Value Maintenance
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form id="maintainUserForm" action="@Url.Action("MaintainUser")" method="post" class="form-horizontal">
+                    <input type="hidden" id="ActionType" name="ActionType" value="CREATE" />
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Id</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="UserId" name="UserId" required placeholder="Search Staff By Email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Generated Amount</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" required id="FullName" name="FullName">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Amount</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" required id="FullName" name="FullName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Value Type</label>
+                        <div class="col-md-9">
+                            <select id="Role" name="Role" class="form-control UserRoles" required style="width: 100%" multiple="multiple"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Comment</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="Comment" name="Comment" required="required" style="width: 100%; border: 0px;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="SaveBtn" class="btn btn-primary btn-md">Save Changes</button>
+                        <button type="button" id="ClearBtn" class="btn btn-danger btn-md">Clear</button>
+                        <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .modal-dialog {
+        width: 500px;
+    }
+
+    .btn.round {
+        border-radius: 50px;
+    }
+</style>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".newbtn").click(function () {
+                $('#modalhdid').text("Staff Access Maintenance - NEW");
+                $('#ActionType').val("CREATE");
+                $("#myModal").modal('show');
+            });
+        });
+
+        function hideAndResetModal(modalID) {
+            $(modalID).modal('hide');
+            $(modalID).on('hidden.bs.modal', function () {
+                $(modalID).find('form').trigger('reset');
+            });
+        }
+
+        function mainPage() {
+            window.location.href = "/Admin/StaffMaintenance";
+        }
+
+        function editUser(UserId, fullName, userRoles, fieldLocation, Comment) {
+            var html = "";
+            $("#UserId").val(UserId);
+            $("#FullName").val(fullName);
+            $("#Comment").val(Comment);
+            $(".UserRoles").html("");
+            $(".UserLocation").html("");
+
+            $.getJSON("/Admin/GetUserLocation", {},
+                function (datas) {
+                    $.each(datas,
+                        function (key, val) {
+                            if (val.Fieldlocationid == fieldLocation) {
+                                html += "<option value=" + val.Fieldlocationid + " selected>" + val.Description + "</option>";
+                            }
+                            else {
+                                html += "<option value=" + val.Fieldlocationid + " >" + val.Description + "</option>";
+                            }
+
+                        });
+                    $(".UserLocation").append(html);
+                });
+
+            $('.UserLocation').select2();
+            console.log("Field Location =>" + fieldLocation);
+
+            var html2 = "";
+            $('.UserRoles').select2();
+            $.getJSON("/Admin/GetUserRole",
+                {},
+                function (datas) {
+                    $.each(datas,
+                        function (key, val) {
+                            if (userRoles.indexOf(val.role) > -1) {
+                                html2 += "<option value=" + val.role + " selected>" + val.Description + "</option>";
+                            }
+                            else {
+                                html2 += "<option value=" + val.role + ">" + val.Description + "</option>";
+                            }
+
+                        });
+                    $(".UserRoles").append(html2);
+                });
+
+            $('#ActionType').val("EDIT");
+            $('#modalhdid').html("Staff Access Maintenance - EDIT")
+            $("#myModal").modal('show');
+        }
+
+
+        function manageUser(UserId, ActionName) {
+
+
+            bootbox.prompt({
+                title: "What is the Reason For " + ActionName + " On  UserId " + UserId,
+                callback: function (result) {
+                    if (result !== null) {
+                        var url = '@Url.Action("ActionUser")';
+                        console.log('url =>' + url);
+                        console.log('UserId =>' + UserId);
+
+                        $.get(url, { useraction: ActionName, user: UserId, comment: result })
+                        .done(function (data) {
+                            console.log('Status =>' + data.Status);
+                            var status = data.Status;
+                            if (status == 'success') {
+
+                                $.notify({
+                                    icon: 'fa fa-users fa-2x',
+                                    message: '<strong>Action on User ' + UserId + ' Successfull </strong>'
+                                }, {
+                                    delay: 1000,
+                                    type: 'info',
+                                    onClose: mainPage,
+                                    animate: {
+                                        enter: 'animated zoomInDown',
+                                        exit: 'animated zoomOutUp'
+                                    }
+                                });
+
+                                console.log("Done Redirecting");
+
+                            } else {
+                                alert(data.Message);
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('Network Communication Error, Restore Connection and Try again');
+                        })
+                        .always(function (data) { });
+                    }
+                }
+            });
+
+        }
+
+
+
+        $(function () {
+
+            $("#UserId").autocomplete({
+                source: function (request, response) {
+                    console.log('term ' + request.term);
+                    $.ajax({
+                        url: '/Admin/UserIdAutosearch',
+                        type: "GET",
+                        datatype: "json",
+                        data: {
+                            key: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data,
+                                function (val, item) {
+                                    console.log('Result ' + val.userId + "=>" + val.firstName);
+                                    return {
+                                        label: val.userId + ' (' + val.firstName + ')',
+                                        value: val.userId,
+                                        FirstName: val.firstName
+                                    }
+                                }));
+                        }
+                    });
+                },
+                maxLength: 10,
+                select: function (event, ui) {
+                    console.log("Selected: " + ui.item.value + " aka " + ui.item.id);
+                    $("#UserId").val(ui.item.value);
+                    $("#FullName").val(ui.item.FirstName);
+                    var userid = $("#UserId").val();
+                }
+            });
+
+
+
+            $('.UserRoles').select2();
+            $(".UserRoles").ready(function () {
+                var html = "";
+                $(".UserRoles").html("");
+                $.getJSON("/Admin/GetUserRole",
+                    {},
+                    function (datas) {
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.role + ">" + val.Description + "</option>";
+                            });
+                        $(".UserRoles").append(html);
+                    });
+            });
+
+            $('.UserLocation').select2();
+            $(".UserLocation").ready(function () {
+                var html = "";
+                $(".UserLocation").html("");
+                $.getJSON("/Admin/GetUserLocation", {
+                },
+                    function (datas) {
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.Fieldlocationid + ">" + val.Description + "</option>";
+                            });
+                        $(".UserLocation").append(html);
+                    });
+            });
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                'iDisplayLength': 8,
+                columnDefs: [{ orderable: true, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Users Created",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[0, "asc"]]
+            });
+
+            $('#ClearBtn').click(function (e) {
+                document.getElementById("maintainUserForm").reset();
+            });
+
+
+            $('#SaveBtn').click(function (e) {
+                e.preventDefault();
+                if ($("#maintainUserForm").valid()) {
+
+                    bootbox.confirm({
+                        message: "Do You Really Want To Maintain User ",
+                        size: 'small',
+                        className: 'bb-alternate-modal',
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
+                            },
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+
+                                $.post($("#maintainUserForm").attr('action'), $("#maintainUserForm").serialize())
+                                       .done(function (data) {
+                                           var status = data.Status;
+                                           if (status != 'success') {
+                                               bootbox.alert(status);
+                                           }
+                                           else {
+                                               var role1 = $("#UserRoles").val();
+                                               var location1 = $("#UserLocation").val();
+                                               console.log("Role =>" + role1);
+                                               console.log("Location =>" + location1);
+
+                                               hideAndResetModal('#myModal');
+
+                                               $.notify({
+                                                   icon: 'fa fa-users fa-spin fa-2x fa-fw',
+                                                   message: '<strong>User  ' + $('#UserId').val() + ' Created/Updated </strong>'
+                                               }, {
+                                                   delay: 1000,
+                                                   onClose: mainPage,
+                                                   type: 'info',
+                                                   animate: {
+                                                       enter: 'animated zoomInDown',
+                                                       exit: 'animated zoomOutUp'
+                                                   }
+                                               });
+
+                                               $("#UserId").val("");
+                                               $("#FullName").val("");
+                                               $("#Comment").val("");
+                                               $(".UserRoles").html("");
+                                               $(".UserLocation").html("");
+                                               //window.location.href = "/Admin/StaffMaintenance";
+                                           }
+                                       })
+                                      .fail(function (data) {
+                                          alert('Network Communication Error, Restore Connection and Try again');
+                                      })
+                                     .always(function (data) {
+                                     });
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

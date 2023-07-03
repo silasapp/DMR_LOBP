@@ -1,0 +1,310 @@
+﻿@model IEnumerable<LOBP.DbEntities.UserMaster>
+@*@model IEnumerable<LOBP.Models.StaffReport>*@
+
+@{
+    ViewBag.Title = "Staff Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+}
+
+<div class="content">
+    <div class="pull-right">
+        <div class="row">
+            <div class="panel short-states" style="background-color:#eaeef3; margin-right:30px; margin-top:-50px">
+                <div class="panel-title">
+                </div>
+                <div class="panel-body">
+                    <div><span class="col-md-offset-1 text-danger" style="font-size:40px">@TempData["totalstaff"]</span></div>
+                    <big class="label label-danger" style="font-size:15px">Total Staff</big>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <select id="Userroles" name="Userroles" class="form-control roleuser"></select>
+        </div>
+        <div class="col-md-3">
+            <select id="zone" name="zone" class="form-control zonalLocation"></select>
+        </div>
+        <div class="col-md-3">
+            <select id="Userlocation" name="Userlocation" class="form-control UserLocation"></select>
+        </div>
+    </div>
+    <h2 class="lefty" style="margin-top:-20px">Staff Report</h2>
+    <hr class="clear" />
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped table-hover table-responsive table-bordered dataTable">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>Roles</th>
+                        <th>Location</th>
+                        <th width="10">Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        </div>
+        <hr style="border: 1px solid white" />
+        <div class="jumbotron">
+
+            <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+            <div id="container1" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto"></div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#Userroles, #zone, #Userlocation").change(function () {
+                    table.search(this.value).draw();
+                    table.ajax.reload();
+                    debugger;
+                    var rolevalue = $("#Userroles").find(":selected").text();
+                    var fieldvalue = $("#Userlocation").find(":selected").text();
+                    var zonevalue = $("#zone").find(":selected").text();
+                    //table.draw();
+                    $.getJSON("/Admin/StaffReport", { "role": rolevalue, "field": fieldvalue, "zone": zonevalue }, function (data) {
+
+                    })
+
+                });
+                $(".roleuser").ready(function () {//get all user role populated in the dropdownlist
+                    var html = "";
+
+                    $(".roleuser").html("");
+
+                    $.getJSON("/Admin/GetUserRole",
+                        {},
+                        function (datas) {
+                            //$(".roleuser").append("<option disabled >--Select Role--</option>");
+                            $.each(datas,
+                                function (key, val) {
+                                    html += "<option value=" + val.role + ">" + val.role + "</option>";
+                                });
+                            $(".roleuser").append("<option disabled selected>--Select Role--</option>");
+                            $(".roleuser").append("<option value='ALLRoles'>ALL</option>");
+                            $(".roleuser").append(html);
+                        });
+                });
+
+
+                $(".UserLocation").ready(function () {//get all field Location populated in the dropdownlist
+
+                    var html = "";
+
+                    $(".UserLocation").html("");
+
+                    $.getJSON("/Admin/GetFieldLocation", {
+                    },
+
+                        function (datas) {
+                            $(".UserLocation").append("<option disabled selected>--Select Field Office--</option>");
+                            $.each(datas,
+                                function (key, val) {
+                                    html += "<option value=" + val.Fieldlocationid + ">" + val.Description + "</option>";
+                                });
+                            $(".UserLocation").append("<option value='ALLFields'>ALL</option>");
+
+                            $(".UserLocation").append(html);
+                        });
+                });
+                $(".zonalLocation").ready(function () {//get all zonal Location populated in the dropdownlist
+
+                    var html = "";
+
+                    $(".zonalLocation").html("");
+
+                    $.getJSON("/Admin/GetZonalLocation", {
+                    },
+
+                        function (datas) {
+                            $(".zonalLocation").append("<option disabled selected>--Select Zonal Office--</option>");
+                            $.each(datas,
+                                function (key, val) {
+                                    html += "<option value=" + val.Fieldlocationid + ">" + val.Description + "</option>";
+                                });
+                            $(".zonalLocation").append("<option value='ALLZones'>ALL</option>");
+
+                            $(".zonalLocation").append(html);
+                        });
+
+                });
+
+                var table = $(".dataTable").DataTable({
+
+                    "processing": true,
+                    "serverSide": true,
+                    //"search": { "search": "Default_filter" },
+                    ajax: {
+                        url: "/Admin/GetStaffReport",
+                        type: "POST",
+                        async: true,
+                        "sDom": "rtipl",
+                        "deferRender": true,
+                        "deferLoading": 5,
+                        "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]]
+                    },
+                    //sDom: 'Blrtip',
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'csv', 'excel', 'pdf', 'print'
+                    ],
+                    columns: [
+                        { data: "UserId" }, { data: "Fullname" }, { data: "UserRoles" }, { data: "Description" },
+                        {
+                            data: "Status",
+                            render: function (data, type, user) {
+                                return user.Status === "ACTIVE" ? '<strong class="badge" style="background-color:green">' + user.Status + '</strong>' : '<strong class="badge" style="background-color:red">' + user.Status + '</strong>';
+                            }
+                        },
+                    ],
+
+
+                    "columnDefs": [
+                        {
+                            "targets": 5,
+                            "data": "UserLocation",
+                            "visible": false,
+                            "searchable": true,
+                        },
+                    ],
+                    "deferLoading": 5,
+                });
+
+
+                $.getJSON("/Admin/GetStaffChart", function (data) {
+                    table.draw();
+                    table.ajax.reload();
+
+
+                    var chart1 = Highcharts.chart({
+                        chart: {
+                            renderTo: 'container',
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'pie',
+                            options3d: {
+                                enabled: true,
+                                alpha: 45,
+                                beta: 0
+                            }
+                        },
+                        title: {
+                            text: 'Staff Chart Ratio'
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                depth: 35,
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    style: {
+                                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                    }
+                                }
+                            }
+                        },
+                        series: [{
+                            name: 'Ratio',
+                            colorByPoint: true,
+                            data: [
+                                { name: 'Total Staff', y: data.totalstaff },
+                                { name: 'ADOPERATIONRBP', y: data.ADOPERATIONRBP },
+                                { name: 'HOOD', y: data.HOOD },
+                                { name: 'HOD', y: data.HOD },
+                                { name: 'REVIEWER', y: data.REVIEWER },
+                                { name: 'SUPERADMIN', y: data.SUPERADMIN },
+                                { name: 'SUPERVISOR', y: data.SUPERVISOR },
+                                { name: 'ZONALADMIN', y: data.ZONALADMIN },
+                                { name: 'OPSCON', y: data.OPSCON },
+                                { name: 'ZOPSCON', y: data.ZOPSCON },
+                            ],
+                            exporting: true
+                        }]
+                    });
+
+                    var chart2 = Highcharts.chart({
+                        chart: {
+                            renderTo: 'container1',
+                            type: 'column',
+                            margin: 75,
+                            options3d: {
+                                enabled: true,
+                                alpha: 15,
+                                beta: 15,
+                                depth: 50,
+                                viewDistance: 25
+                            }
+                        },
+                        title: {
+                            text: 'Staff Bar Chart'
+                        },
+                        xAxis: {
+                            categories: ['TOTAL STAFFS', 'ADOPERATIONRBP', 'HOOD', 'HOD', 'REVIEWER', 'SUPERADMIN', 'SUPERVISOR', 'ZONALADMIN', 'OPSCON', 'ZOPSCON']
+                        },
+                        plotOptions: {
+                            column: {
+                                depth: 25
+                            }
+                        },
+                        series: [{
+                            name: 'Total',
+                            colorByPoint: true,
+                            data: [
+                                [data.totalstaff],
+                                [data.ADOPERATIONRBP],
+                                [data.HOOD],
+                                [data.HOD],
+                                [data.REVIEWER],
+                                [data.SUPERADMIN],
+                                [data.SUPERVISOR],
+                                [data.ZONALADMIN],
+                                [data.OPSCON],
+                                [data.ZOPSCON]
+                            ]
+                        }]
+                    });
+
+                });
+
+
+
+
+            });
+
+        </script>
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,736 @@
+﻿@model LOBP.Models.AppointmentReportModel
+@{ 
+    ViewBag.Title = "Index"; Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var insptby = ViewBag.insptby;
+    var loggedstaff = ViewBag.LoginEmail;
+
+    }
+
+<div class="content">
+    <h3 class="lefty">Site Suitability Finding</h3>
+    @if (ViewBag.ErrorMessage == "SUCCESS")
+    {
+        <div class="righty">
+            <a href="#" class="btn btn-md btn-default newbtn"><i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;&nbsp;Back</a>
+        </div>
+    }
+    <hr class="clear" />
+    <div class="padd-t form-horizontal">
+
+        @using (Html.BeginForm("SiteSuitabilityMaintenance", "Admin", FormMethod.Post, new { id = "formid", role = "form", @class = "form-horizontal" }))
+        {
+            @Html.HiddenFor(model => model.ApplicationId)
+            if (ViewBag.ErrorMessage == "SUCCESS")
+            {
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-xs-12">
+                            <h4 style="color: blue;"><strong>General Features</strong></h4>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="GeneralFeatures">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Land Size</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(model => model.LandSize, new { @class = "form-control", required = "required", type = "number" })
+                                            <span class="input-group-addon">M²</span>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-2 control-label">Proposed Plant Capacity</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(model => model.ProposedPlantCapacity, new { @class = "form-control", required = "required", type = "number" })
+                                            <span class="input-group-addon">Litres</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Beacon Location</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.BeaconLocations, new { @class = "form-control", required = "required" })
+                                    </div>
+                                    <label class="col-md-2 control-label">Name of Access Road</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.AccessRoadSite, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Land Topology</label>
+                                    <div class="col-md-4">
+                                        <select id="GeneralFeatures.LandTopology" name="GeneralFeatures.LandTopology" class="form-control select2" required="required">
+                                            @foreach (SelectListItem item in ViewBag.LandTopology)
+                                            {
+                                                <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <label class="col-md-2 control-label">Nature of Area</label>
+                                    <div class="col-md-4">
+                                        <select id="GeneralFeatures.NatureOfArea" name="GeneralFeatures.NatureOfArea" class="form-control select2" required="required">
+                                            @foreach (SelectListItem item in ViewBag.NatureOfArea)
+                                            {
+                                                <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Adjoining Properties</label>
+                                    <div class="col-md-10">
+                                        @Html.TextAreaFor(model => model.AdjoiningProperties, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-xs-12">
+                            <h4 style="color: blue;"><strong>Existing Facilities</strong></h4>
+                            <div class="ExistingFacilities">
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Structures And Equipment On Site</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.EquipmentOnSite, new { @class = "form-control", required = "required" })
+                                    </div>
+                                    <label class="col-md-2 control-label">RelationShip With PipeLine ROW</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.RelationshipWithPipelineRow, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">RelationShip With Streams</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.RelationshipWithStreams, new { @class = "form-control", required = "required" })
+                                    </div>
+                                    <label class="col-md-2 control-label">RelationShip With PHCN Lines</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.RelationshipWithPhcn, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">RelationShip With Railway Lines</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.RelationshipWithRailwayLine, new { @class = "form-control", required = "required" })
+                                    </div>
+                                    <label class="col-md-2 control-label">RelationShip With Sensitive Institutions</label>
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.RelationshipWithSensitiveIns, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-xs-12">
+                            <h4 style="color: blue;"><strong>Observations and Recommendation</strong></h4>
+                            <div class="ObservationRecommendations">
+
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Participating DPR Officials</label>
+                                    <div class="col-md-10">
+                                        @Html.TextAreaFor(model => model.MemberOfTeams, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Inspector Observation</label>
+                                    <div class="col-md-4">
+                                        @Html.TextAreaFor(model => model.OfficerFieldObservations, new { @class = "form-control", required = "required" })
+                                    </div>
+                                    <label class="col-md-2 control-label">Inspector Recommendations</label>
+                                    <div class="col-md-4">
+                                        @Html.TextAreaFor(model => model.OfficerFieldRecommendation, new { @class = "form-control", required = "required" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <br />
+                        <input type="hidden" name="txtsource" id="txtsource" />
+                        @if (Model.UploadedImage != null)
+                        {
+                            <fieldset class="scheduler-border">
+                                <legend class="scheduler-border alert alert-warning">Inspection Document Upload</legend>
+                                <table class="table table-sm table-hover table-responsive dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Document Name</th>
+                                            <th>Select</th>
+                                            <th>Upload Progress</th>
+                                        </tr>
+                                    </thead>
+
+                                    @for (int i = 0; i < ViewBag.FacilityDocumentList.Count; i++)
+                                    {
+                                        LOBP.Models.DocumentModel doc = ViewBag.FacilityDocumentList[i];
+                                        <tbody>
+                                            <tr class="form-group">
+                                                <td>
+                                                    Inspection Picture
+                                                </td>
+                                                <td>
+                                                    <div id="@("extFileName-" + i)" class="files">
+                                                        <input type="hidden" name="uid-@i" id="uid-@i" value="@doc.UniqueId" />
+                                                        <input type="hidden" name="appdocs[@i].document_id" value="" id="@("document" + i)" />
+                                                        <input type="hidden" name="docs[@i].FileId" id="fid-@i" value="@doc.FileId" class="fileid" />
+                                                        <input type="hidden" name="docs[@i].DocTypId" id="did_@i" value="@doc.DocId" />
+                                                        <input type="hidden" id="baseortran_@i" value="@doc.BaseorTran" />
+                                                        <input type="hidden" name="txtDocumentSource[]" id="docsource-@i" value="@doc.Source" />
+
+
+
+                                                        @if (!Model.UploadedImage.Contains(".pdf"))
+                                                        {
+                                                            <a href='@Model.UploadedImage' target="_blank">
+                                                                <img src="@Model.UploadedImage" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="This Document was rejected goto my applications to know more"
+                                                                     style="max-height: 40px; max-width: 40px; display: inline-block" />
+                                                            </a>
+
+
+                                                        }
+                                                        else
+                                                        {
+
+                                                            <a href="@Model.UploadedImage" target="_blank">
+                                                                <img src="@Url.Content("~/Images/pdficon.png")" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="This Document was rejected goto my applications to know more"
+                                                                     style="max-height: 40px; max-width: 40px; display: inline-block;" />
+                                                            </a>
+
+                                                        }
+
+                                                    </div>
+
+                                                    @if (insptby == ViewBag.LoginEmail)
+                                                    {
+
+                                                        <div id="@("editDoc" + i)" style="display: none">
+                                                            <input type="file" id="@("filebtn" + i)" class="docEdit filebtn" data-doctypeid="@doc.DocId" data-compid="@ViewBag.ElpsId"
+                                                                   accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);"
+                                                                   data-docid="@doc.FileId" data-status="True" enctype="multipart/form-data" />
+
+
+                                                        </div>
+                                                        @*<a href="#" class="btn btn-xs btn-danger delFile" data-i="@i" data-toggle="modal" data-target=".modalPopup" data-fileid="@doc.FileId"><i class="fa fa-times"></i> Delete</a>*@
+                                                    }
+                                                    @if (insptby == null)
+                                                    {
+                                                        <input type="file" id="@("filebtn" + i)" class="docEdit filebtn" data-doctypeid="@doc.DocId" data-compid="@ViewBag.ElpsId"
+                                                               accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);"
+                                                               data-docid="@doc.FileId" data-status="True" enctype="multipart/form-data" />
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (insptby == ViewBag.LoginEmail)
+                                                    {
+                                                        <button class="btnEdit btn btn-xs btn-warning" data-i="@i" style="margin: 5px 0;">
+                                                            <i class="glyphicon glyphicon-upload"></i>Change Document
+                                                        </button>
+                                                    }
+                                                    <div id="@("extProgress-" + i)" class="progress">
+                                                        <div class="progress-bar progress-bar-success progress-bar-striped"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    }
+
+                                </table>
+                            </fieldset>
+                        }
+                        else
+                        {
+                            <fieldset class="scheduler-border">
+                                <legend class="scheduler-border alert alert-warning">
+
+                                    <span>Inspection Document Upload</span>
+
+                                </legend>
+                                <table class="table table-sm table-hover table-responsive dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Document Name</th>
+                                            <th>Select</th>
+                                            <th>Upload Progress</th>
+                                        </tr>
+                                    </thead>
+
+                                    @for (int i = 0; i < ViewBag.FacilityDocumentList.Count; i++)
+                                    {
+
+                                        LOBP.Models.DocumentModel c = ViewBag.FacilityDocumentList[i];
+                                        if (c.Source != null)
+                                        {
+                                            string source = c.Source.Contains("https") ? c.Source : "http://elps.dpr.gov.ng/" + c.Source;
+                                            <tbody>
+                                                <tr class="form-group">
+                                                    <td>
+
+                                                        <input type="hidden" name="uid-@i" id="uid-@i" value="@c.UniqueId" />
+                                                        <input type="hidden" name="appdocs[@i].document_id" value="" id="@("document" + i)" />
+                                                        <input type="hidden" name="docs[@i].FileId" id="fid-@i" value="@c.FileId" class="fileid" />
+                                                        <input type="hidden" name="docs[@i].DocTypId" id="did_@i" value="@c.DocId" />
+                                                        <input type="hidden" id="baseortran_@i" value="@c.BaseorTran" />
+                                                        <input type="hidden" name="txtDocumentSource[]" id="docsource-@i" value="@source" />
+                                                        <input type="hidden" name="txtfacsource" id="txtfacsource" value="@source" />
+
+
+                                                        @c.DocumentTypeName
+                                                    </td>
+                                                    <td>
+                                                        <div id="@("extFileName-" + i)" class="files">
+                                                            @foreach (LOBP.Models.DocumentModel doc in ViewBag.FacilityDocumentList)
+                                                            {
+
+
+                                                                if (!c.Source.Contains(".pdf"))
+                                                                {
+                                                                    if (doc.Source != null)
+                                                                    {
+                                                                        <a href='@doc.Source' target="_blank">
+                                                                            <img src="@doc.Source" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="This Document was rejected goto my applications to know more"
+                                                                                 style="max-height: 40px; max-width: 40px; display: inline-block" />
+                                                                        </a>
+                                                                    }
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (doc.Source != null)
+                                                                    {
+                                                                        <a href="@doc.Source" target="_blank">
+                                                                            <img src="@Url.Content("~/Images/pdficon.png")" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="This Document was rejected goto my applications to know more"
+                                                                                 style="max-height: 40px; max-width: 40px; display: inline-block;" alt="@doc.DocumentName" />
+                                                                        </a>
+                                                                    }
+                                                                }
+                                                            }
+                                                        </div>
+                                                        @if (insptby == ViewBag.LoginEmail)
+                                                        {
+
+                                                            <div id="@("editDoc" + i)" style="display: none">
+                                                                <input type="file" id="@("filebtn" + i)" class="docEdit filebtn" data-doctypeid="@c.DocId" data-compid="@ViewBag.ElpsId"
+                                                                       accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);"
+                                                                       data-docid="@c.FileId" data-status="True" enctype="multipart/form-data" />
+
+
+                                                            </div>
+                                                            @*<a href="#" class="btn btn-xs btn-danger delFile" data-i="@i" data-toggle="modal" data-target=".modalPopup" data-fileid="@c.FileId"><i class="fa fa-times"></i> Delete</a>*@
+                                                        }
+                                                        @if (insptby == null)
+                                                        {
+                                                            <input type="file" id="@("filebtn" + i)" class="docEdit filebtn" data-doctypeid="@c.DocId" data-compid="@ViewBag.ElpsId"
+                                                                   accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);"
+                                                                   data-docid="@c.FileId" data-status="True" enctype="multipart/form-data" />
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (insptby == ViewBag.LoginEmail)
+                                                        {
+                                                            <button class="btnEdit btn btn-xs btn-warning" data-i="@i" style="margin: 5px 0;">
+                                                                <i class="glyphicon glyphicon-upload"></i>Change Document
+                                                            </button>
+                                                        }
+                                                        <div id="@("extProgress-" + i)" class="progress">
+                                                            <div class="progress-bar progress-bar-success progress-bar-striped"></div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        }
+                                        else
+                                        {
+                                            <tbody>
+                                                <tr class="form-group">
+                                                    <td>
+                                                        <input type="hidden" name="uid-@i" id="uid-@i" value="@c.UniqueId" />
+                                                        <input type="hidden" name="appdocs[@i].document_id" value="" id="@("document" + i)" />
+                                                        <input type="hidden" name="docs[@i].FileId" id="fid-@i" value="@c.FileId" class="fileid" />
+                                                        <input type="hidden" name="docs[@i].DocTypId" id="did_@i" value="@c.DocId" />
+                                                        <input type="hidden" id="baseortran_@i" value="@c.BaseorTran" />
+                                                        <input type="hidden" name="txtDocumentSource[]" id="docsource-@i" />
+
+                                                        @c.DocumentTypeName
+                                                    </td>
+
+                                                    <td>
+                                                        @if (insptby != null)
+                                                        {
+                                                            if (insptby == ViewBag.LoginEmail)
+                                                            {
+                                                                <input type="file" name="Name" id="@("filebtn" + i)" class="docUpload" data-doctypeid="@(i + 1)" data-compid="@ViewBag.ElpsId"
+                                                                       accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);" />
+                                                                <div id="@("extFileName-" + i)" class="files"></div>
+
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="file" name="Name" id="@("filebtn" + i)" class="docUpload" data-doctypeid="@(i + 1)" data-compid="@ViewBag.ElpsId"
+                                                                   accept="image/gif, image/png, image/jpeg, application/pdf" data-i="@i" onchange="ValidateSingleInput(this);" />
+                                                            <div id="@("extFileName-" + i)" class="files"></div>
+                                                        }
+                                                    </td>
+
+
+                                                    <td>
+                                                        <div id="@("extProgress-" + i)" class="progress">
+                                                            <div class="progress-bar progress-bar-success progress-bar-striped"></div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        }
+                                    }
+
+                                </table>
+                            </fieldset>
+                        }
+
+
+                        <br />
+
+                        @if (insptby == null || loggedstaff == insptby)
+                        {
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    <div class="col-xs-12 col-sm-4 col-sm-offset-5">
+                                        <button type="submit" class="btn btn-info btn-lg round" id="SaveBtn">&nbsp;&nbsp;Save Changes&nbsp;&nbsp;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+                        </div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-12">
+                    <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <i class="fa fa-exclamation-triangle fa-2x" aria-hidden="true"></i>
+                        <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section scripts{
+
+
+<script type="text/javascript">
+
+    var _validFileExtensions = [".jpg", ".pdf", ".png"];
+    function getContextPath() {
+        return window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+    }
+    function ValidateSingleInput(oInput) {
+        if (oInput.type == "file") {
+            var sFileName = oInput.value;
+            if (sFileName.length > 0) {
+                var blnValid = false;
+                for (var j = 0; j < _validFileExtensions.length; j++) {
+                    var sCurExtension = _validFileExtensions[j];
+                    if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                        blnValid = true;
+                        break;
+                    }
+                }
+
+                if (!blnValid) {
+                    alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+                    oInput.value = "";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+</script>
+
+
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+
+
+        var existImg = '@Model.UploadedImage';
+            var existfacimg = $("#txtfacsource").val();
+            var imgsource = existImg === null || existImg === '' ? existfacimg : existImg;
+            $("#txtsource").val(imgsource);
+
+
+
+
+            $('#SaveBtn').click(function (e) {
+                e.preventDefault();
+                if ($("#formid").valid()) {
+
+                    bootbox.confirm({
+                        message: "Do You Really Want To Maintain this Information For Site Suitability Report?",
+                        size: 'small',
+                        className: 'bb-alternate-modal',
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
+                            },
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+
+                                $.post($("#formid").attr('action'), $("#formid").serialize())
+                                      .done(function (data) {
+
+                                          if (data.status == 'success') {
+                                              bootbox.alert({
+                                                  message: data.Message,
+                                                  size: 'small',
+                                                  className: 'bb-alternate-modal',
+                                                  callback: function () {
+                                                  window.location.href = "/Admin/ViewApplication?applicationId="+'@ViewBag.ApplicationId';
+                                                  }
+                                              });
+                                          }
+                                          else {
+                                              alert(data.Message);
+                                          }
+
+                                      })
+                                     .fail(function (data) {
+                                         alert('Network  Error, Restore Connection and Try again');
+                                     })
+                                    .always(function (data) {
+                                    });
+
+                            }
+                        }
+                    });
+
+                }
+            });
+
+
+
+
+
+
+
+            $(document.body).on("click", '.docUpload', function () {
+                debugger;
+                var url = "";
+                var i = $(this).attr("data-i");
+                var did = $('#did_' + i).val();
+                var docName = $('#document-' + i).val();
+                var uid = $("#uid-" + i).val();
+                var filename = $('#fid-' + i).val();
+                var baseortran = $('#baseortran_' + i).val();
+
+
+                if (baseortran == "T") {
+
+                    url = '@ViewBag.ElpsUrl' + '/api/Facility/UploadFile/' + Number(did) + '/' + Number('@ViewBag.ElpsId') + '/' + Number('@ViewBag.Elpsfacid') + '/@ViewBag.Email/' + '@ViewBag.ApplicationHash' + '?docName=&uniqueid=';
+
+                }
+                else {
+                    url = '@ViewBag.ElpsUrl' + '/api/UploadCompanyDoc/' + did + '/@ViewBag.ElpsId' + '/@ViewBag.Email' + '/' + '@ViewBag.ApplicationHash' + '?docName=&uniqueid=';
+                }
+
+
+                $(this).fileupload({
+                    dataType: 'json',
+                    url: url,
+                    done: function (e, data) {
+                        var file = data.result
+                        $('#document' + i).val(file.FileId);
+                        $(this).removeAttr("required").css("display", "none");
+                        var source = "";
+                        if (file.source.indexOf('https') > -1) {
+                            source = file.source;
+                        } else {
+                            source = '@ViewBag.ElpsUrl' + file.source;
+                        }
+                        $("#txtsource").val(source);
+                        var str = source.replace("~", "");
+                        var src = str.match('.pdf$') ? '/Images/pdficon.png' : str;
+                        var respContent = '<div style="float: left; width: 30%;"><img src="' + src + '" class="thumbnail" style="height: 40px;" />';
+                        respContent += '</div><br />';
+                        respContent += '<a href="#" class="btn btn-xs btn-danger delFile" data-i="' + i + '" data-toggle="modal" data-target=".modalPopup" data-fileid="' + file.FileId + '"><i class="fa fa-times"></i> Delete</a>';
+                        respContent += '</div><div class="clearfix"></div>';
+                        $("#extFileName-" + i).html(respContent);
+                    },
+                    fail: function (e, data) {
+                        $(this).css("display", "block");
+                        $.each(data.messages, function (index, error) {
+                            console.log(error);
+                            if (error.toLowerCase().indexOf('bytes exceed file size' > -1)) {
+                                $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: Max. File size (4MB) Exceeded OR Invalid file type was selected (only pdf, jpg or png)<i class="elusive-remove" style="padding-left:10px;" /></p>')
+                                .appendTo('#extFileName-' + i);
+                            }
+                            else {
+                                $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: ' + error + '<i class="elusive-remove" style="padding-left:10px;" /></p>')
+                                .appendTo('#extFileName-' + i);
+                            }
+                        });
+                        var progBox = '#extProgress-' + $(this).attr("data-i") + ' .progress-bar';
+                        $(progBox).css(
+                        'width',
+                        0 + '%'
+                        ).text("");
+                    },
+                    progressall: function (e, data) {
+                        var progress = parseInt(data.loaded / data.total * 100, 10);
+                        var progBox = '#extProgress-' + i + ' .progress-bar';
+                        $(progBox).css(
+                        'width',
+                        progress + '%'
+                        ).text(progress + '%');
+                    }
+
+                }).prop('disabled', !$.support.fileInput)
+                .parent().addClass($.support.fileInput ? undefined : 'disabled')
+            }).bind('fileuploadadded', function (e, data) {
+                alert("File Upload complete");
+                });
+
+
+            $(document.body).on("click", '.btnEdit', function (e) {
+                debugger;
+                var i = $(this).attr("data-i");
+                e.preventDefault();
+                $('#editDoc' + i).css("display", "block");
+                $("#filebtn" + i).show().removeAttr("disabled").addClass("docEdit").addClass("docUpload");
+
+                //$(this).css("display", "none");
+            });
+
+
+
+
+
+            $(document.body).on("click", '.docEdit', function () {
+                debugger;
+                var loc = "";
+                var compId = $(this).attr("data-compid");
+                var docTypeId = $(this).attr("data-doctypeid");
+                var fileid = $(this).attr("data-docid");
+                var i = $(this).attr("data-i");
+                 var baseortran = $('#baseortran_' + i).val();
+                var documenttype = "";
+
+                if (baseortran === "T") {
+                    documenttype = "Facility"
+                    loc = '@ViewBag.ElpsUrl' + '/api/FacilityDocument/UpdateFile/' + docTypeId + '/@ViewBag.Elpsfacid' + '?docid=' + docTypeId;
+                    }
+                     else {
+                    documenttype = "Company"
+                    loc = '@ViewBag.ElpsUrl' + '/api/CompanyDocument/UpdateFile/' + docTypeId + '/@ViewBag.ElpsId' + '/' + documenttype.toLowerCase() + '?docid=' + docTypeId;
+                     }
+
+
+
+                $(this).fileupload({
+                    dataType: 'json',
+                    url: loc,
+                    done: function (e, data) {
+                        var file = data.result
+                        $('#document' + i).val(file.FileId);
+                        $(this).removeAttr("required").css("display", "none");
+                        var source = "";
+                        if (file.source.indexOf('https') > -1) {
+                            source = file.source;
+                        } else {
+                            source = '@ViewBag.ElpsUrl' + file.source;
+                        }
+                        $("#txtsource").val(source);
+                        var str = source.replace("~", "");
+                        var src = str.match('.pdf$') ? '/Images/pdficon.png' : str;
+                        var respContent = '<div style="float: left; width: 30%;"><img src="' + src + '" class="thumbnail" style="height: 40px;" />';
+                        respContent += '</div><br />';
+                        respContent += '<a href="#" class="btn btn-xs btn-danger delFile" data-i="' + i + '" data-toggle="modal" data-target=".modalPopup" data-fileid="' + file.FileId + '"><i class="fa fa-times"></i> Delete</a>';
+                        respContent += '</div><div class="clearfix"></div>';
+                        $("#extFileName-" + i).html(respContent);
+
+                    },
+                    fail: function (e, data) {
+                        $(this).css("display", "block");
+                        $.each(data.messages, function (index, error) {
+                            if (error.toLowerCase().indexOf('bytes exceed file size' > -1)) {
+                                $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: Max. File size (4MB) Exceeded OR Invalid file type was selected (only pdf, jpg or png) [' + error + ']<i class="elusive-remove" style="padding-left:10px;" /></p>')
+                                .appendTo('#extFileName-' + i);
+                            }
+                            else {
+                                $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: ' + error + '<i class="elusive-remove" style="padding-left:10px;" /></p>')
+                                .appendTo('#extFileName-' + i);
+                            }
+                        });
+                        var progBox = '#extProgress-' + $(this).attr("data-i") + ' .progress-bar';
+                        $(progBox).css(
+                        'width',
+                        0 + '%'
+                        ).text("");
+                    },
+                    progressall: function (e, data) {
+                        var progress = parseInt(data.loaded / data.total * 100, 10);
+                        var progBox = '#extProgress-' + i + ' .progress-bar';
+
+                        $(progBox).css(
+                        'width',
+                        progress + '%'
+                        ).text(progress + '%');
+                    }
+                }).prop('disabled', !$.support.fileInput)
+                .parent().addClass($.support.fileInput ? undefined : 'disabled')
+            }).bind('fileuploadadded', function (e, data) {
+                alert("File Upload complete");
+                });
+
+
+
+
+            $(document).on("click", ".delFile", function () {
+                var url = '@Url.Action("DeleteDocument")';
+                 var param = $(this).data("fileid");
+                 var i = $(this).attr("data-i");
+                 var baseortran = $('#baseortran_' + i).val();
+                 $.get(url, { fileId: param, appid: '@ViewBag.ApplicationId', "apptype": baseortran}, function (data) {
+                    $(".modalPopup").on('show.bs.modal', function () {
+                        var modal = $(this);
+                        modal.find('.modal-content').html(data);
+                    });
+                    $(".modalPopup").modal('show');
+                });
+            });
+
+
+
+
+
+        });
+</script>
+}

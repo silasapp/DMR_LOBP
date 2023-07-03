@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "PaymentReceipt";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h2 class="lefty">PAYMENT RECEIPT</h2>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="row xrow">
+    <div class="col-md-8 col-md-offset-1">
+        <div style="color: gray; font-size: 14px; box-sizing: border-box;">
+
+                <div style="background-color: #ece8d4; width:700px; min-height:200px;">
+                    <div style="padding: 10px 30px 30px 30px;">
+                        @{
+                            if (ViewBag.PaymentLog.Status == "AUTH")
+                            {
+                                <h3 style="color: green; text-align: center; font-weight: 300; padding-bottom: 8px; border-bottom: 1px solid #ddd;">Transaction Success</h3>
+                            }
+                            else if (ViewBag.PaymentLog.Status == "INIT")
+                            {
+                                <h3 style="color: blue; text-align: center; font-weight: 300; padding-bottom: 8px; border-bottom: 1px solid #ddd;">Awaiting Payment</h3>
+                            }
+                            else if (ViewBag.PaymentLog.Status == "FAIL")
+                            {
+                                <h3 style="color: red; text-align: center; font-weight: 300; padding-bottom: 8px; border-bottom: 1px solid #ddd;">Transaction  Fail</h3>
+                            }
+                        }
+
+                        <p style="text-align: right; font-size: 14px;"></p>
+                        <div>
+                            Details Of The Transaction Is Listed Below: <br /><br />
+                            <ul>
+                                <li>Application ID: @ViewBag.PaymentLog.ApplicationId</li>
+                                <li>Remita Reference: @ViewBag.PaymentLog.RRReference</li>
+                                <li>Total Amount: @ViewBag.TotalAmount</li>
+                                <li>Application Date: @ViewBag.PaymentLog.TransactionDate.ToString()</li>
+                                <li>Message: <strong style="color:green;font-size:large;">@ViewBag.PaymentLog.TxnMessage</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+        </div>
+    </div>
+</div>
+
+
+
+

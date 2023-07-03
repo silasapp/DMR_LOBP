@@ -1,0 +1,64 @@
+﻿@model List<LOBP.DbEntities.ActionHistory>
+
+@{
+    ViewBag.Title = "TransitionHistory";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<div class="content">
+    <h2 class="lefty">Transition History</h2>
+    <div class="righty">
+            <a href="@Url.Action("ViewApplication", new { applicationId = ViewBag.ApplicationID })" class="btn btn-default">Back <i class="icon-arrow-left"></i></a>
+    </div>
+    <hr class="clear" />
+            <table class="table dataTable">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="15%">Date</th>
+                        <th width="15%">Location</th>
+                        <th width="15%">Action</th>
+                        <th width="25%">ProcessedBy</th>
+                        <th width="20%">ReceivedBy</th>
+                        <th width="65%">Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int i = 1;}
+
+                    @foreach (LOBP.DbEntities.ActionHistory n in Model)
+                    {
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>@n.ActionDate.Value.ToString("yyyy-MMM-dd HH:mm")</td>
+                            <td>@( ((n.TriggeredByRole == n.TargetedToRole) && n.TriggeredByRole == "COMPANY")?"COMPANY":n.FieldLocation.Description)</td>
+                            <td>@n.Action</td>
+                            <td>@n.TriggeredBy</td>
+                            <td>@n.TargetedTo</td>
+                            <td>@n.MESSAGE</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $(".dataTable").dataTable({
+                "aLengthMenu": [15, 25, 50, 75, 100, 200],
+                'iDisplayLength': 15,
+                columnDefs: [{ orderable: false, "targets": [-1, -3] }],
+                "language": {
+                    "lengthMenu": "Display _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                }
+            });
+        });
+    </script>
+
+}

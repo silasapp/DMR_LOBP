@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="Cache-Control" content="no-cache">
+    <meta name="Pragma" content="no-cache">
+    <meta name="Expires" content="0">
+    <title>Login</title>
+    <link href="@Url.Content("~/Content/bootstrap.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/MainStyle.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/otherStyle.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Fonts5/css/all.min.css")" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/Images/coat-of-arm.jpg")" />
+
+    <style>
+        .btn.round {
+            border-radius: 50px;
+        }
+
+        #main1 {
+            position: relative;
+        }
+
+        div#first {
+            background-image: url('../Images/refinery.png');
+            opacity: 0.1;
+            width: 350px;
+            height: 277px;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        div#second {
+            width: 350px;
+            height: 277px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+
+        .flash {
+            border: 2px solid #e32424;
+            border-radius: 10px;
+            color: #e32424;
+            -webkit-animation: pulse linear 2s infinite;
+            animation: pulse linear 2s infinite;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top shadow">
+        <div class="container">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <a href="#">
+                    <img src="@Url.Content("~/Images/LOBPLogo.png")" height="65"/>
+                </a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav pull-right">
+                    <li>
+                        <a href="https://ems.dpr.gov.ng/Tickets/New" target="_blank" class="flash">Complain/Enquiries</a>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="main">
+        @RenderBody()
+        <br />
+    </div>
+
+    <div class="">
+        <hr style="margin: 10px; padding: 0px;">
+        <div style="margin-top: 0px; text-align: center;" class="container">
+            <footer>
+                <p>
+                    <a href="#">General Information</a>      |
+                    <a href="#">How it works</a>      |
+                    <a href="/Home/faq">FAQs</a> |
+                    <a href="#">Term of Use</a>      |
+                    <a href="#">Privacy Policy</a>      |
+                    <a href="#">Disclaimer</a>      |
+                    <a href="#">Contact Us</a>
+                </p>
+                <p>&copy; @DateTime.Now.Year Nigerian Midstream and Downstream Petroleum Regulatory Authority </p>
+
+            </footer>
+        </div>
+    </div>
+
+    <script src="@Url.Content("~/Scripts/jquery-1.10.2.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.js")"></script>
+    <script src="@Url.Content("~/Scripts/respond.js")"></script>
+    <script src="@Url.Content("~/Scripts/moment.js")"></script>
+    <script src="@Url.Content("~/Scripts/modernizr-2.6.2.js")"></script>
+    <script src="@Url.Content("~/Fonts5/js/all.min.js")"></script>
+    <script type="text/javascript">
+        $(function () {
+     
+            $(".tab:first-child").addClass("active");
+            $("div.pane:first-child").addClass("active");
+
+            $(".tab a[role='tab']").click(function (e) {
+                e.preventDefault();
+                $(".tab").removeClass("active");
+                $(this).parent(".tab").addClass("active");
+
+                var who = $(this).attr("href");
+                $("div.pane").removeClass("active");
+                $(who).addClass("active");
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+﻿@model List<LOBP.DbEntities.UserMaster>
+
+@{
+    ViewBag.Title = "CompanyReports";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="content">
+    <h2 class="lefty">Company Reports</h2>
+    <div class="righty">
+        <a href="#" id="excelExportId" onclick="javascript:ExcelReport();" class="btn btn-default">Export <i class="icon-arrow-left"></i></a>
+    </div>
+    <hr class="clear" />
+
+    <table id="myTable" class="table table-striped customDT">
+        <thead>
+            <tr>
+                <th style="width: 197px;">Company Name</th>
+                <th style="width: 100px;">RegNo</th>
+                <th style="width: 200px;">CompanyEmail</th>
+                <th style="width: 200px;">Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (LOBP.DbEntities.UserMaster up in Model)
+            {
+                <tr>
+                    <td>@up.FirstName</td>
+                    <td>@up.CACNumber</td>
+                    <td>@up.UserId</td>
+                    <td>@up.UserLocation</td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section scripts{
+<script type="text/javascript" src="@Url.Content("~/Scripts/table2excel.js")"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        
+
+        $("#excelExportId").click(function () {
+            var table = $('#myTable').DataTable();
+            $('<table>').append(table.$('tr').clone()).table2excel({
+                exclude: ".noExl",
+                name: "Excel Document Name",
+                filename: "CompanyReport" + new Date().toISOString().replace(/[\-\:\.]/g, ""),
+                fileext: ".xls",
+                exclude_img: true,
+                exclude_links: true,
+                exclude_inputs: true
+            });  
+
+         
+        });
+    });
+</script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+            $(".customDT").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}

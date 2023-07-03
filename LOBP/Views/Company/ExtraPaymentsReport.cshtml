@@ -1,0 +1,67 @@
+﻿
+@model List<LOBP.DbEntities.ExtraPayment>
+@{
+    ViewBag.Title = "ExtraPaymentsReport";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+
+}
+
+
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">My Extra Payments</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+@if (ViewBag.ResponseMessage == "SUCCESS")
+{
+    <div class="row xrow">
+        <div class="col-md-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Application ID</th>
+                        <th>License ApplicationType</th>
+                        <th>Date Applied</th>
+                        <th>RemitaReference</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ViewBag.Counter = 0;}
+                    @foreach (LOBP.DbEntities.ExtraPayment extrapayment in Model)
+                    {
+                    <tr>
+                        <td>@(ViewBag.Counter += 1)</td>
+                        <td>@extrapayment.ApplicationID</td>
+                        <td>@extrapayment.LicenseTypeCode</td>
+                        <td>@extrapayment.TransactionDate.Value.ToString("dd-MMM-yyyy HH:mm")</td>
+                        <td>@extrapayment.RRReference</td>
+                        @if (extrapayment.Status == "Pending" || extrapayment.Status == "FAIL")
+                        {
+                            <td class="badge btn btn-sm" style="background-color:red; color:white">Pending</td>
+                        }
+                        else { <td class="badge btn btn-sm" style="background-color:forestgreen; color:white">Paid</td>}
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-md-12">
+        <div class="col-sm-12">
+            <div class="alert alert-warning alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="fa fa-exclamation-triangle fa-2x fa-border fa-spin " aria-hidden="true"></i>
+                <strong>@MvcHtmlString.Create(ViewBag.ResponseMessage)</strong>
+            </div>
+        </div>
+    </div>
+}

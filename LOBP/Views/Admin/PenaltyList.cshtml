@@ -1,0 +1,171 @@
+﻿
+@{
+    ViewBag.Title = "All Payment";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="content">
+
+    @using (Html.BeginForm("UpdatePenaltyUniqueCode", "Admin", FormMethod.Post, new { id = "formid", role = "form", @class = "form-horizontal" }))
+    {
+        <div class="modal fade updaterecordmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+            <div class="modal-dialog modal" style="vertical-align: middle; margin:0 auto 0 30%; overflow-y:hidden; overflow-x:hidden; display:block; margin-top:50px" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Update Facility Record</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-4">
+                                        <label>Penalty Code</label>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <input type="hidden" id="penaltycodeid" readonly name="penaltycodeid" />
+                                                <input type="text" id="penaltycode" name="penaltycode" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <span style="margin-left:200px"> <button class="btn btn-success" id="facupdaterecord" type="button"><span class="glyphicon glyphicon-save"></span> Update Record</button></span>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+
+
+
+    <h2>@ViewBag.Title</h2>
+    <table class="table table-striped table-bordered table-hover dataTable">
+        <thead>
+            <tr>
+
+
+                <th>RRR Ref Number</th>
+                <th>Application Ref Number</th>
+                <th>Payment Type</th>
+                <th>Applicant Email</th>
+                <th>Transaction Date</th>
+                <th>Transaction ID</th>
+                <th>Total Amount</th>
+                <th>Sanction Type</th>
+                <th>Status</th>
+                @if (ViewBag.Loggedinuserrole == "SUPERADMIN")
+                {
+                    <th>Extra Payment Ref Number</th>
+                    <th>Penalty Code</th>
+                    <th></th>
+
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var b in ViewBag.PenaltyList)
+            {
+            <tr>
+
+                <td>@b.RRReference</td>
+                <td>@b.ApplicationID</td>
+                <td>@b.LicenseTypeCode</td>
+                <td>@b.ApplicantId</td>
+                <td>@b.TransactionDate</td>
+                <td>@b.TransactionID</td>
+                <td>@b.TxnAmount</td>
+                <td>@b.SanctionType</td>
+                <td>
+                    @{
+                        if (b.Status == "AUTH")
+                        {
+                            <div class="btn btn-xs btn-success">Payment Completed</div>
+                        }
+                        else
+                        {
+                            <div class="btn btn-xs btn-warning">Payment Pending</div>
+                        }
+                    }
+
+                </td>
+                @if (ViewBag.Loggedinuserrole == "SUPERADMIN")
+                {
+                    <td>@b.ExtraPaymentAppRef</td>
+                    <td>@b.PenaltyCode</td>
+                    <td><button class="btn btn-success btn-xs" onclick="PenaltyJs('@b.ExtraPaymentAppRef','@b.PenaltyCode')" id="updatebtn"><span class="glyphicon glyphicon-eye-open"></span> Update</button></td>
+                }
+
+            </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+@section scripts{
+    <script type="text/javascript">
+            $(function () {
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                'dom': 'Blfrtip',
+                'columnDefs': [{ orderable: false, "targets": [-1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+
+                $("#facupdaterecord").click(function () {
+
+                    var msg = confirm("Are you sure you want to update this record?");
+                    $(".updaterecordmodal").modal("hide");
+                    var penaltycode = $("#penaltycode").val();
+                    var extrapaymentid = $("#penaltycodeid").val();
+
+
+                    if (msg === true) {
+                        $.post("/Admin/UpdatePenaltyUniqueCode", { Penaltycode: penaltycode, "Extrapaymentid": extrapaymentid}, function (res) {
+                            if (res.Status === "success") {
+                                alert("Update was successful");
+
+                                history.go(0);
+
+                                $(".updaterecordmodal").modal("hide");
+                            }
+                            else {
+                                alert("Something went wrong");
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+
+                });
+
+
+
+            });
+
+        function PenaltyJs(extrapaymentid, Penaltycode) {
+            debugger;
+            $("#penaltycode").val(Penaltycode);
+            $("#penaltycodeid").val(extrapaymentid);
+            $(".updaterecordmodal").modal('show');
+        };
+
+    </script>
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="22b771fc87734212a668ad75b737aee8" Name="Diagram1">
+        <EntityTypeShape EntityType="LOBPModel.ActionHistory" Width="1.5" PointX="3" PointY="40.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.ApplicationTypeLookUp" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.Appointment" Width="1.5" PointX="11.25" PointY="40.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.AppointmentReport" Width="1.5" PointX="13.5" PointY="47.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.BaseOilStorageTnkFacility" Width="1.5" PointX="8.25" PointY="34.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.BlendingKettle" Width="1.5" PointX="8.25" PointY="38.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.Configuration" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.CountriesMasterList" Width="1.5" PointX="4.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.FieldLocation" Width="1.5" PointX="1.5" PointY="28" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.Functionality" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.InspectionDetailSummaryRpt" Width="1.5" PointX="14.25" PointY="39.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.InspectionEffluentHandlingDisposal" Width="1.5" PointX="8.25" PointY="41.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.InspectionQualityCtrlProp" Width="1.5" PointX="8.25" PointY="58.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.InspectionSafetyFacility" Width="1.5" PointX="8.25" PointY="52.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.InspectionTypeMasterList" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.IntermediateHoldingTank" Width="1.5" PointX="8.25" PointY="68.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.LandTopologyLookUp" Width="1.5" PointX="6.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.LegacyRequiredDocument" Width="1.5" PointX="6.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.LgaMasterList" Width="1.5" PointX="3.75" PointY="51.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.LicenseType" Width="1.5" PointX="0.75" PointY="40.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.ListOfLubricant" Width="1.5" PointX="8.25" PointY="72.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.LubricantTypeLookUp" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.Menu" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.NatureOfAreaLookUp" Width="1.5" PointX="2.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.PaymentLog" Width="1.5" PointX="11.25" PointY="32.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.PlantTypeLookUp" Width="1.5" PointX="8.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.RequestFieldMapping" Width="1.5" PointX="10.75" PointY="45.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.Session" Width="1.5" PointX="8.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.StateMasterList" Width="1.5" PointX="1.5" PointY="51.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.TypeOfPlantLookUp" Width="1.5" PointX="12" PointY="29.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.UserActivity" Width="1.5" PointX="3" PointY="36.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.UserActivityHist" Width="1.5" PointX="8.25" PointY="45" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.UserLogin" Width="1.5" PointX="3" PointY="32.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.UserMasterHist" Width="1.5" PointX="6.75" PointY="29.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LOBPModel.ZoneFieldMapping" Width="1.5" PointX="3.75" PointY="29.25" IsExpanded="true" />
+        <AssociationConnector Association="LOBPModel.FK_ActionHistory_Location" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_ActLicenseTypeCode" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.fk_AppointmentResults2" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_AtmLicenseTypeCode" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_UserMasterHist_Location" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.RequestFieldMapping_FieldLocID_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.ZoneFieldMapping_FieldLocID_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.ZoneFieldMapping_ZoneFieldID_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_InspectnDtlSummaryRpt_TypeOfPlantId" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.fk_LgaMasterList" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_PaymentLog_License" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_UserActivity_LicenseType" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_UserActivityHist_LicenseType" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.RequestFieldMapping_StateCode_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="LOBPModel.FK_UserActivityHist_ActivityID" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="LOBPModel.Facility" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="LOBPModel.MissingDocument" Width="1.5" PointX="0.75" PointY="10.75" />
+        <EntityTypeShape EntityType="LOBPModel.OutofOffice" Width="1.5" PointX="2.75" PointY="10.75" />
+        <EntityTypeShape EntityType="LOBPModel.SubmittedDocument" Width="1.5" PointX="7.75" PointY="10.75" />
+        <EntityTypeShape EntityType="LOBPModel.TakeoverApp" Width="1.5" PointX="9.75" PointY="10.75" />
+        <EntityTypeShape EntityType="LOBPModel.Penalty" Width="1.5" PointX="12.375" PointY="10.75" />
+        <EntityTypeShape EntityType="LOBPModel.ExtraPayment" Width="1.5" PointX="10.375" PointY="13.75" />
+        <EntityTypeShape EntityType="LOBPModel.Tank" Width="1.5" PointX="11.375" PointY="3.75" />
+        <EntityTypeShape EntityType="LOBPModel.MistdoData" Width="1.5" PointX="13.375" PointY="0.75" />
+        <EntityTypeShape EntityType="LOBPModel.ApplicationRequest" Width="1.5" PointX="6" PointY="40.375" />
+        <AssociationConnector Association="LOBPModel.ActionHistory_ApplicationID_FK" />
+        <AssociationConnector Association="LOBPModel.FK_APPLicenseTypeCode" />
+        <AssociationConnector Association="LOBPModel.FK_AppRequest_LgaCode" />
+        <AssociationConnector Association="LOBPModel.FK_BaseOilStrgTnkFac_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_BlendingKettles_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_EffluentHandlingDisposal_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_InspectionQualityCtrlProp_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_InspectionSafetyFacilities_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_InspectnDtlSummaryRpt_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_InterHldTanks_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_ListOfLubricants_ApplicationId" />
+        <AssociationConnector Association="LOBPModel.FK_ApplicationRequest_FieldLocation" />
+        <AssociationConnector Association="LOBPModel.FK_ApplicationRequest_StateMasterList" />
+        <AssociationConnector Association="LOBPModel.FK_PaymentLog_ApplicationRequest" />
+        <EntityTypeShape EntityType="LOBPModel.LegacyDocument" Width="1.5" PointX="11.375" PointY="6.75" />
+        <EntityTypeShape EntityType="LOBPModel.RequiredLicenseDocument" Width="1.5" PointX="13.375" PointY="4.75" />
+        <EntityTypeShape EntityType="LOBPModel.UserMaster" Width="1.5" PointX="3.75" PointY="22.125" />
+        <AssociationConnector Association="LOBPModel.FK_UserMaster_FieldLocation" />
+        <EntityTypeShape EntityType="LOBPModel.Role" Width="1.5" PointX="12.75" PointY="13.75" />
+        <EntityTypeShape EntityType="LOBPModel.RoleFunctionalityMapping" Width="1.5" PointX="0.75" PointY="14.75" />
+        <EntityTypeShape EntityType="LOBPModel.WorkFlowNavigation" Width="1.5" PointX="5.375" PointY="14.75" />
+        <EntityTypeShape EntityType="LOBPModel.WorkFlowState" Width="1.5" PointX="3.375" PointY="15" />
+        <AssociationConnector Association="LOBPModel.ActionHistory_FK_CurrentStageID" />
+        <AssociationConnector Association="LOBPModel.ActionHistory_FK_NextStateID" />
+        <AssociationConnector Association="LOBPModel.FK_ApplicationRequest_WorkFlowState" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,426 @@
+﻿@using LOBP.DbEntities
+
+@{
+    ApplicationRequest br = Model;
+    ViewBag.Title = "ApplicationDetails";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    LOBP.Helper.UtilityHelper commonHelper = new LOBP.Helper.UtilityHelper();
+    //var dbCtxt = new LubeBlendingDBEntities();
+    //string storagetypes =   commonHelper.getStorageTypes(dbCtxt,br.StorageType);
+    //ViewBag.Date = appt == null ? null : appt.AppointmentDateStamp == null ? null : appt.AppointmentDateStamp.Value.ToString("dd-MMM-yyyy");
+    //ViewBag.TimeStamp = appt == null ? null : appt.AppointmentDateStamp == null ? null : appt.AppointmentDateStamp.Value.ToString("HH:mm:ss");
+}
+
+<div class="content">
+    <h3 class="lefty">@br.LicenseType.Description Application Form</h3>
+    <div class="righty">
+        <a href="@Url.Action("ViewApplication", new { applicationId = br.ApplicationId })" class="btn btn-default">Back <i class="icon-arrow-left"></i></a>
+    </div>
+    <hr class="clear" />
+    <div class="row">
+
+        @if ((br.LicenseTypeId.Contains("PTE") || br.LicenseTypeId.Contains("ATC") || br.LicenseTypeId.Contains("SSA") || br.LicenseTypeId.Contains("ATM") || br.LicenseTypeId.Contains("ATO")) && (br.IsLegacy == "NO"))
+        {
+            <div class="col-md-11">
+                <div class="form-horizontal">
+
+                    <input type="hidden" id="maplocation" name="maplocation" value="@br.SiteLocationAddress" />
+                    <input type="hidden" id="GPS" name="GPS" value="@br.GPSCordinates" />
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Name Of Company</label>
+                        <div class="col-md-10">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.ApplicantName" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Site Location</label>
+                        <div class="col-md-10">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.SiteLocationAddress" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">State Site Located</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.StateMasterList.StateName" />
+                        </div>
+                        <label class="control-label col-md-2">Local Government Area</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LgaMasterList.LgaName" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Land Size</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input class="form-control" readonly="readonly" type="text" value="@br.LandSize" />
+                                <span class="input-group-addon">M²</span>
+                            </div>
+                        </div>
+                        <label class="control-label col-md-2">GPS Cordinates</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input class="form-control" readonly="readonly" type="text" value="@br.GPSCordinates" />
+                                <span class="input-group-addon">DDM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Beacon Location</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.BeaconLocations" />
+                        </div>
+                        <label class="control-label col-md-2">Access Road</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AccessRoadToFromSite" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Land Topology</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LandTopology" />
+                        </div>
+                        <label class="control-label col-md-2">Nature Of Area</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.NatureOfArea" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Proposed Capacity</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualCumuBaseOilRequirementCapacity" />
+                        </div>
+                        <label class="control-label col-md-2">Production Annual Projection</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualProductionProjectionCapacity" />
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Any Equipment or Structure on Site</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.AnyEquipmentOnSite</textarea>
+                        </div>
+                        <label class="control-label col-md-2">Relationship With PipeLine Right of Way?</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.RelationshipWithPipelineRightOfWay</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Relationship With Stream or River</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.RelationshipWithStreams</textarea>
+                        </div>
+                        <label class="control-label col-md-2">Relationship With PHCN High Tension Lines?</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.RelationshipWithPHCNTensionLines</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Relationship With Railway Line</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.RelationshipWithRailwayLine</textarea>
+                        </div>
+                        <label class="control-label col-md-2">Relationship With Sensitive Institution</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.RelationshipWithSensitiveInstitutions</textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Additional Information</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.AdditionalInfo</textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        }
+
+
+
+        @if ((br.LicenseTypeId.Contains("LTO") || br.LicenseTypeId.Contains("PTE") || br.LicenseTypeId.Contains("ATC") || br.LicenseTypeId.Contains("SSA")) && (br.IsLegacy == "YES"))
+        {
+            <div class="col-md-11">
+                <div class="form-horizontal">
+
+                    <input type="hidden" id="maplocation" name="maplocation" value="@br.SiteLocationAddress" />
+                    <input type="hidden" id="GPS" name="GPS" value="@br.GPSCordinates" />
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Name Of Company</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.ApplicantName" />
+                        </div>
+                        <label class="control-label col-md-2">Site Location</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.SiteLocationAddress" />
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">State Site Located</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.StateMasterList.StateName" />
+                        </div>
+                        <label class="control-label col-md-2">Local Government Area</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LgaMasterList.LgaName" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Approval / License Reference</label>
+                        <div class="col-md-10">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LicenseReference" />
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Issued Date</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LicenseIssuedDate.Value.ToString("dd-MMM-yyyy")" />
+                        </div>
+                        <label class="control-label col-md-2">Expiry Date</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LicenseExpiryDate.Value.ToString("dd-MMM-yyyy")" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Land Size</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input class="form-control" readonly="readonly" type="text" value="@br.LandSize" />
+                                <span class="input-group-addon">M²</span>
+                            </div>
+                        </div>
+                        <label class="control-label col-md-2">GPS Cordinates</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input class="form-control" readonly="readonly" type="text" value="@br.GPSCordinates" />
+                                <span class="input-group-addon">DDM</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Plant Annual Capacity</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualCumuBaseOilRequirementCapacity" />
+                        </div>
+                        <label class="control-label col-md-2">Annual Production Projections</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualProductionProjectionCapacity" />
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Additional Information</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.AdditionalInfo</textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        }
+
+        else if (br.LicenseTypeId.Contains("LTO") && br.IsLegacy == "NO")
+        {
+            <div class="col-md-11">
+                <div class="form-horizontal">
+
+                    <input type="hidden" id="maplocation" name="maplocation" value="@br.SiteLocationAddress" />
+                    <input type="hidden" id="GPS" name="GPS" value="@br.GPSCordinates" />
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Name Of Company</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.ApplicantName" />
+                        </div>
+                        <label class="control-label col-md-2">Total Storage Capacity</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.StorageCapacity" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Location of Facility</label>
+                        <div class="col-md-10">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.SiteLocationAddress" />
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">State Of Facility</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.StateMasterList.StateName" />
+                        </div>
+                        <label class="control-label col-md-2">Local Government Area</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.LgaMasterList.LgaName" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Annual Cumulative Base Oil Requirement</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualCumuBaseOilRequirementCapacity" />
+                        </div>
+                        <label class="control-label col-md-2">Annual Production Projections</label>
+                        <div class="col-md-4">
+                            <input class="form-control" readonly="readonly" type="text" value="@br.AnnualProductionProjectionCapacity" />
+                        </div>
+                    </div>
+
+                  
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Production Base Oil Requirements</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="3" readonly="readonly">@br.ProdBaseOilRequirement</textarea>
+                        </div>
+                        <label class="control-label col-md-2">Lubricants Produced by Company</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="3" readonly="readonly">@br.LubricantProdByCompany</textarea>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Training & Maintenance Programme</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.ListOfPropTrainingforStaff</textarea>
+                        </div>
+                        <label class="control-label col-md-2">Preventive Annual Maintenance Programme</label>
+                        <div class="col-md-4">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.PreventiveAnnualMaintPrgmPlant</textarea>
+                        </div>
+                    </div>
+                   
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Additional Information</label>
+                        <div class="col-md-10">
+                            <textarea class="form-control" rows="2" readonly="readonly">@br.AdditionalInfo</textarea>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        }
+
+
+
+
+
+
+        <div class="form-group" id="maps_container" style="height:350px; width:100%;">
+        </div>
+
+
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC2df9i_A809q2eQQizBb7UqSGXASsQHVQ&libraries=places"></script>
+    <script type="text/javascript">
+
+        function loadMap() {
+            var mapDiv = document.getElementById("maps_container");
+
+            //var gpsCordinates = document.getElementById("GPS");
+            var gpsCordinates = $("#GPS").val();
+            console.log('Gps Cordinates = ' + gpsCordinates);
+            var locationaddress = $("#maplocation").val();
+            console.log('LocationAddress = ' + locationaddress);
+
+
+            if (gpsCordinates != null || gpsCordinates != ' ') {
+
+                google.maps.visualRefresh = true;
+
+                var array = gpsCordinates.split(',')
+
+                var latitude = array[0];
+                console.log('latitude = ' + latitude);
+                var longitude = array[1];
+                console.log('longitude = ' + longitude);
+                var myCenter = new google.maps.LatLng(latitude, longitude);
+
+                var mapOptions = {
+                    center: myCenter,
+                    zoom: 14,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    panControl: true,
+                    zoomControl: true,
+                    mapTypeControl: true,
+                    scaleControl: true,
+                    streetViewControl: true,
+                    overviewMapControl: true,
+                    rotateControl: true,
+                    zoomControl: true,
+                    zoomControlOptions: {
+                        style: google.maps.ZoomControlStyle.SMALL
+                    },
+                    mapTypeControl: true,
+                    mapTypeControlOptions: {
+                        style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        mapTypeIds: [
+                google.maps.MapTypeId.ROADMAP,
+                google.maps.MapTypeId.TERRAIN,
+                google.maps.MapTypeId.SATELLITE,
+                google.maps.MapTypeId.HYBRID
+                        ]
+                    }
+                };
+
+                var map = new google.maps.Map(mapDiv, mapOptions);
+                var marker = new google.maps.Marker({ position: myCenter, animation: google.maps.Animation.BOUNCE });
+                marker.setMap(map);
+
+
+                var infowindow = new google.maps.InfoWindow({ content: locationaddress });
+                infowindow.open(map, marker);
+
+
+                google.maps.event.addListener(marker, 'click', function () {
+                    map.setZoom(13);
+                    map.setCenter(marker.getPosition());
+                });
+
+
+            }
+
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            loadMap();
+        });
+    </script>
+}

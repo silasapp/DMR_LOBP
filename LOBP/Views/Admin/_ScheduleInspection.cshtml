@@ -1,0 +1,69 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title text-center">
+        Inspection Schedule Maintenance
+    </h4>
+</div>
+
+<div class="modal-body">
+    <form action="@Url.Action("ScheduleAppointment")" method="post" class="form-horizontal">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ApplicationId" id="ApplicationId" value="@ViewBag.ApplicationId" />
+        <input type="hidden" name="AppointmentType" id="AppointmentType" value="@ViewBag.AppointmentType" />
+
+            <div class="form-group">
+                <label class="control-label col-md-3">License Type</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="@ViewBag.AppDescription" readonly style="border: 0px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3">Application Reference</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="@ViewBag.ApplicationId" readonly style="border: 0px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3">Application Type</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" value="@ViewBag.ApplicationType" readonly style="border: 0px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label  class="col-md-3 control-label">Proposed Date & Time</label>
+                <div class="col-md-9">
+                    <input class="form-control"  type="text" id="ProposedDate" required="" name="ProposedDate">
+                </div>
+            </div>
+        <div class="clear"></div>
+        <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" value="Save" class="btn btn-success round">
+        </div>
+    </form>
+</div>
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<link href="~/Scripts/DateTimePicker/jquery.datetimepicker.min.css" rel="stylesheet" />
+<script src="~/Scripts/DateTimePicker/jquery.datetimepicker.full.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {         
+            $('#ProposedDate').datetimepicker({
+                minDate: 0,
+                step: 1,
+                beforeShowDay: false,
+                onGenerate: function (ct) {
+                    jQuery(this).find('.xdsoft_date.xdsoft_weekend')
+                        .addClass('xdsoft_disabled');
+                },
+                onSelect: function (selected_date) {
+                }
+            });
+        })
+        
+    </script>

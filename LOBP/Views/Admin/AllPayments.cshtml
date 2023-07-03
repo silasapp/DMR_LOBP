@@ -1,0 +1,103 @@
+﻿@model List<LOBP.DbEntities.PaymentLog>
+
+@{
+    int count = 0;
+    ViewBag.Title = "AllPayments";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+}
+
+
+<div class="content">
+    <h2 class="lefty">All Payments</h2>
+    <div class="righty">
+        <a href="#" class="btn btn-md btn-primary newbtn"><i class="fa fa-home fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Home</a>
+    </div>
+    <hr class="clear" />
+
+    <table class="table  table-responsive table-bordered dataTable">
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>Id</th>
+                <th>Company</th>
+                <th>LicenseType</th>
+                <th>RRR</th>
+                <th>Arrears</th>
+                <th>LateRenewal</th>
+                <th>NonRenewal</th>
+                <th>TotalAmt</th>
+                <th>Capacity</th>
+                <th>RetryDate</th>
+                <th>RetryCount</th>
+                <th>Message</th>
+                <th>Status</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (LOBP.DbEntities.PaymentLog br in Model)
+            {
+                LOBP.DbEntities.UserMaster usermaster = dbCtxt.UserMasters.Where(u => u.UserId == br.ApplicantUserId).FirstOrDefault();
+                LOBP.DbEntities.ApplicationRequest appRequest = dbCtxt.ApplicationRequests.Where(a => a.ApplicationId == br.ApplicationId).FirstOrDefault();
+                
+                <tr>
+                    <td>@(count += 1)</td>
+                    <td><a href="@Url.Action("ApplicationDetails", new { applicationId = br.ApplicationId })">@br.ApplicationId</a></td>
+                    <td>@(usermaster.FirstName+" "+(br.ApplicantUserId))</td>
+                    <td>@br.LicenseTypeId</td>
+                    <td>@br.RRReference</td>
+                    <td>@br.Arrears.ToString("N")</td>
+                    <td>@( br.LateRenewalPenalty.HasValue?br.LateRenewalPenalty.Value.ToString("N") : "0")</td>
+                    <td>@( br.NonRenewalPenalty.HasValue ? br.NonRenewalPenalty.Value.ToString("N") : "0")</td>
+                    <td>@br.TxnAmount.Value.ToString("N")</td>
+                    <td>@Convert.ToInt64(appRequest.StorageCapacity).ToString("N")</td>
+                    <td>@br.LastRetryDate.Value.ToString("dd-MMM-yyyy hh:mm:ss")</td>
+                    <td>@br.RetryCount</td>
+                    <td>@br.TxnMessage</td>
+                    <td>
+                        @if (br.Status == "AUTH")
+                        {
+                            <div class="alert alert-mini alert-info">
+                                <strong>@br.Status</strong>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-mini alert-danger">
+                                <strong>@br.Status</strong>
+                            </div>
+                        }
+                    </td>
+
+                    <td><a href="@Url.Action("ViewApplication", new { applicationId = br.ApplicationId, showPart = false })" class="btn btn-xs btn-info">View <i class="icon-eye"></i></a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+            $(".sidebar > ul > li > ul li a[href='/Application']").addClass("selected");
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [-1, -3] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}
+
+

@@ -1,0 +1,276 @@
+﻿@model LOBP.DbEntities.ApplicationRequest
+
+@{
+    ViewBag.Title = "ApplicationSummary";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Application Fees Summary</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+
+<div class="row xrow">
+
+    @if (ViewBag.ResponseMessage == "SUCCESS")
+    {
+        <div class="panel col-sm-10">
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="divider"></div>
+                    @if (ViewBag.Paid)
+                    {
+                        if (Model.Status != "Processing")
+                        {
+                        <button onclick="Resubmit('@Model.ApplicationId')" class="btn btn-warning btn-sm round"><span>Resubmit</span><i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                        }
+
+                    }
+                    else
+                    {
+
+                        <button onclick="Payment('@Model.ApplicationId')" class="btn btn-primary btn-sm  round"><span>Pay Now</span><i class="fas fa-credit-card" aria-hidden="true"></i></button>
+
+
+                        @*<button onclick="ByPassPayment('@Model.ApplicationId')" class="btn btn-default btn-sm  round"><span>ByPass</span><i class="fa fa-credit-card  fa-border" aria-hidden="true"></i></button>*@
+
+                    }
+                </div>
+            </div>
+
+            <div class="row xrow">
+                <div class="col-md-6">
+                    <h2 class="invoice-client mrg10T">Application Info:</h2>
+                    <ul class="reset-ul">
+                        <li><b>License:</b> @Model.LicenseType.Description</li>
+                        <li><b>ID:</b>@Model.ApplicationId</li>
+                        <li><b>Date:</b>@Model.AddedDate.Value.ToString("dd-MMM-yyyy HH:mm")</li>
+                        @if (ViewBag.Paid == true)
+                        {
+                            <li><b>Status:</b> <span class="label label-success">Paid</span></li>
+                        }
+                        else
+                        {
+                            <li><b>Status:</b> <span class="label label-warning">Pending</span></li>
+                        }
+
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="invoice-client mrg10T">Fees Summary:</h2>
+                    <ul class="reset-ul">
+                        <li><b>License Fee:</b> @ViewBag.LicenseFee</li>
+                        <li><b>Processing Fee:</b> @ViewBag.ProcessFee</li>
+                        <li><b>Arrears:</b> @ViewBag.Arrears</li>
+                        @if (ViewBag.ApprovalFeeLicenseTypeId == "ATO")
+                        {
+                            <li><b>Approval Fee:</b> @ViewBag.Approvalfee</li>
+
+                        }
+                        @if (ViewBag.ApprovalFeeLicenseTypeId == "ATO" || ViewBag.ApprovalFeeLicenseTypeId == "ATM" || ViewBag.ApprovalFeeLicenseTypeId == "SSA" || ViewBag.ApprovalFeeLicenseTypeId == "TPBA" || ViewBag.ApprovalFeeLicenseTypeId == "TITA" || ViewBag.ApprovalFeeLicenseTypeId == "TCA" || ViewBag.ApprovalFeeLicenseTypeId == "ATCLFP" || ViewBag.ApprovalFeeLicenseTypeId == "LTOLFP")
+                        {
+                            <li><b>Service Charge:</b> @ViewBag.Servicecharge</li>
+
+                        }
+                        <li><b>Total Amount:</b> @ViewBag.TotalAmount</li>
+                    </ul>
+                </div>
+            </div>
+
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="center">#</th>
+                        <th><strong>Description</strong></th>
+                        <th class="right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="center">1</td>
+                        <td class="left">Statutory Government License Fee</td>
+                        <td class="left">@ViewBag.LicenseFee</td>
+                    </tr>
+                    <tr>
+                        <td class="center">2</td>
+                        <td class="left">DPR Processing Fee</td>
+                        <td class="right">@ViewBag.ProcessFee</td>
+                    </tr>
+
+                    <tr>
+                        <td class="center">3</td>
+                        <td class="left">License Fee in Arrears</td>
+                        <td class="left">@ViewBag.Arrears</td>
+                    </tr>
+
+                    @if (ViewBag.ApprovalFeeLicenseTypeId == "ATO" || ViewBag.ApprovalFeeLicenseTypeId == "ATM" || ViewBag.ApprovalFeeLicenseTypeId == "SSA" || ViewBag.ApprovalFeeLicenseTypeId == "TPBA" || ViewBag.ApprovalFeeLicenseTypeId == "TITA" || ViewBag.ApprovalFeeLicenseTypeId == "TCA" || ViewBag.ApprovalFeeLicenseTypeId == "ATCLFP" || ViewBag.ApprovalFeeLicenseTypeId == "LTOLFP")
+                    {
+                        <tr>
+                            <td class="center">4</td>
+                            <td class="left">DPR Service Charge</td>
+                            <td class="right">@ViewBag.Servicecharge</td>
+                        </tr>
+
+                    }
+                    @if (ViewBag.ApprovalFeeLicenseTypeId == "ATO")
+                    {
+                        <tr>
+                            <td class="center">5</td>
+                            <td class="left">DPR Approval Fee</td>
+                            <td class="right">@ViewBag.Approvalfee</td>
+                        </tr>
+
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-12">
+            <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="fa fa-exclamation-triangle fa-2x fa-border fa-spin" aria-hidden="true"></i>
+                <strong>@MvcHtmlString.Create(ViewBag.ResponseMessage)</strong>
+            </div>
+        </div>
+    }
+
+    <div style="display:none" class="loadingImage">
+        <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+            <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+        </div>
+    </div>
+
+
+</div>
+
+@section scripts{
+
+    <script type="text/javascript">
+
+        function getContextPath() {
+            return window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        }
+
+   
+
+
+
+
+        function Payment(ApplicationId) {
+
+            var r = confirm("This Will Generate Remita Retrieval Reference (RRR) for Payment, Continue ?");
+            if (r == true) {
+                $(".loadingImage").show();
+                $.post('@Url.Action("Payment")', { ApplicationId: ApplicationId }, function (data) {
+                    debugger;
+                    var status = data.Status;
+                    if (status != 'success') {
+                        $(".loadingImage").hide();
+                            alert(data.Message);
+                        } else {
+                            window.location.replace(data.NewUrl);
+                        }
+                    })
+            }
+        }
+
+
+
+
+
+
+
+        function ByPassPayment(ApplicationId) {
+            bootbox.confirm({
+                message: "This Will ByPass Remita Payment, Continue  ?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    if (result == true) {
+                        $(".loadingImage").show('fast');
+                        $.post('@Url.Action("ByPassPayment")', {
+                            ApplicationId: ApplicationId
+                        })
+                                            .done(function (data) {
+                                                console.debug("here");
+
+                                                var status = data.Status;
+                                                if (status != 'success') {
+                                                    $(".loadingImage").hide('fast');
+                                                    alert(data.Message);
+                                                } else {
+                                                    $(".loadingImage").hide('fast');
+                                                    console.debug(data.Message);
+                                                    window.location.replace(data.Message);
+                                                }
+
+                                            })
+                            .fail(function (data) {
+                                $(".loadingImage").hide('fast');
+                                                alert('Network Communication Error, Restore Connection and Try again');
+                                            })
+                            .always(function (data) { $(".loadingImage").hide('fast'); });
+                    }
+                }
+            });
+        }
+
+
+
+        function Resubmit(ApplicationId) {
+            bootbox.confirm({
+                message: "This Will Resubmit the Application to the Officer for Reverification?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    if (result == true) {
+                        $(".loadingImage").show('fast');
+                        $.post('@Url.Action("Resubmit")', {
+                            ApplicationId: ApplicationId
+                        })
+                                            .done(function (data) {
+                                                var status = data.Status;
+                                                if (status != 'success') {
+                                                    $(".loadingImage").hide('fast');
+                                                    alert(data.Message);
+                                                } else {
+                                                    $(".loadingImage").hide('fast');
+                                                    window.location.href = "/Company";
+                                                }
+                                            })
+                            .fail(function (data) {
+                                $(".loadingImage").hide('fast');
+                                                alert('Network Communication Error, Restore Connection and Try again');
+                                            })
+                            .always(function (data) { $(".loadingImage").hide('fast');});
+                    }
+                }
+            });
+        }
+    </script>
+}

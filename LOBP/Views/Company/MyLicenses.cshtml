@@ -1,0 +1,94 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+
+@{
+    int counter = 0;
+    ViewBag.Title = "MyLicenses";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h2 class="lefty">Approvals and Licenses</h2>
+        <div class="clear"></div>
+    </div>
+</div>
+
+@if (ViewBag.ErrorMessage == "SUCCESS")
+{
+    <div class="row xrow">
+        <div class="col-sm-12">
+            <table class="table dataTable">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>ApplicationId</th>
+                        <th>Description</th>
+                        <th>Reference</th>
+                        <th>Issue Date</th>
+                        <th>Expiry Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (LOBP.DbEntities.ApplicationRequest b in Model)
+                    {
+                        <tr>
+                            <td>@(counter += 1)</td>
+                            <td>@b.ApplicationId</td>
+                            <td>@b.LicenseType.Description</td>
+                            <td>@b.LicenseReference</td>
+                            <td>@b.LicenseIssuedDate.Value.ToString("dd-MMMM-yyyy")</td>
+                            <td>@b.LicenseExpiryDate.Value.ToString("dd-MMMM-yyyy")</td>
+                            @if (b.IsLegacy == "NO")
+                            {
+                                <td>
+                                    <a href="@Url.Action("ViewLicenseAsPDF", "Admin", new { applicationId = b.ApplicationId })" target="_blank" class="btn btn-info btn-xs round" role="button">View<i class="og-icon og-pdf righty"></i></a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="col-md-12">
+        <div class="alert alert-warning alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+            <i class="fas fa-exclamation-triangle fa-2x fa-border" aria-hidden="true"></i>
+            <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+        </div>
+    </div>
+}
+
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No License on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+        });
+    </script>
+}

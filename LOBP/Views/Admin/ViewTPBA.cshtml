@@ -1,0 +1,197 @@
+﻿@model IEnumerable<LOBP.Models.PermitModels>
+@using System.Globalization;
+
+@{
+    Layout = null;
+    DateTime date = DateTime.ParseExact("20/10/2021", "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <style type="text/css">
+    </style>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body style="">
+
+    <div style="padding:3px; color:black">
+
+        <div style="width:100%; height:98%;" class="divPermitPreview divPermitPreview2">
+
+            <div class="text-center">
+
+                <div style="font-family:'Times New Roman'; font-weight:bold; line-height:30px">
+
+                    <div style="font-size:20px; color:forestgreen; margin-top:45px"> NIGERIAN MIDSTREAM AND DOWNSTREAM </div>
+
+                    <div style="font-size:18px; color:forestgreen; margin-top:10px;"> PETROLEUM REGULATORY AUTHORITY </div>
+
+                    <span style="border-bottom: 2px dotted forestgreen; padding:4px;font-size:15px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().Address</span>
+
+                </div>
+
+                <p></p>
+
+                <div style="margin:0px 50px 0px 50px; padding:10px;" class="text-left">
+
+                    <table style="width: 100%; border-spacing: 0;">
+                        <tr>
+                            <td style="width:33.333%;" valign="top">
+                                <div style="border-bottom: dotted 2px #00a900;padding: 5px 0 0;">
+                                    <p style="display: inline-block; margin-bottom: -3px; font-size:15px; background-color: #FFF; padding: 3px 10px 3px 0; color: #00a900;">P.M.B. No:</p>
+                                    &nbsp;<span style="font-family: Calibri; font-size:15px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().PMB</span>
+                                </div>
+                                <p></p>
+                                <div style="border-bottom: dotted 2px #00a900;padding: 5px 0 0;">
+                                    <p style="display: inline-block; margin-bottom: -3px; font-size:15px; background-color: #FFF; padding: 3px 10px 3px 0; color: #00a900;">Telephone:</p>
+                                    &nbsp;<span style="font-family: Calibri; font-size:15px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().TelePhoneNumber</span>
+                                </div>
+
+                            </td>
+                            <td style="width: 33.333%;">
+                                @if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+                                {
+                                    <img src="~/Images/nmdpra.png" alt="Logo" style="height: 110px; display: block; margin: 0 auto" />
+                                }
+                                else
+                                {
+                                    <img src="~/Images/coat_of_arm.jpg" alt="Logo" style="height: 110px; display: block; margin: 0 auto" />
+                                }
+                            </td>
+                            <td style="width: 33.333%;" valign="top">
+                                <div style="border-bottom: dotted 2px #00a900;padding: 5px 0 0;">
+                                    <p style="display: inline-block; margin-bottom: -3px; font-size:15px; background-color: #FFF; padding: 3px 10px 3px 0; color: #00a900;">Ref. No:</p>
+                                    &nbsp;<span style="font-family: Calibri; font-size:15px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().PermitNumber</span>
+                                </div>
+                                <p></p>
+                                <div style="border-bottom: dotted 2px #00a900;padding: 5px 0 0;">
+                                    <p style="display: inline-block; margin-bottom: -3px; font-size:15px; background-color: #FFF; padding: 3px 10px 3px 0; color: #00a900;">Date:</p>
+                                    &nbsp;<span style="font-family: Calibri;font-size:15px;">@Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate</span>@*.ToString("MMMM dd, yyyy")*@
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                    <br /><br />
+
+                    <div style="font-family:'Times New Roman'; font-size:17px;">
+
+
+
+                        <div>
+                            <div class="text-center">
+                                <sanp style="font-weight:bold; text-decoration:underline;">THIRD PARTY BLENDING APPROVAL</sanp>
+
+                            </div>
+                            <p></p>
+                            <div style="line-height:30px; font-size:15px; text-align:justify">
+                                Pursuant to the provisions of the Petroleum Acts/Regulations Petroleum Act 1969, the Department of Petroleum Resources hereby grants this Third-Party Blending Approval as indicated:
+                                <br /><br />
+                                <b>1. NAME AND ADDRESS OF APPLICANT:</b>&nbsp; &nbsp; @Model.FirstOrDefault().permitmodels.FirstOrDefault().CompanyName/@Model.FirstOrDefault().permitmodels.FirstOrDefault().RegisteredAddress
+                                <br />
+
+                                <b>2. NAME AND ADDRESS OF @Model.FirstOrDefault().permitmodels.FirstOrDefault().TPBA_LABEL:</b>&nbsp; &nbsp;@Model.FirstOrDefault().permitmodels.FirstOrDefault().Prw_Plw_Name/@Model.FirstOrDefault().permitmodels.FirstOrDefault().Prw_Plw_Address
+                                <br />
+                                <b>3. APPROVAL DATE:</b> @Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate
+                                <br />
+                                <b>4. APPROVED QUANTITY TO BE BLENDED:</b> @Model.FirstOrDefault().permitmodels.FirstOrDefault().Capacity Litres
+                                <br />
+                                <b>5. OTHER REQUIREMENTS:</b>
+                                <br />
+                                This approval is granted under the following conditions:<br />
+
+                                i. Only approved quantities shall be blended with this approval.<br />
+                                ii. The safety and environmental requirements must be observed and complied with during operation of lube oil blending plant.<br />
+                                iii. You are expected to provide this office advance notification of the exact production dates to enable our representatives from the nearest field office conduct product quality checks and verification, as applicable.<br />
+                                iv.	You are to ensure that all bulk lubricant blend samples are accompanied by a product quality and quantity Certificate which must be endorsed by NMDPRA before evacuation from the plant.<br />
+                                v.  You must ensure that all lubricants produced is sold to only licensed distributors/retailers.<br />
+                                vi. Upon expiry of this approval, you are required to submit lubricants production reports detailing information on base oil receipt into the plant, source, grades, quantity and lubricants production indicating the grades, quantities and distribution.<br /><br />
+                                <b>6. VALIDITY:</b> @Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate - @Model.FirstOrDefault().permitmodels.FirstOrDefault().ExpiryDate
+                                <br />
+                                Please note that contravention of any of these conditions may constitute enough grounds for the NMDPRA to revoke this approval and/or invoke appropriate sanction.
+
+
+
+                            </div>
+                            <br />
+
+                            <table style="width: 100%; position: relative;">
+                                <tr style="height: 180px; margin-top: 0px;">
+                                    <td style="vertical-align: bottom;">
+                                        Yours faithfully,
+
+                                        <br />
+                                        <img src="@Url.Content(Model.FirstOrDefault().permitmodels.FirstOrDefault().Signature)" style="height: 100px; width: 235px;" />
+                                        <br />
+                                        @if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+                                        {
+                                            <sanp style="float:left">Authority Chief Excutive, NMDPRA</sanp>
+                                        }
+                                        else
+                                        {
+                                            <sanp style="float:left">Director/CEO, Department of Petroleum Resources.</sanp>
+                                        }
+
+                                    </td>
+                                    <td>
+                                        <div class="center">
+                                            <img style="height:150px" src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.FirstOrDefault().permitmodels.FirstOrDefault().QrCode))" />
+                                        </div>
+                                        <div style="clear: both;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</body>
+</html>
+@if (Convert.ToDateTime(Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) >= date || (Model.FirstOrDefault().permitmodels.FirstOrDefault().IssuedDate) == Convert.ToDateTime(null).ToString("MMMM dd, yyyy"))
+{
+    <style>
+        .divPermitPreview {
+            background-image: url('../../Images/waterMark2.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        #List1 li {
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+
+}
+else
+{
+    <style>
+        .divPermitPreview2 {
+            background-image: url('../../Images/waterMark.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        #List1 li {
+            display: inline-block;
+            text-align: left;
+        }
+    </style>
+}

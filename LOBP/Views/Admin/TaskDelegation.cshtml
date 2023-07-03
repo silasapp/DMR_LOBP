@@ -1,0 +1,181 @@
+﻿
+@using LOBP.DbEntities
+
+@model List<ApplicationRequest>
+
+
+@{
+    int count = 0;
+    ViewBag.Title = "TaskDelegation";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string userRole = ((LOBP.DbEntities.UserMaster)(Session["UserID"])).UserRoles;
+    LOBP.Helper.UtilityHelper utilityHelper = new LOBP.Helper.UtilityHelper();
+}
+
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-5">
+            <h2 class="">Applications On My Desk</h2>
+        </div>
+    </div>
+
+    <hr class="clear" />
+    <div class="modal fade" id="TaskDelegationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-center" id="modalhdid">
+                        Assign Task
+                    </h4>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id="AssignTaskForm" action="@Url.Action("AssignTaskModal")" method="post" class="form-horizontal">
+                                         
+                        <div class="form-group">
+                            <label class="control-label col-md-3">New Assigned Task</label>
+                            <div class="col-md-9">
+                                <select id="Newtask" name="Newtask" class="form-control UserRoles" required style="width: 100%"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">ApplicationId</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="appid" name="appid" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Last Assigned Task</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="Oldtask" name="Oldtask" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Current Office Location</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="officelocation" name="officelocation" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Comment</label>
+                            <div class="col-md-9">
+                                <textarea type="text" class="form-control" id="Comment" name="Comment" required="required" style="width: 100%; resize:none"></textarea>                            
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="SaveBtn" class="btn btn-info btn-sm round">Save Changes</button>
+                            <button type="button" id="ClearBtn" class="btn btn-warning btn-sm round">Clear</button>
+                            <button type="button" class="btn btn-default btn-sm round" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <form action="#" method="post" id="frmPush">
+        @Html.AntiForgeryToken()
+        <table class="table table-responsive dataTable" id="pushTable">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Id</th>
+                    <th>License</th>                  
+                    <th>Stage</th>
+                    <th>Current Assigned User</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            @foreach (ApplicationRequest req in Model)
+            {
+                <tr>
+                    <td>@(count += 1)</td>
+                    <td>@req.ApplicationId</td>
+                    <td>@req.LicenseType.Description</td>                  
+                    <td>@req.WorkFlowState.StateName</td>
+                    <td>@req.CurrentAssignedUser</td>
+                    <td>@req.AddedDate</td>
+                    <td class="txtright">
+                    <a class="btn btn-info btn-xs round" href="#" onclick="javascript:TaskDelegation('@req.ApplicationId','@req.CurrentAssignedUser','@req.FieldLocation.Description')">Assign</a>                    
+                    </td>
+                </tr>
+            }
+        </table>
+    </form>
+
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+
+
+        function TaskDelegation(ApplicationId, CurrentAssignedUser, FieldLocation) {
+            $("#appid").val(ApplicationId);
+            $("#Oldtask").val(CurrentAssignedUser);
+            $("#officelocation").val(FieldLocation);
+            //$("#Newtask").ready(function () {//get all user role populated in the dropdownlist
+            var html = "";
+            //$("#Newtask").html("");
+            $('.UserRoles').select2();
+
+            $.getJSON("/Admin/TaskDelegationUsers",
+                { ApplicationId: ApplicationId },
+                function (datas) {
+                    debugger;
+                    $("#Newtask").append("<option disabled selected>--Select whom to Assign--</option>");
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.role + ">" + val.role + "</option>";
+                        });
+                    $("#Newtask").append(html);
+                });
+
+            $("#TaskDelegationModal").modal('show');
+
+        }
+
+
+
+
+
+
+
+
+        $(function () {
+            $("#lnk-Branches > a").addClass("selected").find(".act").addClass("selected");
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+         
+
+            
+            });
+        //});
+
+</script>
+}
+
+

@@ -1,0 +1,213 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+
+    @{
+        ViewBag.Title = "All Applications";
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+    }
+
+
+<div class="content">
+    @if (ViewBag.LoggedOnRole == "EDSTA")
+    {
+        <h2 class="lefty">All Applications on Excutive Director's Desk</h2>
+    }
+    else if (ViewBag.LoggedOnRole == "ACESTA")
+    {
+        <h2 class="lefty">All Applications on Authority Chief Excutive Desk</h2>
+    }
+    else
+    {
+        <h2 class="lefty">All Applications</h2>
+
+    }
+    <hr class="clear" />
+    <div class="row">
+
+        <div class="form-group">
+            <div style="margin-left:400px">
+                <div class="col-md-3">
+                    <a href="@Url.Action("AllApplications", new { location = "Stafflocation" })" class="btn btn-primary">Show my location Applications</a>
+                </div>
+                <div class="col-md-2">
+                    <a href="@Url.Action("AllApplications", new { location = "Allstafflocation" })" class="btn btn-info">Show all location Applications</a>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped table-hover dataTable">
+            <thead>
+                <tr>
+                    <th>Application Ref</th>
+                    <th>Company Name</th>
+                    <th>Description</th>
+                    <th>Application Type</th>
+                    <th>Location</th>
+                    <th>LGA</th>
+                    <th>App Stage</th>
+                    <th>Status</th>
+                    <th>Date Applied</th>
+                    <th>Rate</th>
+                    @if (ViewBag.LoggedOnRole != "EDSTA" && ViewBag.LoggedOnRole != "ACESTA")
+                    {
+                        <th></th>
+                        <th></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (LOBP.DbEntities.ApplicationRequest br in Model)
+                {
+                <tr>
+                    <td class="nr">@br.ApplicationId</td>
+                    <td><a href="@Url.Action("ApplicationDetails", new { applicationId = br.ApplicationId })">@br.ApplicantName</a></td>
+                    <td>
+                        @{
+                            var des = br.LicenseType == null ? "" : @br.LicenseType.Description;
+                        }
+                        @des
+                    </td>
+                    <td>@br.ApplicationTypeId</td>
+
+                    <td>
+                        @{
+                            var state = br.StateMasterList == null ? "" : br.StateMasterList.StateName;
+
+                        }
+                        <div>@state</div>
+                    </td>
+                    <td>
+                        @{
+                            var lga = br.LgaMasterList == null ? "" : br.LgaMasterList.LgaName;
+                        }
+                        <div>@lga</div>
+                    </td>
+                    <td>
+                        @if (br.CurrentStageID == 21 && br.LicenseTypeId == "ATC")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>ATC Letter Issued</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+
+                                @*<strong>ATC Letter Issued</strong>*@
+                            </div>
+                        }
+                        else if (br.CurrentStageID == 21 && br.LicenseTypeId == "LTO")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>License Issued</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+                                @*<strong>License Issued</strong>*@
+                            </div>
+                        }
+                        else if (br.CurrentStageID == 21 && br.LicenseTypeId == "SSA")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>Site Suitability Letter Issued</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+
+                                @*<strong>Site Suitability Letter Issued</strong>*@
+                            </div>
+                        }
+
+                        else if (br.CurrentStageID == 21 && br.LicenseTypeId == "PTE")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>Permit To Establish Letter Issued</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+
+                                @*<strong>Site Suitability Letter Issued</strong>*@
+                            </div>
+                        }
+                        else if (br.CurrentStageID == 21 && br.LicenseTypeId == "ATM")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>Approval To Modify Letter Issued</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+
+                                @*<strong>Site Suitability Letter Issued</strong>*@
+                            </div>
+                        }
+                        else if (br.CurrentStageID == 21 && br.LicenseTypeId == "ATO")
+                        {
+                            <div class="alert alert-mini alert-success">
+                                <button type="button" class="use-address media btn btn-success btn-xs"><strong>Takeover Approved</strong> <span class="glyphicon glyphicon-eye-open"></span></button>
+
+                                @*<strong>Site Suitability Letter Issued</strong>*@
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-mini alert-info">
+                                <strong>@dbCtxt.WorkFlowStates.Where(w => w.StateID == br.CurrentStageID).FirstOrDefault().StateName.ToString()</strong>
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @{
+                            if (br.Status == "Rejected")
+                            {
+                                <div class="btn btn-danger">Rejected</div>
+                            }
+                            else if (br.Status == "Processing")
+                            {
+                                <div class="btn btn-warning">Processing</div>
+                            }
+                            else if (br.Status == "Approved")
+                            {
+                                <div class="btn btn-success">Approved</div>
+                            }
+                            else if (br.CurrentStageID == 3)
+                            {
+                                <div class="btn btn-warning">Payment Pending</div>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @{
+                            var date = br.AddedDate == null ? "" : br.AddedDate.Value.ToString("dd-MMM-yyyy");
+                            <div>@date</div>
+                        }
+                    </td>
+                    @{ string rate = dbCtxt.WorkFlowStates.Where(w => w.StateID == br.CurrentStageID).FirstOrDefault().Progress; }
+                    <td><div class="badge"><b style="font-size:large">@rate</b></div></td>
+                    @if(ViewBag.LoggedOnRole != "EDSTA" && ViewBag.LoggedOnRole != "ACESTA")
+                    {
+                        <td>
+                            <a href="@Url.Action("ViewApplication", new { applicationId = br.ApplicationId})" class="btn btn-xs btn-info">View <span class="glyphicon glyphicon-eye-open"></span></a>
+                        </td>
+                        <td>
+                            <a href="@Url.Action("TransitionHistory", new { applicationId = br.ApplicationId})" class="btn btn-xs btn-primary">App History <span class="glyphicon glyphicon-eye-open"></span></a>
+                        </td>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @section scripts
+{
+        <script type="text/javascript">
+            $(function () {
+                $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+                //$(".sidebar > ul > li > ul li a[href='/Application']").addClass("selected");
+
+                $(".dataTable").dataTable({
+                    "aLengthMenu": [25, 50, 75, 100, 200],
+                    'iDisplayLength': 25,
+                    columnDefs: [{ orderable: false, "targets": [-1, -3] }],
+                    "language": {
+                        "lengthMenu": "Display  _MENU_ records per page",
+                        "zeroRecords": "Nothing found - sorry",
+                        "infoEmpty": "No records available",
+                        "infoFiltered": "(filtered from _MAX_ total records)"
+                    },
+                    "order": [[1, "desc"]]
+                });
+                $(".use-address").click(function () {
+                    // var item = $(this).closest("tr").find(".nr").text();
+                    debugger;
+                    window.open('/Admin/ALLPermits/', '_blank')
+                });
+
+            });
+        </script>
+    }
+
+

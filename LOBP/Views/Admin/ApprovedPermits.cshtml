@@ -1,0 +1,94 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+
+@{
+    ViewBag.Title = "ApprovedPermits";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="content">
+    <h2 class="">Approved Permits by Management</h2>
+    <hr />
+
+    <table class="table table-striped table-hover dataTable">
+        <thead>
+            <tr>
+                <th>ApplicationId</th>
+                <th>PermitRef</th>     
+                <th>Company</th>             
+                <th>Description</th>
+                <th>Application Type</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (LOBP.DbEntities.ApplicationRequest b in Model)
+            {
+                <tr>
+                    <td>@b.ApplicationId</td>
+                    <td>@b.LicenseReference</td>
+                    <td>@b.UserMaster.FirstName</td>
+                    <td>@b.LicenseTypeId</td>
+                    <td>@b.ApplicationTypeId</td>
+                    <td>@b.LicenseIssuedDate.Value.ToString("dd-MMM-yyyy")</td>
+                    <td>@b.LicenseExpiryDate.Value.ToString("dd-MMM-yyyy")</td>
+                    <td>
+                        <a href="@Url.Action("ViewLicenseAsPDF", "Admin", new { applicationId = b.ApplicationId })" target="_blank" class="btn btn-info btn-xs round" role="button">View<i class="og-icon og-pdf righty"></i></a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.media.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.metadata.js")"></script>
+    @if (Model.Count > 0)
+    {
+        <script type="text/javascript">
+            $(function () {
+                $('a.media').media({ width: 500, height: 400 });
+            });
+            function loadModal() {
+                $('#myModal').modal({ show: true });
+            }
+
+            $(function () {
+                $(".use-address").click(function () {
+                    var $item = $(this).closest("tr").find(".nr").text();
+                    //window.open("/Licenses" + "?AppId=" + $item, '_blank')
+                    window.open("/ViewLicenseAsPDF" + "?applicationId=" + $item, '_blank')
+                });
+            });
+        </script>
+    }
+    <script type="text/javascript">
+        $(function () {
+            //$("#lnk-Permits > a").addClass("selected");
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [-1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+
+}

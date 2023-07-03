@@ -1,0 +1,574 @@
+﻿@model List<LOBP.DbEntities.LicenseType>
+
+@{
+    ViewBag.Title = "ApplyForLicense";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Lube Oil Blending Licenses and Approvals</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="padd-t form-horizontal">
+    <div class="row">
+        @if (ViewBag.ErrorMessage == "SUCCESS")
+        {
+            <table class="table  table-hover  table-bordered dataTable1">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Description</th>
+                        <th>Charges</th>
+                        <th>Tenor</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (LOBP.DbEntities.LicenseType b in Model)
+                    {
+
+                        <tr>
+                            <td>
+                                <i class="glyphicon glyphicon-book text-success"></i>
+                            </td>
+
+                            <td>
+                                <div style="color:#000000; font-weight:600;font-size:15px !important;font-family: Helvetica, Arial, sans-serif;">
+                                    @b.Description.ToUpper()
+                                </div>
+                            </td>
+                            <td>@b.ProcessingFees.Value.ToString("N")</td>
+                            <td>@b.Duration</td>
+                            <td>
+                                @if (b.LicenseTypeId == "PTE")
+                                {
+                                    <a class="btn btn-primary btn-xs round" href="#" onclick="javascript:ApplyForPTE('@b.LicenseTypeId','@b.Description')">Permit To Establish</a>
+                                }
+                                else if (b.LicenseTypeId == "ATC1")
+                                {
+                                    <a class="btn btn-warning btn-xs round" href="#" onclick="javascript:ApplyForATC('@b.LicenseTypeId','@b.Description')">Approval To Construct</a>
+                                }
+
+                                else if (b.LicenseTypeId == "LTO")
+                                {
+                                    <a class="btn btn-success btn-xs round" href="#" onclick="javascript:ApplyForLTO('@b.LicenseTypeId')">License To Operate</a>
+                                }
+
+                                else if (b.LicenseTypeId == "LEG")
+                                {
+                                    <a class="btn btn-info btn-xs round" href="#" onclick="javascript:LegacyApplication('@b.LicenseTypeId')">Legacy License</a>
+                                }
+
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+
+            <div class="alert alert-danger alert-dismissible center-block" role="alert" align="center">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="fa fa-exclamation-triangle fa-border" aria-hidden="true"></i>
+                <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+            </div>
+        }
+    </div>
+
+</div>
+
+<div id="spinner" class="spinner" style="display:none;">
+    <img id="img-spinner" src="@Url.Content("~/Images/Preloader_3.gif")" alt="Loading" />
+</div>
+
+
+
+<div class="modal fade" id="ATCModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title text-center">Select Site Suitability (PTE) Reference</h3>
+            </div>
+            <div class="modal-body">
+                <form id="AtcModalForm" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">PTE Reference</label>
+                        <div class="col-md-9">
+                            <select id="PteReference" name="PteReference" class="form-control ApprovedLicense" required="required" style="width: 100%">PTE Reference</select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" id="AtcButton" class="btn btn-info btn-sm round">Proceed</button>
+                        <button type="button" class="btn btn-default btn-sm round" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="LTOModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title text-center">Select License Application Type</h3>
+            </div>
+            <div class="modal-body">
+                <form id="LtoModalForm" class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Application Type</label>
+                        <div class="col-md-9">
+                            <select id="ApplicationType" name="ApplicationType" class="form-control  ApplicationTypeList" required="required" style="width: 100%">
+                                <option value="NEW">New License</option>
+                                <option value="RENEW">Renewal of License</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="ExpReferenceId">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label" id="labelid">Expiring Reference</label>
+                            <div class="col-md-9">
+                                <select id="ExpReference" name="ExpReference" class="form-control ExpReferenceList" style="width: 100%"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" id="LtoButton" class="btn btn-primary">Proceed</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="LegacyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title text-center">Maintain Legacy Permit Or Approval</h3>
+            </div>
+            <div class="modal-body">
+                <form id="LegacyModalForm" class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Legacy Type</label>
+                        <div class="col-md-9">
+                            <select id="LicenseTypeList" name="LicenseTypeList" class="form-control" required="required" style="width: 100%">
+                                <option value="PTE">Permit To Establish Approval</option>
+                                <option value="LTO">License To Operate Permits</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <style>
+        .modal.bb-alternate-modal .modal-content {
+            background: #555;
+            color: #fff;
+        }
+
+        .spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            margin-left: -50px; /* half width of the spinner gif */
+            margin-top: -50px; /* half height of the spinner gif */
+            text-align: center;
+            z-index: 1234;
+            overflow: auto;
+            width: 100px; /* width of the spinner gif */
+            height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#loading").bind("ajaxSend", function () {
+                $(this).show();
+            }).bind("ajaxStop", function () {
+                $(this).hide();
+            }).bind("ajaxError", function () {
+                $(this).hide();
+            });
+
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        $(".dataTable").dataTable({
+            'searching': false, 'paging': false, 'info': false,
+            'iDisplayLength': 5
+        });
+
+        function isEmpty(str) {
+            return (!str || 0 === str.length);
+        }
+
+        function hideAndResetModal(modalID) {
+            $(modalID).modal('hide');
+            $(modalID).on('hidden.bs.modal', function () {
+                $(modalID).find('form').trigger('reset');
+            });
+        }
+
+        $(document).ready(function () {
+
+            $("#LicenseTypeList").change(function () {
+                var count = 0;
+                var message = "";
+                var LegacyType = $('#LicenseTypeList').val();
+                console.debug(LegacyType);
+
+                if (LegacyType == "0") {
+                    alert("Please Ignore");
+                    return false;
+                }
+
+                if (LegacyType == "PTE") {
+                    message = "The Platform understood that you have your Permit To Establish/Site Suitability Approval\n and want To Maintain it so as to continue with Approval To Construct, Kindly Confirm To Proceed";
+                }
+                else if (LegacyType == "LTO") {
+                    message = "The Platform understood that you have your Last License To Operate License\n and want To Maintain it so as to be able to Renew, Kindly Confirm To Proceed";
+                }
+
+                //hideAndResetModal('#LegacyModal');
+
+                bootbox.confirm({
+                    message: message,
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+
+                            $('#loading').show();
+                            $.get('@Url.Action("GenerateLegacyApplicationNo")', {})
+                            .done(function (data) {
+
+                                var status = data.Status;
+                                if (status == 'success') {
+                                    window.location.href = "/Company/LegacyApplication?LicenseTypeId=" + LegacyType + "&ReferenceId=" + data.applicationId;
+                                } else {
+                                    bootbox.alert({
+                                        message: data.Message,
+                                        size: 'small',
+                                        callback: function () { }
+                                    });
+                                }
+                            })
+                            .fail(function (data) {
+                                alert('The System Cannot Access the Resource/Network Error');
+                            })
+                            .always(function (data) { });
+                        }
+                    }
+                });
+            });
+
+
+            $("#ApplicationType").change(function (e) {
+                var count = 0;
+                var html = "";
+                var AppType = $('#ApplicationType').val();
+                console.info(AppType);
+                $('.ExpReferenceList').children().remove();
+
+                if (AppType == "RENEW") {
+                    $('#loading').show();
+                    $.getJSON("/Company/GetApprovedLicense",
+                        { LicenseTypeId: "LTO" },
+                         function (datas) {
+                             $.each(datas,
+                                 function (key, val) {
+                                     count += 1;
+                                     html += "<option value=" + val.Id + ">" + val.Description + "</option>";
+                                 });
+
+                             console.debug("Count =>" + count);
+
+                             if (count == 0) {
+                                 hideAndResetModal('#LTOModal');
+                                 bootbox.alert({
+                                     message: "The Platform Could Not Detect Any License Reference, \nKindly update your Last License Information through the Legacy Application Option",
+                                     size: 'small',
+                                     callback: function () { }
+                                 });
+                             }
+                             else {
+                                 $('.ExpReferenceList').append(html);
+                                 $('#ExpReferenceId').show();
+                             }
+                         });
+                }
+                else {
+                    $('#ExpReference').prop('required', false);
+                    $('#ExpReferenceId').hide();
+                }
+
+            });
+
+
+            $('#LtoButton').click(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                var ExpiredReference = $('#ExpReference').val();
+                console.debug(ExpiredReference);
+
+                hideAndResetModal('#LegacyModal');
+                $('#loading').show();
+
+                $.get('@Url.Action("CheckForUnsubmittedApplication")', { LicenseTypeCode: 'LTO' })
+                .done(function (data) {
+
+                    var status = data.Status;
+                    if (status == 'success') {
+                        var appCount = data.AppCount;
+                        if (appCount > 0) {
+                            bootbox.alert({
+                                message: data.Message,
+                                size: 'small',
+                                callback: function () { }
+                            });
+                            window.location.href = "/Company/MyApplications";
+                        }
+                        else {
+                            //window.location.href = "/Company/PermitToEstablish?LicenseTypeId=" + LicenseTypeId;
+
+
+                            $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                           .done(function (data) {
+
+                               var status = data.Status;
+                               if (status == 'success') {
+                                   window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=RENEW&LicenseTypeId=LTO&ApplicationId=" + data.applicationId + "&RenewReference=" + ExpiredReference;
+                               } else {
+                                   bootbox.alert({
+                                       message: data.Message,
+                                       size: 'small',
+                                       callback: function () { }
+                                   });
+                               }
+                           })
+                           .fail(function (data) {
+                               alert('The System Cannot Access the Resource/Network Error');
+                           })
+                           .always(function (data) { });
+
+
+                        }
+                    } else {
+                        bootbox.alert({
+                            message: data.Message,
+                            size: 'small',
+                            callback: function () { }
+                        });
+                    }
+                })
+                .fail(function (data) {
+                    alert('The System Cannot Access the Resource/Network Error');
+                })
+                .always(function (data) { });
+
+
+
+
+            });
+
+
+        });
+
+
+
+        function LegacyApplication(LicenseTypeId) {
+            var count = 0;
+            var ApplicationId = "";
+            var Description = "";
+
+            $.getJSON("/Company/CheckForLegacyApplication",
+                       {},
+                        function (datas) {
+
+                            $.each(datas,
+                                function (key, val) {
+                                    count += 1;
+                                    ApplicationId = val.Id;
+                                    Description = val.Description;
+                                });
+
+                            if (count == 0) {
+                                $("#LegacyModal").modal('show');
+                            }
+                            else {
+                                bootbox.alert({
+                                    message: 'UNSUBMITTED LEGACY APPLICATION DETECTED WITH REFERENCE ' + ApplicationId,
+                                    size: 'small',
+                                    callback: function () {
+                                        window.location.href = "/Company/MyApplications";
+                                    }
+                                });
+                            }
+                        });
+        }
+
+
+        function ApplyForLTO(LicenseTypeCode, Description) {
+            $("#LTOModal").modal('show');
+        }
+
+
+        function ApplyForPTE(LicenseTypeId, Description) {
+            bootbox.confirm({
+                title: Description,
+                message: "Do you want to Apply For Site Suitability (PTE) Approval?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    if (result == true) {
+                        var url = '@Url.Action("CheckForUnsubmittedApplication")';
+                        $.get(url, { LicenseTypeCode: LicenseTypeId })
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'success') {
+                                var appCount = data.AppCount;
+                                if (appCount > 0) {
+                                    bootbox.alert({
+                                        message: data.Message,
+                                        size: 'small',
+                                        callback: function () { }
+                                    });
+                                    window.location.href = "/Company/MyApplications";
+                                }
+                                else {
+                                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=" + LicenseTypeId;
+                                }
+                            } else {
+                                bootbox.alert({
+                                    message: data.Message,
+                                    size: 'small',
+                                    callback: function () { }
+                                });
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+                    }
+                }
+            });
+        }
+
+
+
+
+
+        function ApplyForATC(LicenseTypeCode, Description) {
+            var html = "";
+            var count = 0;
+            bootbox.confirm({
+                title: Description,
+                message: "Do you want to Apply For Approval To Construct (ATC)?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+
+                    if (result == true) {
+                        $.getJSON("/Company/GetApprovedLicense",
+                            { LicenseTypeId: "PTE" },
+                            function (datas) {
+                                $.each(datas,
+                                    function (key, val) {
+                                        count += 1;
+                                        html += "<option value=" + val.Id + ">" + val.Description + "</option>";
+                                    });
+                                $(".ApprovedLicense").append(html);
+                            });
+
+                        if (count == 0) {
+
+                            bootbox.confirm({
+                                message: "The PLatform Could Not Detect Any Site Suitability Reference, Do you want to Maintain the Manual Information?",
+                                size: 'small',
+                                className: 'bb-alternate-modal',
+                                buttons: {
+                                    cancel: {
+                                        label: '<i class="fa fa-times"></i> Cancel'
+                                    },
+                                    confirm: {
+                                        label: '<i class="fa fa-check"></i> Confirm'
+                                    }
+                                },
+                                callback: function (result) {
+                                    if (result == true) {
+                                        window.location.href = "/Company/LegacyApplication?LicenseTypeId=PTE&NextLicenseTypeId=" + LicenseTypeCode;
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            $("#ATCModal").modal('show');
+                        }
+
+                    }
+                }
+            });
+        }
+
+
+
+    </script>
+}

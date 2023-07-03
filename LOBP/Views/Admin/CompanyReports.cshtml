@@ -1,0 +1,74 @@
+﻿@model List<LOBP.DbEntities.UserMaster>
+
+@{
+    ViewBag.Title = "CompanyReports";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="content">
+    <h2 class="lefty">Company Reports</h2>
+    <div class="righty">
+    </div>
+    <hr class="clear" />
+
+    <table id="myTable" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th style="width: 197px;">Company Name</th>
+                <th style="width: 100px;">RegNo</th>
+                <th style="width: 200px;">CompanyEmail</th>
+                <th style="width: 200px;">Address</th>
+                <th style="width: 200px;">Contact</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (LOBP.DbEntities.UserMaster up in Model)
+            {
+                <tr>
+                    <td>@up.FirstName</td>
+                    <td>@up.CACNumber</td>
+                    <td>@up.UserId</td>
+                    <td>@up.UserLocation</td>
+                    <td>@up.LastName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section scripts{
+
+
+<script type="text/javascript">
+    $(function () {
+
+    });
+</script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#myTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                'dom': 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                'columnDefs': [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}

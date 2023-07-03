@@ -1,0 +1,162 @@
+﻿@model List<LOBP.DbEntities.MistdoData>
+    @{
+        int count = 0;
+        ViewBag.Title = "MistDo Verification";
+        Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    }
+
+    <div class="row">
+        <div class="pageTitle  bg1">
+            <h2 class="lefty">@ViewBag.Title</h2>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="padd-t form-horizontal">
+
+        @using (Html.BeginForm("MistdoPost", "Company", FormMethod.Post, new { id = "formid" }))
+        {
+        <div class="row">
+
+            <div class="alert alert-warning alert-dismissable text-center" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign"></span> At least five(5) Mistdo trained staff is required.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div><br /><br />
+
+            <div class="col-md-12">
+
+                <div class="input-group">
+
+                    <div><input type="text" class="min form-control" id="Mistdonumber" autocomplete="off" name="Mistdonumber" required="required" placeholder="Enter Mistdo Certificate Number" /></div>
+                    <div type="button"  id="btnmistdo" class="input-group-addon" style="background-color:orange; cursor:pointer"><i class="fa fa-search"></i> Verify</div>
+
+                </div>
+
+            </div>
+        </div>
+            <button type="button" id="btnsuccess" class="btn btn-success" style="display:none">Ok, Proceed</button>
+        }
+        <br /><br />
+        <div class="row">
+            <table class="table-bordered table-responsive table-condensed" id="mytable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Certificate Issue</th>
+                        <th>Certificate Expiry</th>
+                        <th>Certificate Number</th>
+                        <th style="width:5px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(LOBP.DbEntities.MistdoData m in Model)
+                    {
+                    <tr>
+                        <td>@(count += 1)</td>
+                        <td>@m.fullName</td>
+                        <td>@m.email</td>
+                        <td>@m.certificateIssue</td>
+                        <td>@m.certificateExpiry</td>
+                        <td>@m.certificateNo</td>
+                        <td><button class="btn btn-sm btn-danger" type="button" onclick="DeleteMistdo('@m.certificateNo')">Delete</button></td>
+                    </tr>
+                    }
+                </tbody>
+
+
+            </table>
+        </div>
+
+
+
+        </div>
+
+        @section Scripts {
+
+            <script type="text/javascript">
+
+                $(document).ready(function () {
+
+                    $("#mytable").dataTable({
+                        "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                        'iDisplayLength': 10,
+                        columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                        "language": {
+                            "lengthMenu": "Display  _MENU_ records",
+                            "zeroRecords": "No record found",
+                            "info": "Showing page _PAGE_ of _PAGES_",
+                            "infoEmpty": "No Record to Display Currently",
+                            "infoFiltered": "(filtered from _MAX_ total records)"
+                        },
+                        "order": [[1, "desc"]]
+                    });
+
+                    debugger;
+
+                    var mistdocount = '@ViewBag.Mistdolist';
+
+                    if (Number(mistdocount) >= 5) {
+                        $("#btnsuccess").show();
+                    } else {
+                        $("#btnsuccess").hide();
+                    }
+
+                    $("#btnsuccess").click(function () {
+                        
+                        window.location.href = "/Company/ChargeSummary?ApplicationId=" + '@ViewBag.Appref';
+                        //window.location = "/Company/ApplyForLicense";
+                    });
+
+
+                    $("#btnmistdo").click(function () {
+                        debugger;
+                        var certnbr = $("#Mistdonumber").val();
+
+                        if (certnbr === "") {
+                            $('#Mistdonumber').css('border-color', 'red');
+                            $('#Mistdonumber').addClass('alert alert-danger');
+
+                            $('#Mistdonumber').focus();
+                            alert("Please enter Mistdo certificate number");
+                            return false;
+
+                        }
+
+                        if ($("#formid").valid()) {
+                            $.post("/Company/MistdoPost", { "certificatid": certnbr }, function (data) {
+
+                                if (data.Success === "success" && Number(mistdocount) >= 5) {
+                                    $("#btnsuccess").show();
+                                   
+                                } else if (data.Success === "failed") {
+                                    alert(data.Message);
+                                    $("#btnsuccess").hide();
+                                }
+                                history.go(0);
+                            });
+                        }
+
+                        });
+                
+                });
+
+                function DeleteMistdo(certnbr) {
+                    debugger;
+                    var msg = confirm("Are you sure you want to delete " +certnbr+"?");
+                    if (msg === true) {
+                        $.post("/Company/DeleteMisdo", {"certificatenbr": certnbr }, function (data) {
+                            if (data.Success === "success") {
+                                alert(data.Message);
+                                history.go(0);
+                            } else {
+                                alert(data.Message);
+                            }
+                        });
+                    }
+                }
+
+            </script>
+        }

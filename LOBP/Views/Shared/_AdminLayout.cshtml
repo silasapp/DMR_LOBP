@@ -1,0 +1,517 @@
+﻿@using LOBP.DbEntities
+@using LOBP.Helper;
+
+@{
+    int cnt = 0;
+    UserHelper userMasterHelper = new UserHelper();
+    var dbCtxt = new LubeBlendingDBEntities();
+    UserMaster userMaster = (UserMaster)Session["UserID"];
+    List<Functionality> userfunctionality = new List<Functionality>();
+    List<LOBP.DbEntities.Menu> userMenuList = userMasterHelper.GetUserMenuList(userMaster, out userfunctionality);
+    var getallrelievedstaffscount = (from s in dbCtxt.OutofOffices join r in dbCtxt.ApplicationRequests on s.Relieved equals r.CurrentAssignedUser where s.Reliever == userMaster.UserId && s.Status == "Started" select s).ToList().Count();
+    var schedulecount = (from s in dbCtxt.Appointments join a in dbCtxt.ApplicationRequests on s.ApplicationId equals a.ApplicationId where a.CurrentStageID == 10 && s.ScheduledBy == userMaster.UserId select s).ToList().Count();
+}
+
+<!DOCTYPE html>
+
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="Cache-Control" content="no-cache">
+    <meta name="Pragma" content="no-cache">
+    <meta name="Expires" content="0">
+    <title>Admin Dashboard</title>
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/Images/coat-of-arm.jpg")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Fonts47/css/font-awesome.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/select2.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/MainStyle.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/otherStyle.css")" />
+
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datepicker.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker.min.css")" />
+
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/jquery.timepicker.css")" />
+    <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css" />
+    @*<link rel="stylesheet" href="@Url.Content("~/Content/jquery.dataTables.css")" />*@
+    <link rel="stylesheet" href="@Url.Content("~/Content/fullcalendar.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/fullcalendar.print.min.css")" media="print" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/gps-coordinates.css" )" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/jquery-ui.css")" />
+
+    <style>
+
+        .center-cropped {
+            width: 120px;
+            height: 120px;
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: #214528
+        }
+
+        .table-responsive {
+            overflow-y: visible !important;
+        }
+
+        .btn.round {
+            border-radius: 50px;
+        }
+
+        .label-medium {
+            vertical-align: super;
+            font-size: medium;
+        }
+
+        .label-large {
+            vertical-align: super;
+            font-size: large;
+        }
+
+        .label-bs {
+            vertical-align: super;
+        }
+
+        .label-as-badge {
+            border-radius: 1em;
+        }
+
+        .ui-autocomplete {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1510 !important;
+            float: left;
+            display: none;
+            padding: 4px 0;
+            margin: 2px 0 0 0;
+            list-style: none;
+            background-color: #ffffff;
+            border-color: #ccc;
+            border-color: rgba(0, 0, 0, 0.2);
+            border-style: solid;
+            border-width: 1px;
+            -webkit-border-radius: 2px;
+            -moz-border-radius: 2px;
+            border-radius: 2px;
+            -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            -webkit-background-clip: padding-box;
+            -moz-background-clip: padding;
+            background-clip: padding-box;
+            *border-right-width: 2px;
+            *border-bottom-width: 2px;
+        }
+
+        fieldset.scheduler-border {
+            border: 1px groove #ddd !important;
+            padding: 0 1.4em 1.4em 1.4em !important;
+            margin: 0 0 1.5em 0 !important;
+            -webkit-box-shadow: 0px 0px 0px 0px #000;
+            box-shadow: 0px 0px 0px 0px #000;
+        }
+
+        legend.scheduler-border {
+            width: inherit; /* Or auto */
+            padding: 0 10px; /* To give a bit of padding on the left and right */
+            border-bottom: none;
+        }
+
+        .modal {
+            z-index: 20;
+            margin-top: 20px;
+        }
+
+        .modal-backdrop {
+            z-index: 10;
+        }
+
+        #appContainer {
+            padding: 0;
+            margin: 50px 0 0;
+            position: relative;
+            background-color: whitesmoke;
+        }
+
+            #appContainer .ctrl-sidebar .sidebar > ul > li > a {
+                background-color: #001a33;
+            }
+
+
+            /* ol, ul {
+            margin-top: 0;
+            margin-bottom: 10px;
+            background-color: #001a33;
+        }*/
+
+            #appContainer .ctrl-sidebar .sidebar > ul > li:last-child {
+                height: 500px;
+            }
+
+        .flash {
+            border: 2px solid #e32424;
+            border-radius: 10px;
+            color: #e32424;
+            -webkit-animation: pulse linear 2s infinite;
+            animation: pulse linear 2s infinite;
+        }
+    </style>
+
+    @RenderSection("css", false)
+</head>
+<body>
+
+    <div id="loading" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+        <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+    </div>
+
+    <div class="navbar navbar-fixed-top og_Head" role="navigation" style="min-width:25%">
+        <div class="navbar-header">
+            <div class="navbar-brand">
+                <a href="#">
+                    <img src="@Url.Content("~/Images/LOBPLogo.png")" />
+                </a>
+            </div>
+            <div class="navbar-left">
+                <form class="navbar-form navbar-left" role="search" action="@Url.Action("/")" method="get">
+                    <div class="form-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search for Application">
+                    </div>
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+        <div class="top-nav">
+            <form class="navbar-right" onsubmit="return confirm('Are you sure you want to log out ?');" id="logoutForm" method="post" action="@Url.Action("LogOff", "Account")">
+                <ul class="nav navbar-nav pull-right">
+                    <li class="dropdown notify">
+                        <a href="@Url.Action("Index","Admin")" data-toggle="dropdown">
+                            <i class="label label-danger label-medium" id="totalPendingCount">@cnt</i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://ems.dpr.gov.ng/Tickets/New" target="_blank" class="flash">Complain/Enquiries</a>
+
+                    </li>
+                    <li>
+                        <a title="Manage" href="@Url.Action("ChangePassword","Admin")">@Session["UserName"] &nbsp;<strong style="color:white;">(@Session["UserBranch"])</strong></a>
+                    </li>
+                    <li>
+                        <button type="submit" class="initLogoff ad"><i class="fa fa-sign-out alert-danger" style="font-size: 24px;"></i></button>
+                    </li>
+                </ul>
+                @Html.AntiForgeryToken()
+            </form>
+
+
+            <ul class="nav navbar-nav pull-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><sapn class="glyphicon glyphicon-transfer"></sapn> LUBE Portals Navigation<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+
+                        <li>
+                            <a href="#" onclick="LOBP('@userMaster.UserId')" id="lobp">Goto LOBP</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#" id="rpl" onclick="RPL('@userMaster.UserId')">Goto RPL</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#" onclick="LSSL('@userMaster.UserId')" id="lssl">Goto LSSL</a>
+                        </li>
+
+
+
+                    </ul>
+                </li>
+            </ul>
+
+
+
+
+
+        </div>
+    </div>
+
+    <div class="" id="appContainer">
+        <div class="ctrl-sidebar" style="height:100%">
+            <div class="collapse navbar-collapse sidebar" style="height:100%">
+                <ul>
+                    <li>
+                        <a href="#">
+                            <span>Control Panel Admin</span>
+                            <br />
+                            @if (userMaster.UserRoles == "HOD")
+                            {<small>HEAD DOWN STREAM</small>}
+                            else if (userMaster.UserRoles == "HOOD")
+                            { <small>AUTHORITY CHIEF EXECUTIVE</small>}
+                            else
+                            {<small>@userMaster.UserRoles</small>}
+                        </a>
+                    </li>
+
+                    @if (userfunctionality != null && userfunctionality.Count > 0)
+                    {
+                        foreach (Menu menu in userMenuList)
+                        {
+                            <li class="more">
+
+                                <a href="#">
+                                    <i class="@menu.IconName" aria-hidden="true"></i>
+                                    <span>@menu.Description</span>
+                                    <span class="more"></span>
+                                    <span class="act"></span>
+                                </a>
+
+                                <ul>
+                                    @foreach (Functionality f2 in userfunctionality)
+                                    {
+                                        if (menu.MenuId == f2.MenuId)
+                                        {
+                                            <li>
+                                                <a href="@Url.Action(f2.Action, "Admin")" id="@f2.Action">
+                                                    <i class="@f2.IconName" aria-hidden="true"></i>
+                                                    <span>@f2.Description</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        if (userMaster.UserRoles == "SUPERADMIN")
+                        {
+                            <li class="more">
+                                <a href="#">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                    <span>Settings</span>
+                                    <span class="more"></span>
+                                    <span class="act"></span>
+                                </a>
+                                <ul>
+                                    <li>
+                                        <a href="@Url.Action("Documentconfiguration", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>Document Configuration</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("WorkFlow", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>WorkFlow Configuration</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("WorkFlowState", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>WorkFlowState</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("RoleMappingMenu", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>Role Mapping Menu</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("StaffRoles", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>Staff Role Configuration</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("LicenseTypeConfig", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>License Category</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Configurations", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>General Configuration</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("SubmittedDocuments", "Admin")">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span>Submitted Documents</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        <li>
+                            <a href="@Url.Action("ActiveSchedule", "Admin")">
+                                <div class="row" style="margin-left:4px"><i class="fa fa-calendar"></i>My Inspection Schedule<i class="label label-danger label-bs"><b>@schedulecount</b></i></div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("GetRelievedStaffOutofOffice","Admin")">
+                                <span class="glyphicon glyphicon-user"></span> Relieved Staff(s)&nbsp;<i class="label label-danger label-bs"><b>@getallrelievedstaffscount</b></i>
+                            </a>
+                        </li>
+                        <li></li>
+                    }
+                    else
+                    {
+                        if (userMaster.UserRoles == "ACESTA" && userMaster.UserRoles == "EDSTA")
+                        {
+                            <li>
+                                <a href="@Url.Action("AllApplications", "Admin")">
+                                    <div class="row" style="margin-left:4px"><i class="fa fa-calendar"></i>All Applications</div>
+                                </a>
+                            </li>
+                        }
+                    }
+
+                </ul>
+            </div>
+
+
+
+        </div>
+        <div class="ctrl-content">
+            @RenderBody()
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="clear"></div>
+    <div class="" style="color: #f7f7f7;">
+        <hr style="margin: 10px; padding: 0px;">
+    </div>
+
+    <script src="@Url.Content("~/Scripts/jquery-1.10.2.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/select2.min.js")"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+    @*<script src="@Url.Content("~/Scripts/DatatableJS/jquery.dataTables.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/dataTables.buttons.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/jszip.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/pdfmake.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/vfs_fonts.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/buttons.html5.min.js")"></script>
+        <script src="@Url.Content("~/Scripts/DatatableJS/buttons.print.min.js")"></script>*@
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.print.min.js"></script>
+    <script src=" https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+    <script src="~/Scripts/dataTables.checkboxes.min.js"></script>
+    <script src="@Url.Content("~/Scripts/moment.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/fullcalendar.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.ui.widget.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.iframe-transport.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.fileupload.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap-notify.min.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/bootstrap-datepicker.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/bootstrap-datetimepicker.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/admin.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootbox.min.js")"></script>
+
+    <script>
+
+
+        window.setInterval(function () {
+            $.post('/Admin/GetStaffEndOutofOffice', function (result) {
+                if (result == "done") {
+                    //console("triggered done end");
+                }
+            });
+        }, 30000);
+        window.setInterval(function () {
+            $.post('/Admin/GetStaffStartOutofOffice', function (result) {
+                if (result == "done") {
+                    //console("triggered done start");
+                }
+            });
+        }, 30000);
+
+        //window.setInterval(function () {
+        //    $.post('/Admin/AutoConfirmPayment', function (result) {
+        //        if (result == "done") {
+        //            //console("triggered done start");
+        //        }
+        //    });
+        //}, 30000);
+
+
+
+
+        $(document).ready(function () {
+            $('#loading').hide()
+                .ajaxStart(function () {
+                    $(this).show();
+                })
+                .ajaxStop(function () {
+                    $(this).hide();
+                });
+        })
+
+
+
+        function LOBP(email) {
+            var msg = confirm("Are you sure you want to navigate to LOBP portal?");
+            if (msg === true) {
+                window.location.href = "https://lobp.dpr.gov.ng/Account/Login?Email=" + email;
+
+            } else { return false }
+        }
+        function RPL(email) {
+            var msg = confirm("Are you sure you want to navigate to RPL portal?");
+            if (msg === true) {
+                window.location.href = "https://rpl.dpr.gov.ng/Account/Login?Email=" + email;
+
+            } else { return false }
+        }
+        function LSSL(email) {
+            var msg = confirm("Are you sure you want to navigate to LSSL portal?");
+            if (msg === true) {
+                window.location.href = "https://lssl.dpr.gov.ng/Account/Login?Email=" + email;
+
+            } else { return false }
+        }
+
+
+        function add_chatinline() { var hccid = 89311022; var nt = document.createElement("script"); nt.async = true; nt.src = "https://mylivechat.com/chatinline.aspx?hccid=" + hccid; var ct = document.getElementsByTagName("script")[0]; ct.parentNode.insertBefore(nt, ct); }
+        add_chatinline();
+
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

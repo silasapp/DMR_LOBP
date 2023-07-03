@@ -1,0 +1,243 @@
+﻿@using LOBP.DbEntities
+@model List<ApplicationRequest>
+
+
+@{
+    int count = 0;
+    ViewBag.Title = "ReassignApplication";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string userRole = ((LOBP.DbEntities.UserMaster)(Session["UserID"])).UserRoles;
+    LOBP.Helper.UtilityHelper utilityHelper = new LOBP.Helper.UtilityHelper();
+}
+
+
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-5">
+            <h2 class="">Reassign Applications</h2>
+        </div>
+    </div>
+
+    <hr class="clear" />
+    <div class="modal fade" id="TaskDelegationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-center" id="modalhdid">
+                        REASSIGN APPLICATION
+                    </h4>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id="AssignTaskForm" class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label col-md-3">New Assigned Task</label>
+                            <div class="col-md-9">
+                                <select id="Newtask" name="Newtask" class="form-control UserRoles" required style="width: 100%"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">ApplicationId</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="appid" name="appid" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Current Assigned Task</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="Oldtask" name="Oldtask" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Current Office Location</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" readonly="readonly" id="officelocation" name="officelocation" style="width: 100%">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Comment</label>
+                            <div class="col-md-9">
+                                <textarea class="form-control" id="Comment" name="Comment" required="required" style="width: 100%; resize:none"></textarea>
+                            </div>
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="SaveBtn" class="btn btn-info btn-sm round">Save Changes</button>
+                            <button type="button" class="btn btn-default btn-sm round" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (ViewBag.ErrorMessage == "SUCCESS")
+    {
+        <table class="table table-responsive dataTable">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Id</th>
+                    <th>License</th>
+                    <th>Stage</th>
+                    <th>Staff</th>
+                    <th>Office</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            @foreach (ApplicationRequest req in Model)
+            {
+                if (req.CurrentAssignedUser.Contains("dpr.gov.ng")) { 
+                <tr>
+                    <td>@(count += 1)</td>
+                    <td>@req.ApplicationId</td>
+                    <td>@req.LicenseType.Description</td>
+                    <td>@req.WorkFlowState.StateName</td>
+                    <td>@req.CurrentAssignedUser</td>
+                    <td>@req.FieldLocation.Description</td>
+                    <td class="txtright">
+                        <a class="btn btn-info btn-xs round" href="#" onclick="javascript:TaskDelegation('@req.ApplicationId','@req.CurrentAssignedUser','@req.FieldLocation.Description')">Assign</a>
+                    </td>
+                </tr>
+                }
+            }
+        </table>
+    }
+    else
+    {
+        <div class="alert-mini alert-info alert-dismissible center-block" role="alert" align="center">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+
+        function hideAndResetModal(modalID) {
+            $(modalID).modal('hide');
+            $(modalID).on('hidden.bs.modal', function () {
+                $(modalID).find('form').trigger('reset');
+            });
+        }
+
+        function isEmpty(value) {
+            return (value == null || value.length === 0);
+        }
+
+
+        function TaskDelegation(ApplicationId, CurrentAssignedUser, FieldLocation) {
+            $("#appid").val(ApplicationId);
+            $("#Oldtask").val(CurrentAssignedUser);
+            $("#officelocation").val(FieldLocation);
+            $("#comment").val("");
+            //$("#Newtask").ready(function () {//get all user role populated in the dropdownlist
+            var html = "";
+            //$("#Newtask").html("");
+            $('.UserRoles').html("");
+            $('.UserRoles').select2();
+
+            $.getJSON("/Admin/GetUsersToAssign",
+                { ApplicationId: ApplicationId },
+                function (datas) {
+
+                    $("#Newtask").append("<option disabled selected>--Select whom to Assign--</option>");
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.id + ">" + val.description + "</option>";
+                        });
+                    $("#Newtask").append(html);
+                });
+
+            $("#TaskDelegationModal").modal('show');
+
+        }
+
+
+
+        $('#SaveBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+
+            if ($("#AssignTaskForm").valid()) {
+
+                bootbox.confirm({
+                    message: "Do You Really Want To Reassign the Application?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+                            var url = '@Url.Action("MoveApplication")';
+                            $.get(url, { applicationId: $("#appid").val(), assigneduser: $("#Newtask").val(), reason: $('#Comment').val() }, function (data) {
+                                console.log('before console');
+                                var status = data.status;
+                                console.log(status);
+                                hideAndResetModal('#TaskDelegationModal');
+                                if (status == 'success') {
+                                    bootbox.alert({
+                                        message: data.Message,
+                                        size: 'small',
+                                        className: 'bb-alternate-modal',
+                                        callback: function () {
+                                            //window.location.href = "/Admin/ReassignApplication";
+                                            window.location.href = "/Admin/MyDesk";
+                                        }
+                                    });
+                                }
+                                else {
+                                    alert(data.Message);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+
+
+
+        $(function () {
+            $("#lnk-Branches > a").addClass("selected").find(".act").addClass("selected");
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+
+
+
+        });
+
+    </script>
+}
+
+

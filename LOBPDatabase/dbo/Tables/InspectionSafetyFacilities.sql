@@ -1,0 +1,27 @@
+﻿CREATE TABLE [dbo].[InspectionSafetyFacilities] (
+    [InspectionFacilityId]                  INT           IDENTITY (1, 1) NOT NULL,
+    [ApplicationId]                         VARCHAR (30)  NOT NULL,
+    [C02DryPowderExtinguisherTotal]         INT           NOT NULL,
+    [C02DryPowderExtSizeTypeLocation]       VARCHAR (MAX) NOT NULL,
+    [FoamingExtinguisherTotal]              INT           NOT NULL,
+    [FoamingExtSizeTypeLocation]            VARCHAR (MAX) NOT NULL,
+    [WaterHydrantTotal]                     INT           NOT NULL,
+    [WaterHydrantSizeTypeLocation]          VARCHAR (MAX) NOT NULL,
+    [SmokeDetectorsTotal]                   INT           NOT NULL,
+    [SmokeDetectorsSizeTypeLocation]        VARCHAR (MAX) NOT NULL,
+    [AlarmUnitsTotal]                       INT           NOT NULL,
+    [AlarmUnitsSizeTypeLocation]            VARCHAR (MAX) NOT NULL,
+    [EmergencyShutOffUnitTotal]             INT           NOT NULL,
+    [EmergencyShutOffUnitSizeTypeLocation]  VARCHAR (MAX) NOT NULL,
+    [SafetyWarningSignTotal]                INT           NOT NULL,
+    [SafetyWarningSignSizeTypeLocation]     VARCHAR (MAX) NOT NULL,
+    [EmergencyProcedureBrdTotal]            INT           NOT NULL,
+    [EmergencyProcedureBrdSizeTypeLocation] VARCHAR (MAX) NOT NULL,
+    [FireMusterPointTotal]                  INT           NOT NULL,
+    [FireMusterPointSizeTypeLocation]       VARCHAR (MAX) NOT NULL,
+    [ListOfPpeTechStaffTotal]               INT           NOT NULL,
+    [ListOfPpeTechStaffSizeTypeLocation]    VARCHAR (MAX) NOT NULL,
+    CONSTRAINT [PK__Inspecti__57218E9FFF3DA590] PRIMARY KEY CLUSTERED ([InspectionFacilityId] ASC),
+    CONSTRAINT [FK_InspectionSafetyFacilities_ApplicationId] FOREIGN KEY ([ApplicationId]) REFERENCES [dbo].[ApplicationRequest] ([ApplicationId])
+);
+

@@ -1,0 +1,140 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+@using LOBP.DbEntities
+@{
+    ViewBag.Title = "Company Permits";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+
+    var dbCtxt = new LubeBlendingDBEntities();
+
+}
+
+
+<div class="content">
+    <h2 class="">All Permits/Licenses by &quot;@ViewBag.CompanyName&quot;</h2>
+    <hr />
+
+    <table class="table table-striped table-hover dataTable">
+        <thead>
+            <tr>
+                <th>Permit Number</th>
+                <th>Application Id</th>
+                <th>Description</th>
+                <th>Application Type</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th>Is Legacy</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (LOBP.DbEntities.ApplicationRequest b in Model)
+            {
+                <tr>
+                    <td>@b.LicenseReference</td>
+                    <td class="nr">@b.ApplicationId</td>
+                    <td style="display:none" class="linkcode">@b.LicenseTypeId</td>
+                    
+                    <td>@b.LicenseTypeId</td>
+                    <td>@b.ApplicationTypeId</td>
+                    <td>@b.LicenseIssuedDate</td>
+                    <td>@b.LicenseExpiryDate</td>
+                    <td>@b.IsLegacy</td>
+                    <td>
+                        @if (b.IsLegacy == "NO")
+                        {
+                            <button type="button" class="use-address media btn btn-success btn-xs">View License</button>
+                        }
+                    </td>
+                    @*<td><a href="#@(b.ApplicationID)myRejModal" data-app-id="@b.ApplicationID.ToString()" data-id="1" data-i="@b.ApplicationID.ToString()" class="myRejModal btn btn-default" data-toggle="modal">View License</a></td>*@
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+
+@foreach (LOBP.DbEntities.ApplicationRequest br in Model)
+{
+    <div class="modal fade" id="@(br.ApplicationId)myRejModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h2 class="modal-title">License Preview</h2>
+                </div>
+                <div class="modal-body">
+                    <a id="licenseData" class="media" href="@Url.Content("~/Licenses/" + br.ApplicationId + ".pdf")"></a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.media.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.metadata.js")"></script>
+    @if (Model.Count > 0)
+    {
+        <script type="text/javascript">
+            $(function () {
+                $('a.media').media({ width: 500, height: 400 });
+            });
+            function loadModal() {
+                $('#myModal').modal({ show: true });
+            }
+        </script>
+    }
+    <script type="text/javascript">
+        $(function () {
+            $(".use-address").click(function () {
+                debugger;
+                var $item = $(this).closest("tr").find(".nr").text();
+                var apptype = $(this).closest("tr").find(".linkcode").text();
+
+                if (apptype === "LTO") {
+                    window.open('/Admin/ViewLTO/' + $item, '_blank');
+                }
+                else if (apptype === "ATM") {
+                    window.open('/Admin/ViewATCMOD/' + $item, '_blank');
+                }
+                else if (apptype === "SSA") {
+                    window.open('/Admin/ViewSUI/' + $item, '_blank');
+                }
+                else if (apptype === "PTE") {
+                    window.open('/Admin/ViewPTE/' + $item, '_blank');
+                }
+                else if (apptype === "ATC") {
+                    window.open('/Admin/ViewATC/' + $item, '_blank');
+                }
+                else if (apptype === "ATO") {
+                    window.open('/Admin/ViewTO/' + $item, '_blank');
+
+               }
+
+                //window.open("/Licenses/" + $item + ".pdf", '_blank')
+            });
+            //$("#lnk-Permits > a").addClass("selected");
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [-1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+
+}

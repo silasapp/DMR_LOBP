@@ -1,0 +1,463 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+
+@{
+    int counter = 0;
+    ViewBag.Title = "PermitApplications";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Online Application Permits</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="row xrow">
+    <div class="col-md-12">
+        <table class="table dataTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ApplicationId</th>                   
+                    <th>Description</th>
+                    <th>PermitReference</th>
+                    <th>Issue Date</th>
+                    <th>Expiry Date</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appmaster in Model)
+                {
+                    <tr>
+                        <td>@(counter += 1)</td>
+                        <td>@appmaster.ApplicationId</td>
+                        <td>@appmaster.LicenseType.Description</td>
+                        <td>@appmaster.LicenseReference</td>
+                        <td>@appmaster.LicenseIssuedDate.Value.ToString("dd-MMMM-yyyy")</td>
+                        <td>@appmaster.LicenseExpiryDate.Value.ToString("dd-MMMM-yyyy")</td>
+                        <td>
+
+                            @if (appmaster.LicenseTypeId == "PTE")
+                            {
+                            <a class="btn btn-warning btn-xs round" href="#" onclick="javascript:MoveToATC('@appmaster.LicenseReference')">Proceed For LOBP ATC</a>
+                            }
+
+                            else if (appmaster.LicenseTypeId == "ATC")
+                            {
+                                <a class="btn btn-success btn-xs round" href="#" onclick="javascript:MoveToLTO('@appmaster.LicenseReference')">Proceed For LOBP LTO</a>
+                            }
+
+                            else if (appmaster.LicenseTypeId == "LTO")
+                            {
+                                <a class="btn btn-primary btn-xs round" href="#" onclick="javascript:RenewLicense('@appmaster.LicenseReference')">LOBP License Renewal</a>
+                            }
+
+                            else if (appmaster.LicenseTypeId == "ATCLFP")
+                            {
+                                <a class="btn btn-success btn-xs round" href="#" onclick="javascript:MoveToLTOLFP('@appmaster.LicenseReference')">Proceed For Lubricant Filling Plant (LTO)</a>
+                            }
+                            else if (appmaster.LicenseTypeId == "LTOLFP")
+                            {
+                                <a class="btn btn-success btn-xs round" href="#" onclick="javascript:RenewLicenseLFP('@appmaster.LicenseReference')">Lubricant Filling Plant License Renewal</a>
+                            }
+                        </td>
+                        <td>
+                            <a class="btn btn-info btn-xs round" href="#" onclick="javascript:MoveToATM('@appmaster.LicenseReference','@appmaster.LicenseTypeId','@appmaster.ApplicationTypeId','@appmaster.ApplicationId')">Proceed For Modification</a>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section scripts{
+
+    
+
+    <script type="text/javascript">
+         $(document).ready(function () {
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Application on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+    });
+
+
+        function MoveToATC(PTEReference) {
+
+            bootbox.confirm({
+                message: "Apply For New Approval To Construct (ATC) using the Reference (PTE) " + PTEReference + " ?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    $.get('@Url.Action("CheckForUnsubmittedApplication")', { LicenseTypeCode: "ATC" })
+                    .done(function (data) {
+
+                        var status = data.Status;
+                        if (status == 'expiredpte') {
+                                bootbox.alert({
+                                    message: "Your Permit To Establish has expired, please apply for Permit To Establish before proceeding to Approval To Construct(ATC)",
+                                    size: 'small',
+                                    callback: function () {
+                                        return false;
+                                    }
+                                });
+                                //window.location.href = "/Company/MyApplications";
+                            }
+                            else {
+
+
+                                $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                               .done(function (data) {
+
+                                   var status = data.Status;
+                                   if (status == 'success') {
+
+                                       window.location.href = "/Company/ApprovalToConstruct?LicenseTypeId=ATC&ApplicationId="+data.applicationId+"&PTEReference=" + PTEReference;
+                                   } else {
+                                       bootbox.alert({
+                                           message: data.Message,
+                                           size: 'small',
+                                           callback: function () { }
+                                       });
+                                   }
+                               })
+                               .fail(function (data) {
+                                   alert('The System Cannot Access the Resource/Network Error');
+                               })
+                               .always(function (data) { });
+
+
+
+
+                            }
+
+                    })
+                    .fail(function (data) {
+                        alert('The System Cannot Access the Resource/Network Error');
+                    })
+                    .always(function (data) { });
+                }
+            });
+            }
+
+
+
+
+
+
+
+
+        function MoveToATM(PTEReference, licensetype, apptype, appid) {
+
+            bootbox.confirm({
+                message: "Apply For Approval To Modify using the Reference " + PTEReference + " ?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+
+
+
+                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'success') {
+                                if (licensetype === "PTE") {
+                                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=ATM&ApplicationId=" + appid;
+                                } else if (licensetype === "ATC" || licensetype === "ATCLFP") {
+                                    window.location.href = "/Company/ApprovalToConstruct?LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&PTEReference=" + PTEReference;
+
+                                } else if (licensetype === "LTO" || licensetype === "LTOLFP") {
+                                    window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=NEW&LicenseTypeId=ATM&ApplicationId=" + data.applicationId + "&LinkedReference=" + PTEReference;;
+                                }
+
+                            } else {
+                                bootbox.alert({
+                                    message: data.Message,
+                                    size: 'small',
+                                    callback: function () { }
+                                });
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+
+
+                    }
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+            function MoveToLTO(ATCReference) {
+
+                bootbox.confirm({
+                    message: "Apply For New License To Operate (LTO) using the Reference (ATC) " + ATCReference + " ?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        $.get('@Url.Action("CheckForUnsubmittedApplication")', { LicenseTypeCode: "LTO" })
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'expiredatc') {
+
+                                bootbox.alert({
+                                    message: "Your Approval To Construct has expired, please apply for Approval To Construct before proceeding to License To Operate(LTO)",
+                                    size: 'small',
+                                    callback: function () {
+
+                                        return false;
+                                    }
+                                });
+                            }
+                                else {
+
+
+                                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                                 .done(function (data) {
+
+                                     var status = data.Status;
+                                     if (status == 'success') {
+
+                                         window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=NEW&LicenseTypeId=LTO&ApplicationId=" + data.applicationId + "&LinkedReference=" + ATCReference;;
+                                     } else {
+                                         bootbox.alert({
+                                             message: data.Message,
+                                             size: 'small',
+                                             callback: function () { }
+                                         });
+                                     }
+                                 })
+                                 .fail(function (data) {
+                                     alert('The System Cannot Access the Resource/Network Error');
+                                 })
+                                 .always(function (data) { });
+
+
+                                }
+
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+                    }
+                });
+            }
+
+
+
+
+                    function MoveToLTOLFP(ATCLFPReference) {
+
+                bootbox.confirm({
+                    message: "Apply For New Lubricant Filling Plant (LTO) using Lubricant Filling Plant (ATC) Reference " + ATCLFPReference + " ?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        $.get('@Url.Action("CheckForUnsubmittedApplication")', { LicenseTypeCode: "LTOLFP" })
+                        .done(function (data) {
+
+                            var status = data.Status;
+                            if (status == 'expiredatc') {
+
+                                bootbox.alert({
+                                    message: "Your Lubricant Filling Plant (ATC) has expired, please apply for Lubricant Filling Plant (ATC) before proceeding to Lubricant Filling Plant(LTO)",
+                                    size: 'small',
+                                    callback: function () {
+
+                                        return false;
+                                    }
+                                });
+                            }
+                                else {
+
+
+                                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                                 .done(function (data) {
+
+                                     var status = data.Status;
+                                     if (status == 'success') {
+
+                                         window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=NEW&LicenseTypeId=LTOLFP&ApplicationId=" + data.applicationId + "&LinkedReference=" + ATCLFPReference;;
+                                     } else {
+                                         bootbox.alert({
+                                             message: data.Message,
+                                             size: 'small',
+                                             callback: function () { }
+                                         });
+                                     }
+                                 })
+                                 .fail(function (data) {
+                                     alert('The System Cannot Access the Resource/Network Error');
+                                 })
+                                 .always(function (data) { });
+
+
+                                }
+
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+                    }
+                });
+            }
+
+
+                function RenewLicenseLFP(LTOReference) {
+                debugger;
+                bootbox.confirm({
+                    message: "Renew License To Operate Lubricant Filling Plant using the Reference " + LTOReference + " ?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+
+                                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                                 .done(function (data) {
+
+                                     var status = data.Status;
+                                     if (status == 'success') {
+                                         window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=RENEW&LicenseTypeId=LTOLFP&ApplicationId=" + data.applicationId + "&LinkedReference=" + LTOReference;
+                                     } else {
+                                         bootbox.alert({
+                                             message: "Something went wrong please try again later.",
+                                             size: 'small',
+                                             callback: function () { }
+                                         });
+                                     }
+                                 })
+                                 .fail(function (data) {
+                                     alert('The System Cannot Access the Resource/Network Error');
+                                 })
+                                 .always(function (data) { });
+
+
+
+                    }
+                });
+            }
+
+
+
+
+
+
+
+            function RenewLicense(LTOReference) {
+                debugger;
+                bootbox.confirm({
+                    message: "Renew License To Operate (LTO) using the Reference (LTO) " + LTOReference + " ?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+
+
+
+                                    $.get('@Url.Action("GenerateNormalApplicationNo")', {})
+                                 .done(function (data) {
+
+                                     var status = data.Status;
+                                     if (status == 'success') {
+                                         window.location.href = "/Company/LicenseToOperate?ApplicationTypeId=RENEW&LicenseTypeId=LTO&ApplicationId=" + data.applicationId + "&LinkedReference=" + LTOReference;
+                                     } else {
+                                         bootbox.alert({
+                                             message: "Something went wrong please try again later.",
+                                             size: 'small',
+                                             callback: function () { }
+                                         });
+                                     }
+                                 })
+                                 .fail(function (data) {
+                                     alert('The System Cannot Access the Resource/Network Error');
+                                 })
+                                 .always(function (data) { });
+
+
+
+                    }
+                });
+            }
+
+
+
+    </script>
+
+}

@@ -1,0 +1,516 @@
+﻿@model List<LOBP.DbEntities.LicenseType>
+
+@{
+    ViewBag.Title = "ApplyForLicense";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Lube Blending Licenses and Approvals</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+
+<div class="row">
+
+    <div class="col-sm-12">
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/lube1.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>New Permit To Establish/Site Suitability</b></h2>
+                    <p class="card-text">Use For the Application of NEW Permit To Establish/Site Suitability Approval From The Field Offices</p>
+                    <p>
+                        <button type="button" class="btn btn-info round" id="ApplyBtnPTE">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/lube2.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Application Permits</b></h2>
+                    <p class="card-text">Use For the Application of Approval To Construct, Approval To Modify, License To Operate and Renewals</p>
+                    <p>
+                        <button type="button" class="btn btn-warning round ApplyBtnAll" id="ApplyBtnAll">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/onlineapp.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Legacy Application</b></h2>
+                    <p class="card-text">Use For Re-Certication of Permit To Establish,Approval To Construct and License To Operate issued through Manual Process</p>
+                    <p>
+                        <button type="button" class="btn btn-default  round" id="ApplyForLegacy">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="row">
+
+    <div class="col-sm-12">
+
+        <div class="col-sm-4">
+
+            <div class="card">
+                <img src="@Url.Content("~/Images/doc3.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Takeover of Facility</b></h2>
+                    <p class="card-text">Use For Takeover of Facility</p>
+                    <p>
+                        <button type="button" class="btn btn-success  round" onclick="ATMTOBtn('ATO')">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/engine.png")" style="width:50%">
+                <div class="container">
+                    <h2><b>Online Tank Integrity Test</b></h2>
+                    <p class="card-text">Use For Application of Tank Integrity Test Approval</p>
+                    <p>
+                        <button type="button" class="btn btn-danger round" onclick="GeneralBtn('TITA')">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/lube3.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Tank Calibration</b></h2>
+                    <p class="card-text">Use For Application of Tank Calibration Approval</p>
+                    <p>
+                        <button type="button" class="btn btn-info round" onclick="GeneralBtn('TCA')">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+    </div></div>
+
+
+
+<div class="row">
+
+    <div class="col-sm-12">
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/refinery.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Third Party Blending</b></h2>
+                    <p class="card-text">Use For Application of Third Party Blending Approval</p>
+                    <p>
+                        <button type="button" class="btn btn-warning round" onclick="GeneralBtn('TPBA')">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/engine.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Lubricant Filling Plant (ATC)</b></h2>
+                    <p class="card-text">Use For Application of Approval To Construct Lubricant Filling Plant</p>
+                    <p>
+                        <button type="button" class="btn btn-success round" onclick="GeneralBtn('ATCLFP')">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="col-sm-4">
+            <div class="card">
+                <img src="@Url.Content("~/Images/lube1.png")" style="width:40%">
+                <div class="container">
+                    <h2><b>Online Lubricant Filling Plant (LTO)</b></h2>
+                    <p class="card-text">Use For Application of License To Operate Lubricant Filling Plant</p>
+                    <p>
+                        <button type="button" class="btn btn-danger round ApplyBtnAll" id="ApplyBtnAll">Apply</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+
+
+        <div id="spinner" class="spinner" style="display:none;">
+            <div class="fa-4x">
+                <i class="fas fa-sync fa-spin"></i>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="myLegacyModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered  modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="modal-title text-center">Select Legacy Application Type</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form id="LegacyModalForm" class="form-horizontal">
+                            <div class="form-group">
+
+                                @*<div>
+                                    <input type="radio" id="SSA" name="LegacyType" value="SSA">
+                                    <label for="SSA">SITE SUITABILITY APPROVAL (SSA)</label>
+                                </div>*@
+
+                                <div>
+                                    <input type="radio" id="PTE" name="LegacyType" value="PTE">
+                                    <label for="PTE">PERMIT TO ESTABLISH (PTE)</label>
+                                </div>
+
+                                <div>
+                                    <input type="radio" id="ATC" name="LegacyType" value="ATC">
+                                    <label for="ATC">APPROVAL TO CONSTRUCT (ATC)</label>
+                                </div>
+
+                                <div>
+                                    <input type="radio" id="LTO" name="LegacyType" value="LTO">
+                                    <label for="LTO">LICENSE TO OPERATE (LTO)</label>   
+                                </div>
+
+                                @*<div>
+                                    <input type="radio" id="LTO" name="LegacyType" value="ATCLFP">
+                                    <label for="ATCLFP">LUBRICANT FILLING PLANT (ATC)</label>
+                                </div>*@
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @section scripts{
+            <style>
+                .card {
+                    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                    max-width: 350px;
+                    margin: auto;
+                    text-align: center;
+                    font-family: arial;
+                    perspective: 1000px;
+                }
+
+                    .card img {
+                        border-radius: 50%;
+                        border: 2px solid #73AD21;
+                    }
+
+                    .card button:hover {
+                        opacity: 0.7;
+                    }
+
+                .spinner {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    margin-left: -50px; /* half width of the spinner gif */
+                    margin-top: -50px; /* half height of the spinner gif */
+                    text-align: center;
+                    z-index: 1234;
+                    overflow: auto;
+                    width: 100px; /* width of the spinner gif */
+                    height: 102px; /*hight of the spinner gif +2px to fix IE8 issue */
+                }
+            </style>
+
+
+       
+           
+
+
+            <script type="text/javascript">
+
+        $(document).ready(function () {
+        $("input").on("click", function () {
+            var message = "";
+            var LegacyType = $("input:checked").val();
+
+            if (LegacyType == "SSA") {
+                message = "Do you want to apply for Site Suitability Legacy?"
+            }
+
+            if (LegacyType == "PTE") {
+                message = "Do you want to apply for Permit To Establish Legacy?"
+            }
+            else if (LegacyType == "ATC") {
+                message = "Do you want to  apply for Approval To Construct Legacy?"
+            }
+            else if (LegacyType == "LTO") {
+                message = "Do you want to  apply for License To Operate Legacy?"
+            }
+            else if (LegacyType == "ATCLFP") {
+                message = "Do you want to  apply for Libricant Filling Plant (ATC) Legacy?"
+            }
+
+
+            bootbox.confirm({
+                message: message.toUpperCase(),
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    if (result == true) {
+                        hideAndResetModal('#myLegacyModal');
+                        $('#spinner').show();
+
+                        $.get('@Url.Action("GenerateLegacyApplicationNo")', {})
+                        .done(function (data) {
+                            $('#spinner').hide();
+                            var status = data.Status;
+                            if (status == 'success') {
+                                window.location.href = "/Company/LegacyApplication?LicenseTypeId=" + LegacyType + "&ReferenceId=" + data.applicationId;
+                            } else {
+                                bootbox.alert({
+                                    message: data.Message,
+                                    size: 'small',
+                                    callback: function () { }
+                                });
+                            }
+                        })
+                        .fail(function (data) {
+                            alert('The System Cannot Access the Resource/Network Error');
+                        })
+                        .always(function (data) { });
+                    }
+                }
+            });
+
+        });
+               // });
+
+
+        
+
+       // $(document).ready(function () {
+
+            $("#spinner").bind("ajaxSend", function () {
+                $(this).show();
+            }).bind("ajaxStop", function () {
+                $(this).hide();
+            }).bind("ajaxError", function () {
+                $(this).hide();
+            });
+
+
+
+
+            $('#ApplyForLegacy').click(function (e) {
+                debugger;
+               e.stopImmediatePropagation();
+                e.preventDefault();
+
+               
+                $("#myLegacyModal").modal('show');
+
+            });
+
+
+            $('#ApplyBtnPTE').click(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                var LicenseTypeId = "PTE";
+                bootbox.confirm({
+                    message: "Do you want to Apply For Site Suitability (PTE) Approval?",
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+                            var url = '@Url.Action("CheckForUnsubmittedApplication")';
+                            $.get(url, { LicenseTypeCode: LicenseTypeId })
+                            .done(function (data) {
+
+                                var status = data.Status;
+                                if (status == 'expiredssa') {
+                                    bootbox.alert({
+                                        message: "Your site suitability has expired, please apply for site suitability before proceeding to Permit To Establish(PTE)",
+                                        size: 'small',
+                                        callback: function () {
+                                            window.location.href = "/Company/PermitToEstablish?LicenseTypeId=" + LicenseTypeId;
+                                        }
+                                    });
+
+
+                                } else {
+                                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=" + LicenseTypeId;
+                                }
+                            })
+                            .fail(function (data) {
+                                alert('The System Cannot Access the Resource/Network Error');
+                            })
+                            .always(function (data) { });
+                        }
+                    }
+                });
+
+            });
+
+
+
+
+            $('.ApplyBtnAll').click(function (e) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                window.location.href = "/Company/PermitApplications";
+            });
+
+
+
+
+
+
+
+        });
+
+
+                function isEmpty(str) {
+                    return (!str || 0 === str.length);
+                }
+
+                function hideAndResetModal(modalID) {
+                    $(modalID).modal('hide');
+                    $(modalID).on('hidden.bs.modal', function () {
+                        $(modalID).find('form').trigger('reset');
+                    });
+                }
+
+
+
+                function ATMTOBtn(LicenseTypeCode) {
+
+                    window.location.href = "/Company/MyApplicationForm?LicenseType=" + LicenseTypeCode;
+
+                }
+
+
+
+                function GeneralBtn(LicenseTypeCode) {
+
+                    window.location.href = "/Company/PermitToEstablish?LicenseTypeId=" + LicenseTypeCode;
+
+                }
+
+
+
+
+        function ApplyForATC(LicenseTypeCode, Description) {
+            var html = "";
+            var count = 0;
+            bootbox.confirm({
+                title: Description,
+                message: "Do you want to Apply For Approval To Construct (ATC)?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+
+                    if (result == true) {
+                        $.getJSON("/Company/GetApprovedLicense",
+                            { LicenseTypeId: "PTE" },
+                            function (datas) {
+                                $.each(datas,
+                                    function (key, val) {
+                                        count += 1;
+                                        html += "<option value=" + val.Id + ">" + val.Description + "</option>";
+                                    });
+                                $(".ApprovedLicense").append(html);
+                            });
+
+                        if (count == 0) {
+
+                            bootbox.confirm({
+                                message: "The PLatform Could Not Detect Any Permit To Establish Reference, Do you want to Maintain the Manual Information?",
+                                size: 'small',
+                                className: 'bb-alternate-modal',
+                                buttons: {
+                                    cancel: {
+                                        label: '<i class="fa fa-times"></i> Cancel'
+                                    },
+                                    confirm: {
+                                        label: '<i class="fa fa-check"></i> Confirm'
+                                    }
+                                },
+                                callback: function (result) {
+                                    if (result == true) {
+                                        window.location.href = "/Company/LegacyApplication?LicenseTypeId=PTE&NextLicenseTypeId=" + LicenseTypeCode;
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            $("#ATCModal").modal('show');
+                        }
+
+                    }
+                }
+            });
+        }
+
+            </script>
+        }

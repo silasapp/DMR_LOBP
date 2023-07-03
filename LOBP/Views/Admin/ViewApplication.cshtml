@@ -1,0 +1,2968 @@
+﻿@using LOBP.DbEntities
+@model LOBP.DbEntities.ApplicationRequest
+
+@{
+    bool showPart = true;
+    ViewBag.Title = "ViewApplication";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    string CurrentLoggedUser = ((LOBP.DbEntities.UserMaster)(Session["UserID"])).UserId;
+    string userRole = ((LOBP.DbEntities.UserMaster)(Session["UserID"])).UserRoles;
+
+}
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+<div class="content">
+    <h3 class="lefty">Application Reference No: @ViewBag.ApplicationId </h3>
+    <div class="righty">
+        <a href="@Url.Action("MyDesk")" class="btn btn-default">Back <i class="icon-arrow-left"></i></a>
+    </div>
+    <hr class="clear" />
+    <div class="row">
+        @if (ViewBag.ErrorMessage != "SUCCESS")
+        {
+            <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <i class="fa fa-exclamation-triangle fa-2x fa-border fa-spin " aria-hidden="true"></i>
+                    <strong>@MvcHtmlString.Create(ViewBag.ErrorMessage)</strong>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-9" id="showPart">
+                <div class="mypanel-2leaf-h">
+                    <div class="left-side">
+                        <div class="padd">
+                            <dl class="dl-horizontal lt">
+                                <dt>Company Name</dt>
+                                <dd><a href="/Admin/CompanyProfile?ApplicationId=@ViewBag.ApplicationId">@ViewBag.AppRequest.ApplicantName</a></dd>
+                                <dt>Approval/License Name</dt>
+                                <dd>@ViewBag.appRequest.LicenseType.Description</dd>
+                                <dt>Type</dt>
+                                <dd>@ViewBag.appRequest.ApplicationTypeId</dd>
+                                <dt>Application Date</dt>
+                                <dd>@ViewBag.appRequest.AddedDate.ToString("dd-MMM-yyyy HH:mm")</dd>
+
+                                <dt>Base Capacity</dt>
+                                <dd>@ViewBag.Capacity</dd>
+
+                                @if (ViewBag.appRequest.LicenseTypeId == "ATO" || ViewBag.appRequest.LicenseTypeId == "SSA" || ViewBag.appRequest.LicenseTypeId == "ATM" || ViewBag.appRequest.LicenseTypeId == "PTE" || ViewBag.appRequest.LicenseTypeId == "LTO")
+                                {
+
+                                    <dt>Projection Production</dt>
+                                    <dd>@ViewBag.Projection</dd>
+
+                                }
+                                else if (ViewBag.appRequest.LicenseTypeId.Contains("TPBA"))
+                                {
+                                    <dt>Quarter</dt>
+                                    <dd>@ViewBag.appRequest.Quarter</dd>
+                                }
+                                <dt>Current Stage</dt>
+                                <dd>
+                                    <div class="alert alert-mini alert-info">
+                                        <strong>@ViewBag.Status</strong>
+                                    </div>
+                                </dd>
+
+                                @if (ViewBag.isLegacy == false)
+                                {
+
+                                    <dt>Legacy Application</dt>
+                                    <dd>NO</dd>
+                                    <dt>Statutory Fee</dt>
+                                    <dd class="">@ViewBag.LicenseFee</dd>
+                                    <dt>Processing Fee</dt>
+                                    <dd class="">@ViewBag.ProcessingFee</dd>
+                                    <dt>Service Charge</dt>
+                                    <dd> @ViewBag.ServiceCharge</dd>
+                                    <dt>Approval Fee</dt>
+                                    <dd>
+                                        @if (ViewBag.appRequest.LicenseTypeId == "ATO")
+                                        {
+                                            @ViewBag.Approvalfee
+                                        }
+                                        else
+                                        {
+                                            <span>0.00</span>
+                                        }
+                                    </dd>
+
+                                    <dt>Arrears</dt>
+                                    <dd class="">@ViewBag.Arrears</dd>
+                                    <dt>Total Amount</dt>
+                                    <dd class="">@ViewBag.TotalAmount</dd>
+                                    <dt>Remita Reference</dt>
+                                    <dd>@ViewBag.Remita</dd>
+                                    if (ViewBag.PaymentStatus == "Payment Received")
+                                    {
+                                        <dt>Payment Status</dt>
+                                        <dd>
+                                            <div class="alert alert-mini alert-info">
+                                                <strong>@ViewBag.PaymentStatus</strong>
+                                            </div>
+                                        </dd>
+                                        <dt>Date Received</dt>
+                                        <dd>@ViewBag.PaymentDate</dd>
+                                    }
+                                    else
+                                    {
+                                        <dt>Payment Status</dt>
+                                        <dd>
+                                            <div class="alert alert-mini alert-danger">
+                                                <strong>@ViewBag.PaymentStatus</strong>
+                                            </div>
+                                        </dd>
+                                    }
+                                }
+                                else
+                                {
+                                    <dt>Legacy Application</dt>
+                                    <dd>YES</dd>
+                                }
+
+                                <dt>Status</dt>
+                                <dd>
+                                    @{
+                                        if (ViewBag.Applicationstatus != null)
+                                        {
+                                            if (ViewBag.Applicationstatus == "Processing")
+                                            {
+                                                <div class="alert alert-mini alert-warning">
+                                                    <strong>@ViewBag.Applicationstatus</strong>
+                                                </div>
+                                            }
+                                            else if (ViewBag.Applicationstatus == "Rejected")
+                                            {
+                                                <div class="alert alert-mini alert-danger">
+                                                    <strong>@ViewBag.Applicationstatus</strong>
+                                                </div>
+                                            }
+                                            else if (ViewBag.Applicationstatus == "Approved")
+                                            {
+                                                <div class="alert alert-mini alert-success">
+                                                    <strong>@ViewBag.Applicationstatus</strong>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </dd>
+
+
+
+
+
+                                <dt>
+                                    Uploaded Documents
+                                </dt>
+                                <dd>
+                                    <div class="list-group">
+                                        @foreach (LOBP.Models.DocumentModel doc in ViewBag.DocumentList)
+                                        {
+                                            <a href="@doc.Source" target="_blank" class="list-group-item">@doc.DocumentName<i class="og-icon og-pdf righty"></i></a>
+                                        }
+                                    </div>
+                                </dd>
+
+                                @*@if (ViewBag.OtherDocList.Count > 0)
+                                    {
+                                        <dt>
+                                            Other Documents
+                                        </dt>
+                                        <dd>
+                                            <div class="list-group">
+                                                @foreach (LOBP.Models.DocumentModel doc in ViewBag.OtherDocList)
+                                                {
+                                                    <a href="@doc.Source" target="_blank" class="list-group-item">@doc.DocumentName<i class="og-icon og-pdf righty"></i></a>
+                                                }
+                                            </div>
+                                        </dd>
+
+                                    }*@
+
+                            </dl>
+                        </div>
+                    </div>
+
+
+                    <div class="right-side">
+                        <div class="pad">
+                            <table class="" style="width: 100%;">
+                                <tr>
+                                    <td valign="top" class="pad"><b>Application Type</b></td>
+                                    <td>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <a href="@Url.Action("ApplicationDetails", new { applicationId = ViewBag.ApplicationId })"> Application Form</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td valign="top" class="pad"><b>Received From</b></td>
+
+                                    <td>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                @ViewBag.TriggeredBy
+                                            </li>
+                                        </ul>
+
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td valign="top" class="pad"><b>Received Date</b></td>
+                                    <td>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                @ViewBag.TriggeredDate
+                                            </li>
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top" class="pad"><b>Received Office</b></td>
+                                    <td>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                @ViewBag.TriggeredField
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td valign="top" class="pad"><b>Current Desk</b></td>
+                                    <td>
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                @ViewBag.CurrentDesk
+                                            </li>
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top" class="pad"><b>Last Message</b></td>
+                                    <td>
+                                        <ul class="list-group" style="color:#167994">
+                                            <li class="list-group-item">
+                                                <b>@ViewBag.LastMessage</b>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <hr class="marg25" />
+                        <div class="pad">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <p class="panel-title">Application History (Last 5)</p>
+                                </div>
+                                <table class="table table-striped">
+                                    <tr>
+                                        <td>#</td>
+                                        <td>Date</td>
+                                        <td>Comment</td>
+                                    </tr>
+                                    @{int i = 1;}
+                                    @foreach (LOBP.DbEntities.ActionHistory n in ViewBag.ActionHistoryList)
+                                    {
+                                        <tr>
+                                            <td>@(i++)</td>
+                                            <td>@n.ActionDate</td>
+                                            <td>@n.MESSAGE</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td colspan="3">
+                                            <a href="@Url.Action("TransitionHistory", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block round">WorkFlow History</a>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td colspan="3">
+
+                                            <div style="height:5px; color:green"></div>
+                                            <button class="btn btn-primary btn-block round" data-toggle="modal" data-target=".Extrapaymentmodal" style="font-family:Cambria; font-weight:bold"><span class="glyphicon glyphicon-plus"></span> Add Extra Payment</button>
+
+                                            <br />
+                                            @if (ViewBag.ExtraPayment.Count > 0)
+                                            {
+                                                <div class="btn btn-block btn-info"><span class="glyphicon glyphicon-hand-down"></span> Extra Payment Details</div>
+
+                                                foreach (var item in ViewBag.ExtraPayment)
+                                                {
+
+                                                    if (item.Status == "Pending" || item.Status == "FAIL")
+                                                    {
+                                                <tr><td colspan="3"><b style="color:#4f0a94">*************************************************************************************</b></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Application Ref No</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.ApplicationID</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Sanction Type</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.SanctionType</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold"> Amount</span> :<span style="font-size:18px; color:green; font-weight:bold"> ₦@item.TxnAmount</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Status</span> : <span style="font-size:18px; color:green; font-weight:bold"> <span class="glyphicon glyphicon-remove" style="color:red"></span> Pending </span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Description</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.Description</span></td></tr>
+
+                                            }
+                                            else
+                                            {
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Application Ref No</span> :<span style="font-size:18px; color:green; font-weight:bold"> @item.ApplicationID</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">RRR Ref No</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.RRReference</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Sanction Type</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.SanctionType</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Amount</span> : <span style="font-size:18px; color:green; font-weight:bold">₦@item.TxnAmount </span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Status</span> :<span style="font-size:18px; color:green; font-weight:bold"><span class="glyphicon glyphicon-ok" style="color:green"></span> Paid</span></td></tr>
+                                                <tr><td colspan="3"><span style="font-size:20px; color:red; font-weight:bold">Description</span> : <span style="font-size:18px; color:green; font-weight:bold">@item.Description </span></td></tr>
+                                            }
+                                        }
+                                    }
+
+
+                                            </td>
+                                            </tr>
+
+
+
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+
+
+
+
+                    using (Html.BeginForm("AddExtraPayment", "Admin", FormMethod.Post, new { id = "formid", role = "form", @class = "form-horizontal" }))
+                    {
+
+                        <div class="modal fade Extrapaymentmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+                            <div class="modal-dialog" style="display:inline-block; vertical-align:middle; margin:0 auto 0 35%; width:400px; height:500px; margin-top:100px" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Extra Payment for (@ViewBag.ApplicationId)</h4>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div class="container">
+                                            <div class="paymentmade">
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        <input type="hidden" id="myappid" name="myappid" value="@ViewBag.ApplicationId" />
+                                                        <input type="hidden" id="status" name="status" value="Pending" />
+                                                        <input type="hidden" id="penaltytype" name="penaltytype" />
+                                                        <input type="number" style="display:none" id="subtotal" name="subtotal" />
+
+                                                        <label style="font-family:Cambria; font-weight:bold">Penalty Type</label>
+                                                        <select class="form-control Penaltytxt" required="" id="Penaltytxt" name="Penaltytxt"></select>
+                                                        <br />
+
+                                                        <label style="font-family:Cambria; font-weight:bold">Qty</label>
+                                                        <input class="form-control" id="Qty" type="number" name="Qty" required="" /><br />
+
+
+                                                        <label style="font-family:Cambria; font-weight:bold">Amount</label>
+                                                        <input class="form-control" id="penaltyamount" type="number" name="penaltyamount" required="" /><br />
+
+
+                                                        <label style="font-family:Cambria; font-weight:bold">Description</label>
+                                                        <textarea cols="3" rows="3" class="form-control" id="penaltydescription" name="penaltydescription" required=""></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="row">
+                                            <div class="col-sm-offset-4">
+                                                <div class="col-sm-4">
+                                                    <button type="submit" id="submitbtn" class="btn btn-success">Submit</button>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+
+
+
+
+
+
+                    <div class="col-md-3">
+                        <div class="pad">
+
+                            @if (Model.CurrentAssignedUser == CurrentLoggedUser)
+                            {
+                                <h3>Action Panel</h3>
+
+                                if (ViewBag.AppRequest.CurrentStageID == 7)
+                                {
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Pass For Approval</a>
+                                    </div>
+                                    <br />
+                                    <div>
+                                        <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application to Marketer')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                    </div><br />
+                                    <div>
+                                        <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','SUPERVISOR','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign To Reviewer</a>
+                                    </div>
+                                }
+                                else if (ViewBag.AppRequest.CurrentStageID == 6)
+                                {
+                                    <div>
+                                        <a class="btn btn-warning btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve/Reject Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve/Reject to Supervisor</a>
+                                    </div>
+                                    <br />
+                                    <div>
+                                        <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application to Marketer')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                    </div>
+                                }
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 9)
+                                {
+                                    if (ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP")
+                                    {
+                                        <div>
+                                            <a class="btn btn-info btn-block" href='javascript:ScheduleAppointment("Appoinment Schedule For Inspection","INSPECTION","@ViewBag.AppRequest.SiteLocationAddress")'><i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a class="btn btn-info btn-block" href='javascript:ScheduleAppointment("Appoinment Schedule For Presentation","INSPECTION","@ViewBag.AppRequest.SiteLocationAddress")'><i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                        </div>
+                                    }
+                                    <br />
+                                    <div>
+                                        <a class="btn btn-danger btn-block" href='javascript:DelegateRevalidation("Delegate Revalidation Task To Officer","OPSCON","REVIEWER")'><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign To Reviewer/Supervisor</a>
+                                    </div>
+                                }
+
+
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 11 || ViewBag.AppRequest.CurrentStageID == 12 || ViewBag.AppRequest.CurrentStageID == 25 || ViewBag.AppRequest.CurrentStageID == 26 || ViewBag.AppRequest.CurrentStageID == 37 || ViewBag.AppRequest.CurrentStageID == 38)
+                                {
+                                    if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO")
+                                    {
+                                        <div>
+                                            <a class="btn btn-info btn-block" href='javascript:ScheduleAppointment("Appoinment Schedule For Inspection","INSPECTION","@ViewBag.AppRequest.SiteLocationAddress")'><i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Schedule Presentation</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a class="btn btn-info btn-block" href='javascript:ScheduleAppointment("Appoinment Schedule For Inspection","INSPECTION","@ViewBag.AppRequest.SiteLocationAddress")'><i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Schedule Inspection</a>
+                                        </div>
+                                    }
+                                    if (ViewBag.AppRequest.CurrentStageID == 11 || ViewBag.AppRequest.CurrentStageID == 12)
+                                    {
+                                        <br />
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                        </div>
+                                    }
+
+                                }
+
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 14 || ViewBag.AppRequest.CurrentStageID == 15 || ViewBag.AppRequest.CurrentStageID == 27 || ViewBag.AppRequest.CurrentStageID == 28 || ViewBag.AppRequest.CurrentStageID == 39 || ViewBag.AppRequest.CurrentStageID == 40)
+                                {
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.LinkedLicenseId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP" || ViewBag.LinkedLicenseId == "LTOLFP")
+                                    {
+                                        if (ViewBag.CheckInspectionExist == null)
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-upload fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Upload Inspection Report</a>
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-danger btn-block"><i class="fa fa-upload fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-Upload Inspection Report</a>
+
+                                            </div>
+                                            <br />
+                                            <div>
+                                                <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Pass For Approval</a>
+                                            </div>
+                                        }
+                                        <br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+                                        if (ViewBag.CheckInspectionExist == null)
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Upload Inspection Report</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-danger btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Re-Upload Inspection Report</a>
+                                            </div>
+                                            <br />
+                                            <div>
+                                                <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Pass For Approval</a>
+                                            </div>
+                                        }
+                                        <br />
+
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId.Contains("TPBA"))
+                                    {
+                                        if (ViewBag.CheckInspectionExist == null)
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-danger btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Re-Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        <br />
+                                    }
+
+                                    else if ((ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO") && (ViewBag.LinkedLicenseId == "PTE" || ViewBag.LinkedLicenseId == "SSA" || ViewBag.LinkedLicenseId == "ATC" || ViewBag.LinkedLicenseId == null))
+                                    {
+                                        if (ViewBag.CheckInspectionExist == null)
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-danger btn-block"><i class="fa fa-upload fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Re-Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        <br />
+                                    }
+                                    else
+                                    {
+                                        if (ViewBag.CheckInspectionExist == null)
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-danger btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp; Re-Upload Presentation Report</a>
+                                            </div>
+                                        }
+                                        <br />
+                                    }
+
+                                    if (ViewBag.AppRequest.CurrentStageID == 14 || ViewBag.AppRequest.CurrentStageID == 15)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                        </div>
+                                    }
+                                }
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 16 || ViewBag.AppRequest.CurrentStageID == 17 || ViewBag.AppRequest.CurrentStageID == 29 || ViewBag.AppRequest.CurrentStageID == 30 || ViewBag.AppRequest.CurrentStageID == 41 || ViewBag.AppRequest.CurrentStageID == 42)
+                                {
+
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.LinkedLicenseId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP" || ViewBag.LinkedLicenseId == "LTOLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId.Contains("TPBA") || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+
+                                    else if ((ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO") && (ViewBag.LinkedLicenseId == "PTE" || ViewBag.LinkedLicenseId == "SSA" || ViewBag.LinkedLicenseId == "ATC" || ViewBag.LinkedLicenseId == null))
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Pass For Approval</a>
+                                    </div>
+
+                                    if (ViewBag.AppRequest.CurrentStageID == 16 || ViewBag.AppRequest.CurrentStageID == 17)
+                                    {
+                                        <br />
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 18 || ViewBag.AppRequest.CurrentStageID == 19)
+                                {
+
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.LinkedLicenseId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP" || ViewBag.LinkedLicenseId == "LTOLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId.Contains("TPBA") || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+
+                                    else if ((ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO") && (ViewBag.LinkedLicenseId == "PTE" || ViewBag.LinkedLicenseId == "SSA" || ViewBag.LinkedLicenseId == "ATC" || ViewBag.LinkedLicenseId == null))
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Pass For Approval</a>
+                                    </div>
+                                    <br />
+                                    if (ViewBag.AppRequest.CurrentStageID == 18)
+                                    {
+                                        if (ViewBag.AssignedZN != null)
+                                        {
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectzn','Reject Application To Zopscon')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Zopscon</a>
+                                            </div><br />
+                                            <br />
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application to Marketer')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AssignedOpscon != null)
+                                        {
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectopscon','Reject Application To Opscon')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Opscon</a>
+                                            </div>
+                                            <br />
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application to Marketer')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','OPSCON','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign To Reviewer/Supervisor</a>
+                                            </div>
+                                            <br />
+                                            <div>
+                                                <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Rejectmk','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject To Marketer</a>
+                                            </div>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <div>
+
+                                            <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Reject','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject</a>
+                                        </div>
+                                    }
+
+
+                                }
+
+
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 20)
+                                {
+
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.LinkedLicenseId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP" || ViewBag.LinkedLicenseId == "LTOLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId.Contains("TPBA") || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+
+                                    else if ((ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO") && (ViewBag.LinkedLicenseId == "PTE" || ViewBag.LinkedLicenseId == "SSA" || ViewBag.LinkedLicenseId == "ATC" || ViewBag.LinkedLicenseId == null))
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO")
+                                    {
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve License To Operate For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve LTO</a>
+                                        </div><br />
+                                    }
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTOLFP")
+                                    {
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve License To Operate Lubricant Filling Plant')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve LTOLFP</a>
+                                        </div><br />
+                                    }
+                                    if (ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Approval To Construct Lubricant Filling Plant')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve ATCLFP</a>
+                                        </div><br />
+                                    }
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "PTE")
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Permit To Establish For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve PTE</a>
+                                        </div><br />
+                                    }
+                                    else if (ViewBag.AppRequest.LicenseTypeId.Contains("TPBA"))
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Third Party Blending For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Third Party Blending</a>
+                                        </div><br />
+                                    }
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "TITA")
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Tank Integrity Test For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Tank Integrity Test</a>
+                                        </div><br />
+                                    }
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "TCA")
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Tank Calibration For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Tank Calibration</a>
+                                        </div><br />
+                                    }
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "SSA")
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Site Suitability For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Site Suitability</a>
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC")
+                                    {
+
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Approval To Construct For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve ATC</a>
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATO")
+                                    {
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Approval To Construct For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Takeover</a>
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATM")
+                                    {
+
+
+
+                                        <div>
+                                            <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Approval To Construct For Dispatch')"><i class="fa fa-thumbs-up fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Approve Modification</a>
+                                        </div><br />
+                                    }
+
+                                    <div>
+                                        <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Reject','Reject Application Review')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Reject</a>
+                                    </div>
+
+
+
+
+                                }
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 22 || ViewBag.AppRequest.CurrentStageID == 23 || ViewBag.AppRequest.CurrentStageID == 24 || ViewBag.AppRequest.CurrentStageID == 34 || ViewBag.AppRequest.CurrentStageID == 35 || ViewBag.AppRequest.CurrentStageID == 36)
+                                {
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP")
+                                    {
+                                        if (ViewBag.AppRequest.CurrentStageID == 22)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','OPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 23)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 24)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 34)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ZOPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 35)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 36)
+                                        {
+                                            <div>
+                                                <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Inspection Schedule</a>
+                                            </div>
+                                        }
+
+
+
+                                    }
+                                    else
+                                    {
+
+
+                                        if (ViewBag.AppRequest.CurrentStageID == 22)
+                                        {
+                                            <div>
+                                                @if (ViewBag.CheckInspectionExist == null)
+                                                {
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','OPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','OPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+
+                                                }
+                                            </div>
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 23)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 24)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 32)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 34)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ZOPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ZOPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 35)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+                                        else if (ViewBag.AppRequest.CurrentStageID == 36)
+                                        {
+                                            if (ViewBag.CheckInspectionExist == null)
+                                            {
+                                                <div>
+                                                    <a class="btn btn-warning btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Delegate Presentation Schedule</a>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;Re-assign Presentation Schedule</a>
+                                                </div>
+                                            }
+                                        }
+
+
+                                    }
+
+
+                                }
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 31 || ViewBag.AppRequest.CurrentStageID == 32 || ViewBag.AppRequest.CurrentStageID == 33 || ViewBag.AppRequest.CurrentStageID == 43 || ViewBag.AppRequest.CurrentStageID == 44 || ViewBag.AppRequest.CurrentStageID == 45)
+                                {
+
+                                    if (ViewBag.AppRequest.LicenseTypeId == "LTO" || ViewBag.LinkedLicenseId == "LTO" || ViewBag.AppRequest.LicenseTypeId == "LTOLFP" || ViewBag.LinkedLicenseId == "LTOLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("LTOInspectionMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+
+                                        </div><br />
+                                    }
+
+                                    else if (ViewBag.AppRequest.LicenseTypeId == "ATC" || ViewBag.AppRequest.LicenseTypeId == "SSA" || ViewBag.AppRequest.LicenseTypeId == "PTE" || ViewBag.AppRequest.LicenseTypeId.Contains("TPBA") || ViewBag.AppRequest.LicenseTypeId == "TITA" || ViewBag.AppRequest.LicenseTypeId == "TCA" || ViewBag.AppRequest.LicenseTypeId == "ATCLFP")
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i>&nbsp;&nbsp;View Report</a>
+                                        </div><br />
+                                    }
+
+
+                                    else if ((ViewBag.AppRequest.LicenseTypeId == "ATM" || ViewBag.AppRequest.LicenseTypeId == "ATO") && (ViewBag.LinkedLicenseId == "PTE" || ViewBag.LinkedLicenseId == "SSA" || ViewBag.LinkedLicenseId == "ATC" || ViewBag.LinkedLicenseId == null))
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i> &nbsp; &nbsp; View Report</a>
+                                        </div><br />
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <a href="@Url.Action("PresentationMaintenance", new { applicationId = ViewBag.ApplicationId })" class="btn btn-info btn-block"><i class="fa fa-book fa-border" aria-hidden="true"></i> &nbsp; &nbsp; View Report</a>
+                                        </div><br />
+                                    }
+
+
+
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','Accept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Pass For Approval</a>
+                                    </div>
+
+                                    <br />
+
+                                    if (ViewBag.AppRequest.CurrentStageID == 31)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+                                    else if (ViewBag.AppRequest.CurrentStageID == 32)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+                                    else if (ViewBag.AppRequest.CurrentStageID == 33)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','OPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+                                    else if (ViewBag.AppRequest.CurrentStageID == 43)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','HOD','REVIEWER')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+                                    else if (ViewBag.AppRequest.CurrentStageID == 44)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ADOPERATION','SUPERVISOR')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+                                    else if (ViewBag.AppRequest.CurrentStageID == 45)
+                                    {
+                                        <div>
+                                            <a class="btn btn-danger btn-block" href="javascript:DelegateRevalidation('Delegate Revalidation Task To Officer','ZOPSCON','ADOPERATION')"><i class="fa fa-arrow-right fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Re-assign Task </a>
+
+                                        </div>
+
+                                    }
+
+
+
+                                }
+
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 47)
+                                {
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','LSAccept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Pass For Approval</a>
+                                    </div>
+                                    <br />
+                                    <div>
+                                        <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','LSReject','Reject Application to Marketer')">
+                                            <i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Reject
+                                        </a>
+
+                                    </div>
+
+                                }
+
+
+
+                                else if (ViewBag.AppRequest.CurrentStageID == 48)
+                                {
+
+                                    <div>
+                                        <a class="btn btn-success btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','LRAccept','Approve Application Review')"><i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Approve </a>
+
+                                    </div>
+
+                                    <br />
+
+                                    <div>
+
+                                        <a class="btn btn-danger btn-block" href="javascript:showApprovalForm('@ViewBag.ApplicationId','LRReject','Reject Application to Supervisor')"><i class="fa fa-thumbs-o-down fa-2x" aria-hidden="true"></i> &nbsp; &nbsp; Reject </a>
+
+                                    </div>
+
+                                }
+
+
+
+
+                            }
+
+                        </div>
+                    </div>
+                }
+    </div>
+
+    <div style="display:none" class="loadingImage">
+        <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+            <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="DelegationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="delegateheader"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="DelegationForm" action="@Url.Action("Delegate")" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateLicenseType" name="delegateLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateAppId" name="delegateAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Company Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateCompanyName" name="delegateCompanyName" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div id="OfficerAppointmentDet">
+
+                        @if (ViewBag.AppRequest.CurrentStageID == 9 || ViewBag.AppRequest.CurrentStageID == 43 || ViewBag.AppRequest.CurrentStageID == 31 || ViewBag.AppRequest.CurrentStageID == 24 || ViewBag.AppRequest.CurrentStageID == 18 || ViewBag.AppRequest.CurrentStageID == 36)
+                        {
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Delegate To</label>
+                                <div class="col-md-9">
+                                    <select id="delegateOfficer" name="delegateOfficer" class="form-control delegateOfficerList" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Delegate To</label>
+                                <div class="col-md-9">
+                                    <select id="delegatestaff" name="delegatestaff" class="form-control delegatestaff" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        }
+
+
+
+
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control delegationcomment" rows="3" id="delegationcomment" name="delegationcomment" required="required"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" value="Delegate" id="DelegateBtn" class="btn btn-info round">Delegate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="DelegateVerificationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="delegateVerificationheader"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="DelegationVerificationForm" action="@Url.Action("DelegateVerification")" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateVerificationLicenseType" name="delegateVerificationLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateVerificationAppId" name="delegateVerificationAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Company Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="delegateVerificationCompanyName" name="delegateVerificationCompanyName" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div id="OfficerAppointmentDet">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Verification Staff</label>
+                            <div class="col-md-9">
+                                <select id="delegateVerificationOfficer" name="delegateVerificationOfficer" class="form-control delegateVerificationOfficerList" style="width: 100%"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" value="Delegate" id="DelegateVerificationBtn" class="btn btn-info round">Delegate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" id="DetermineInspectionTypeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="DetermineInspectionTypeHeader"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="DetermineInspectionTypeForm" action="@Url.Action("DetermineInspectionType")" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+
+
+                    <div id="InspectionTypeDet">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Inspection Type</label>
+                            <div class="col-md-9">
+                                <select id="determineType" name="determineType" onchange="getInspectionAssignedUsers(this.value);" class="form-control determineTypeList" style="width: 100%"></select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionLicenseType" name="determineInspectionLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionAppId" name="determineInspectionAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Company Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionCompanyName" name="determineInspectionCompanyName" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">State Located</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionState" name="determineInspectionState" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div id="AssignInspectionToDetail">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Assigned To</label>
+                            <div class="col-md-9">
+                                <select id="determineInspectionUser" name="determineInspectionUser" class="form-control determineInspectionUserList" style="width: 100%"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Inspection Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="determinecomment" name="determinecomment" required></textarea>
+                        </div>
+                    </div>
+
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" value="AssignInspection" id="DetermineInspectionBtn" class="btn btn-info round">Assign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" id="DetermineInspectionResourceModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="DetermineInspectionResourceHeader"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="DetermineInspectionResoureForm" action="@Url.Action("DetermineInspectionResource")" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionResourceType" name="determineInspectionResourceType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionResourceAppId" name="determineInspectionResourceAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Company Name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionResourceCompanyName" name="determineInspectionResourceCompanyName" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">State Located</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="determineInspectionResourceState" name="determineInspectionResourceState" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    <div id="AssignInspectionResourceToDetail">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Assigned To</label>
+                            <div class="col-md-9">
+                                <select id="determineInspectionResourceUser" name="determineInspectionResourceUser" class="form-control determineInspectionResourceUserList" style="width: 100%"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Inspection Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="determineResourcecomment" name="determineResourcecomment" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" value="AssignInspectionResource" id="DetermineInspectionResourceBtn" class="btn btn-info round">Assign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="apprvheader"></h4>
+            </div>
+            <div class="modal-body">
+                <div method="post" class="form-horizontal">
+                    @*@Html.AntiForgeryToken() action="@Url.Action("ApplicationAcceptDecline")"*@
+                    <input type="hidden" name="ApplicationId" id="ApplicationId" value="@ViewBag.ApplicationId" />
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="apprvLicenseType" name="apprvLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="apprvAppId" name="apprvAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="apprvAppType" name="apprvAppType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+
+                    <div class="alldocument">
+                        <div style="display:none">
+                            <div id="text" name="text" type="hidden"></div>
+                            <div id="textvalue" name="text" type="hidden"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Missing Document(s)</label>
+
+                            <div class="col-md-9">
+                                <select class="form-control ui-multiselect alldoc example-getting-started" id="alldoc" name="alldoc" multiple="multiple"></select>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    @*<div id="commentDivRej">*@
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="comment" name="comment" required></textarea>
+                        </div>
+                    </div>
+                    @*</div>*@
+
+                    <div id="commentDivAcce">
+                        <input type="hidden" name="comment" id="comment" value="Documents Accepted" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        @if (ViewBag.AppRequest.CurrentStageID == 20)
+                        {
+                            <button type="button" id="apprvAcceptBtn" class="btn btn-success approvalBtn">Approve</button>
+                        }
+                        else
+                        {
+                            <button type="button" id="apprvAcceptBtn" class="btn btn-success approvalBtn">Accept</button>
+
+                        }
+                        <button type="button" id="apprvRejectBtn" class="btn btn-danger approvalBtn">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="RecommendationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="Recomheader"></h4>
+            </div>
+            <div class="modal-body">
+                <form action="@Url.Action("ApplicationAcceptDecline")" method="post" class="form-horizontal">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ApplicationId" id="ApplicationId" value="@ViewBag.ApplicationId" />
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="RecomLicenseType" name="RecomLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Reference</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="RecomAppId" name="RecomAppId" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Application Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="RecomAppType" name="RecomAppType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="Recomcomment" name="Recomcomment" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" value="Accept" id="apprvAcceptBtn" class="btn btn-success RecommBtn">Accept</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="appointheader"></h4>
+            </div>
+            <div class="modal-body">
+                @*<form id="ScheduleAppointmentForm" action="@Url.Action("ScheduleAppointment")" method="post" class="form-horizontal">*@
+                @*@Html.AntiForgeryToken()*@
+                <form class="form-horizontal" id="ScheduleAppointmentForm" role="form">
+                    <input type="hidden" id="appointType" name="appointType">
+                    <div style="display:none"> <label type="hidden" id="staffemail" name="staffemail"></label></div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="appointLicenseType" name="appointLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+
+                    @if (ViewBag.LoggedinUserRole == "AD RBP")
+                    {
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Inpspection Type</label>
+                            <div class="col-md-9">
+                                <select class="form-control" id="inspectiontype" name="inspectiontype" required="required"></select>
+                            </div>
+                        </div>
+
+
+                        <div class="delegateto">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Delegate To</label>
+                                <div class="col-md-9">
+                                    <select id="delegatetask" name="delegatetask" class="form-control delegateOfficerList" required="required" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    }
+                    else
+                    {
+                        if (ViewBag.AppRequest.CurrentStageID == 37 || ViewBag.AppRequest.CurrentStageID == 38 || ViewBag.AppRequest.CurrentStageID == 25 || ViewBag.AppRequest.CurrentStageID == 26)
+                        {
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Inspection Type</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="inspectiontypefield" value="FIELD ONLY INSPECTION" name="inspectiontypefield" readonly="readonly">
+
+                                </div>
+                            </div>
+
+                        }
+
+                        <div id="appointmentdate">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Proposed DateTime</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control appointDateTime" id="appointDateTime" name="appointDateTime" required style="border: 0px;">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="NotificationStaff">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Select Staff for Appointment Notification</label>
+                                <div class="col-md-9">
+                                    <select id="appointOfficer" name="appointOfficer" class="form-control appointmentOfficerList" multiple="multiple" style="width: 100%"></select>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Proposed Location</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="2" id="appointLocation" name="appointLocation" readonly style="border: 0px;"></textarea>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="inspectioncomment" name="inspectioncomment" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                        @if (ViewBag.LoggedinUserRole == "AD RBP")
+                        {
+                            <button type="button" value="DelegateSchedule" id="Assignbtn" class="btn btn-info round">Delegate</button>
+
+                        }
+                        else
+                        {
+                            <button type="button" value="Schedule" id="ScheduleBtn" class="btn btn-info round">Schedule</button>
+                        }
+
+                        <button type="button" style="display:none" value="passinspectionSchedule" id="passinspectionbtn" class="btn btn-success round">Pass To Opscon/Zopscon</button>
+
+                    </div>
+                </form>
+                @*</form>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    .modal-dialog {
+        overflow-y: initial !important;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+</style>
+
+
+@section scripts{
+
+    @if (!showPart)
+    {
+        <script type="text/javascript">
+            $(function () {
+                $("#showPart").addClass("col-md-12");
+            });
+        </script>
+    }
+
+
+    <script type="text/javascript">
+        var StaffEmails = [];
+
+        var Stafs = [];
+        $(function () {
+
+
+
+            $('#submitbtn').click(function (e) {
+                e.preventDefault();
+                debugger;
+                if ($("#formid").valid()) {
+                    $(".loadingImage").show('fast');
+
+                    $.post($("#formid").attr('action'), $("#formid").serialize())
+                        .done(function (data) {
+                            hideAndResetModal('.Extrapaymentmodal');
+                            $(".loadingImage").hide('fast');
+                            bootbox.alert({
+                                message: data.message,
+                                size: 'small',
+                                className: 'bb-alternate-modal',
+                                callback: function () {
+                                    window.location.href = "/Admin/ViewApplication?applicationId=" + data.AppId;
+
+                                }
+                            });
+
+                        }).fail(function (data) {
+                            bootbox.alert({
+                                message: data.message,
+                                size: 'small',
+                                className: 'bb-alternate-modal',
+                                callback: function () { $(".loadingImage").hide('fast'); }
+                            });
+                        });
+
+
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+            $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+
+            $(".zPix").click(function (e) {
+                $("#myModalBody").html(Loading());
+                e.preventDefault();
+                var src = $(this).attr("data-url");
+                var name = $(this).text();
+                var md = $("#imgModal").html();
+                $("#myModalBody").html(md);
+                $("#modalBody").html("<img src=\"" + src + "\" alt=\"\" />");
+                $("#myModalLabel").text(name);
+            });
+
+
+
+            $('.alldoc').select2({
+                placeholder: "Select",
+                width: '100%'
+            });
+
+
+            $('.alldoc').on('change', function () {
+                debugger;
+                var datatext = $(".alldoc option:selected").text();
+                var datavalue = $(".alldoc").select2("val");
+                $("#text").text(datatext);
+                $("#textvalue").text(datavalue);
+            })
+
+
+
+
+            $('.appointmentOfficerList').select2({
+                placeholder: "Select",
+                width: '100%'
+            });
+
+            $('.appointmentOfficerList').on('change', function () {
+                debugger;
+                Stafs = $(".appointmentOfficerList").select2("val");
+                $("#staffemail").text(Stafs);
+
+
+
+            });
+
+
+
+
+
+            $(".delegateOfficerList").ready(function () {
+                var html = "";
+                $(".delegateOfficerList").html("");
+                $.getJSON("/Admin/TaskDelegationUsers", {}, function (datas) {
+                    $(".delegateOfficerList").append("<option></option>");
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.role + ">" + val.role + "</option>";
+                        });
+                    $(".delegateOfficerList").append(html);
+                });
+            });
+
+
+
+
+
+            $("#Qty").keyup(function () {
+                debugger;
+                var subamt = $("#subtotal").val();
+                var qty = $("#Qty").val();
+                var totalamt = subamt * qty;
+                $("#penaltyamount").val(totalamt);
+
+                if (qty === "0" || qty.length === 0) {
+                    $("#penaltyamount").val(0);
+                    $("#submitbtn").attr("disabled", true);
+                } else {
+                    $("#submitbtn").attr("disabled", false);
+                }
+            });
+
+
+
+
+
+
+            $("#Penaltytxt").change(function () {
+                debugger;
+                PenaltyText = $("#Penaltytxt option:selected").text();
+                if (PenaltyText === "INCOMPLETE FEE") {
+                    $("#penaltyamount").attr("readonly", false);
+
+                } else {
+                    $("#penaltyamount").attr("readonly", true);
+                }
+
+                $("#penaltytype").val(PenaltyText);
+
+                $.getJSON("/Admin/GetPenaltyAmount",
+                    { "Penalty": PenaltyText },
+                    function (response) {
+
+                        if (response != null) {
+
+                            console.log(response);
+
+                            $.each(response, function (key, val) {
+
+                                $("#penaltyamount").val(val.PenaltyFee);
+                                $("#subtotal").val(val.PenaltyFee);
+                                $("#Qty").val(1);
+                            });
+                        }
+
+                    });
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+            $(".Penaltytxt").ready(function () {
+                var html = "";
+                debugger;
+                $(".Penaltytxt").html("");
+
+                $.getJSON("/Admin/GetPenalty",
+                    {},
+                    function (datas) {
+                        $(".Penaltytxt").append("<option></option>");
+                        $.each(datas,
+                            function (key, val) {
+                                html += "<option value=" + val.PenaltyType + ">" + val.PenaltyType + "</option>";
+                            });
+                        $(".Penaltytxt").append(html);
+                    });
+            });
+
+
+
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        var jqXHR;
+
+        function hideAndResetModal(modalID) {
+            $(modalID).modal('hide');
+            $(modalID).on('hidden.bs.modal', function () {
+                $(modalID).find('form').trigger('reset');
+            });
+        }
+
+        function isEmpty(value) {
+            return (value == null || value.length === 0);
+        }
+
+        $("*").dblclick(function (e) {
+            e.preventDefault();
+            //alert("Double Click Disabled");
+        });
+
+
+        $('.approvalBtn').on("click", function () {
+
+            $(".loadingImage").show('fast');
+            debugger;
+            var useraction = $(this).attr('value');
+            if ((useraction == "Reject" || useraction == "RejectInspection" || useraction == "LRReject" || useraction == "LSReject" || useraction == "Rejectmk")&& ($.trim($('#comment').val())) == "") {
+                $(".loadingImage").hide('fast');
+                alert("Kindly State Reason for Rejection");
+                $("#comment").focus();
+            } else if ((useraction == "Accept" || useraction == "AcceptInspection" || useraction == "LRAccept" || useraction == "LSAccept") && ($.trim($('#comment').val()) == "")) {
+                $(".loadingImage").hide('fast');
+                alert("Kindly State Reason for Approval");
+                $("#comment").focus();
+            }
+            else {
+
+
+                var selectedtext = $("#text").text();;
+                var selectedvalue = $("#textvalue").text();
+                var comments = "";
+                var docval = "";
+                if (selectedtext === "" || selectedtext === null) {
+                    comments = $("#comment").val();
+                }
+                else{
+                        comments = $("#comment").val() + " => " + selectedtext;
+                    docval = selectedvalue;
+                }
+
+                hideAndResetModal('#approvalModal');
+
+                var url = '@Url.Action("ProcessUserAction")';
+                $.get(url, { applicationId: $("#ApplicationId").val(), useraction: $(this).attr('value'), processtype: 'NORMAL', comment: comments, DocId: docval }, function (data) {
+                    console.log('before console');
+                    var status = data.status;
+                    console.log(status);
+
+
+
+                    if (status == 'success') {
+                        $(".loadingImage").hide('fast');
+                        bootbox.alert({
+                            message: data.Message,
+                            size: 'small',
+                            className: 'bb-alternate-modal',
+                            callback: function () {
+                                window.location.href = "/Admin/MyDesk";
+                            }
+                        });
+                    }
+                    else {
+                        $(".loadingImage").hide('fast');
+                        alert(data.Message);
+                    }
+                });
+            }
+        });
+
+
+        $('#ScheduleBtn, #passinspectionbtn, #Assignbtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            debugger;
+            var messagealert = "";
+            var role = '@ViewBag.LoggedinUserRole';
+            var inspectiontypeselected = $("#inspectiontype option:selected").val();
+            var delegatedstaff = $("#delegatetask option:selected").val();
+
+            if (inspectiontypeselected === "FOI") {
+                messagealert = "Do you want to pass inspection schedule to the Opscon/Zopscon?";
+            } else if (inspectiontypeselected !=="FOI"){
+                messagealert = (role === "REVIEWER" || role === "SUPERVISOR") ? "Are you sure you want to schedule inspection/presentation?" : "Are you sure you want to delegate inspection/presentation schedule?";
+            }
+            else {
+                messagealert = "Do you want to proceed with apponitment schedule?";
+            }
+
+            var selectedtext = $("#staffemail").text();
+            if ($.trim($('#inspectioncomment').val()) == "") {
+                alert("Kindly Enter a Comment");
+                $("#inspectioncomment").focus();
+                $(".loadingImage").hide('fast');
+
+            } else {
+            if ($("#ScheduleAppointmentForm").valid()) {
+
+                bootbox.confirm({
+                    message: messagealert,
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+                            $(".loadingImage").show('fast');
+
+                            hideAndResetModal('#appointmentModal');
+                            debugger;
+                            var url = '@Url.Action("ScheduleAppointment")';
+                            $.get(url, { applicationId: $("#ApplicationId").val(), proposedDate: $("#appointDateTime").val(), proposedVenue: $("#appointLocation").val(), principalOfficer: $("#appointOfficer").val(), appointmentType: $('#appointType').val(), appointedofficers: selectedtext, inspectiontype: inspectiontypeselected, DelegatedStaff: delegatedstaff}, function (data) {
+                                console.log('before console');
+                                var status = data.status;
+                                console.log(status);
+                                if (status == 'success') {
+                                    $(".loadingImage").hide('fast');
+                                    bootbox.alert({
+                                        message: data.Message,
+                                        size: 'small',
+                                        className: 'bb-alternate-modal',
+                                        callback: function () {
+                                            window.location.href = "/Admin/MyDesk";
+                                        }
+                                    });
+                                }
+                                else {
+                                    $(".loadingImage").hide('fast');
+                                    alert(data.Message);
+                                }
+                            });
+                        } else {
+                            $(".loadingImage").hide('fast');
+                        }
+                    }
+                });
+            }
+        }
+        });
+
+
+
+
+
+
+
+
+
+        $('#DelegateBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+
+            if ($("#DelegationForm").valid()) {
+                debugger;
+                var officerValue = $("#delegateOfficer option:selected").val();
+                var staffvalue = $("#delegatestaff option:selected").val();
+
+                var delegatedstaffvalue = (officerValue === null || officerValue === "" || officerValue === undefined) ? staffvalue : officerValue;
+
+               var Delegationcomment = $("#delegationcomment").val();
+                var officerText = $("#delegateOfficer option:selected").text();
+
+                console.debug(officerValue);
+                console.debug(officerText);
+
+                //if (!isEmpty(officerValue)) {
+
+                    bootbox.confirm({
+                        message: "Do You Really Want To Assign the Revalidation Task To " + officerText,
+                        size: 'small',
+                        className: 'bb-alternate-modal',
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
+                            },
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+                                $(".loadingImage").show('fast');
+
+                                $.get('@Url.Action("DelegateRevalidation")', { applicationId: $("#delegateAppId").val(), delegatedOfficer: delegatedstaffvalue, comment: Delegationcomment }, function (data) {
+                                    console.log('before console');
+                                    var status = data.status;
+                                    console.log(status);
+                                    hideAndResetModal('#DelegationModal');
+                                    if (status == 'success') {
+                                        $(".loadingImage").hide('fast');
+                                        bootbox.alert({
+                                            message: data.Message,
+                                            size: 'small',
+                                            className: 'bb-alternate-modal',
+                                            callback: function () {
+                                                window.location.href = "/Admin/MyDesk";
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        $(".loadingImage").hide('fast');
+                                        alert(data.Message);
+                                    }
+                                });
+                            } else {
+                                $(".loadingImage").hide('fast');
+                            }
+                        }
+                    });
+
+
+                //}
+                //else {
+                //    alert('Kindly Select a Supervisor To Delegate Revalidation');
+                //}
+            }
+        });
+
+
+        $('#DelegateVerificationBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+
+            if ($("#DelegationVerificationForm").valid()) {
+
+                var officerValue = $("#delegateVerificationOfficer").val();
+                var officerText = $("#delegateVerificationOfficer option:selected").text();
+
+                console.debug(officerValue);
+                console.debug(officerText);
+
+                if (!isEmpty(officerValue)) {
+
+                    bootbox.confirm({
+                        message: "Do You Really Want To Assign the Review and Verification Task To " + officerText,
+                        size: 'small',
+                        className: 'bb-alternate-modal',
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
+                            },
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result == true) {
+                                $(".loadingImage").show('fast');
+                                $.get('@Url.Action("DelegateVerification")', { applicationId: $("#delegateVerificationAppId").val(), delegatedOfficer: officerValue }, function (data) {
+                                    console.log('before console');
+                                    var status = data.status;
+                                    console.log(status);
+                                    hideAndResetModal('#DelegateVerificationModal');
+                                    if (status == 'success') {
+                                        $(".loadingImage").hide('fast');
+                                        bootbox.alert({
+                                            message: data.Message,
+                                            size: 'small',
+                                            className: 'bb-alternate-modal',
+                                            callback: function () {
+                                                window.location.href = "/Admin/MyDesk";
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        $(".loadingImage").hide('fast');
+                                        alert(data.Message);
+                                    }
+                                });
+                            } else {
+                                $(".loadingImage").hide('fast');
+                            }
+                        }
+                    });
+
+
+                }
+                else {
+                    alert('Kindly Select an Officer/Supervisor To Delegate Verification');
+                }
+            }
+        });
+
+
+
+
+        $("#inspectiontype").ready(function () {//get all Inpection Types in the dropdownlist
+            debugger;
+            var appid = '@ViewBag.ApplicationId';
+            var html = "";
+            $("#inspectiontype").html("");
+
+            $.getJSON("/Admin/GetInspectionType",
+                {ApplicationId:appid},
+                function (datas) {
+                    $("#inspectiontype").append("<option></option>");
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.inspectionid + ">" + val.inspectionname + "</option>";
+                        });
+                    $("#inspectiontype").append(html);
+                });
+        });
+
+
+
+        $("#inspectiontype").change(function () {
+            debugger;
+
+            var selectedval = $("#inspectiontype option:selected").val();
+
+            var userrole = '@ViewBag.LoggedinUserRole';
+
+            if (selectedval === "FOI" && userrole === "AD RBP") {
+
+                $("#appointmentdate").attr("required", false);
+                $("#delegatetask").attr("required", false);
+                $("#NotificationStaff").hide();
+                $("#appointmentdate").hide();
+                $("#ScheduleBtn").hide();
+                $("#Assignbtn").hide();
+                $(".delegateto").hide();
+                $("#passinspectionbtn").show();
+
+            } else {
+                $("#delegatetask").attr("required", true);
+                $("#appointmentdate").attr("required", false);
+                $("#appointmentdate").hide();
+                $("#ScheduleBtn").hide();
+                $("#Assignbtn").show();
+                $(".delegateto").show();
+                $("#passinspectionbtn").hide();
+            }
+
+
+        });
+
+
+
+
+
+
+        $('#DetermineInspectionBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            if ($.trim($('#determinecomment').val()) == "") {
+                alert("Kindly Enter your Reason for the Inspection");
+                $("#determinecomment").focus();
+            }
+            else {
+
+                if ($("#DetermineInspectionTypeForm").valid()) {
+
+                    var officerValue = $("#determineInspectionUser").val();
+                    var officerText = $("#determineInspectionUser option:selected").text();
+
+                    var determineInspectionType = $("#determineType").val();
+
+                    console.info(officerValue);
+                    console.info(officerText);
+                    console.info(determineType);
+
+                    if (!isEmpty(officerValue)) {
+
+                        bootbox.confirm({
+                            message: "Do You Really Want To Assign Inspection Activities To " + officerText,
+                            size: 'small',
+                            className: 'bb-alternate-modal',
+                            buttons: {
+                                cancel: {
+                                    label: '<i class="fa fa-times"></i> Cancel'
+                                },
+                                confirm: {
+                                    label: '<i class="fa fa-check"></i> Confirm'
+                                }
+                            },
+                            callback: function (result) {
+                                if (result == true) {
+                                    $(".loadingImage").show('fast');
+
+                                    $.get('@Url.Action("DetermineInspectionType")', { applicationId: $("#determineInspectionAppId").val(), delegatedOfficer: officerValue, comment: $("#determinecomment").val(), actionType: determineInspectionType }, function (data) {
+                                        console.log('before console');
+                                        var status = data.status;
+                                        console.log(status);
+                                        hideAndResetModal('#DetermineInspectionTypeModal');
+                                        if (status == 'success') {
+                                            $(".loadingImage").hide('fast');
+                                            bootbox.alert({
+                                                message: data.Message,
+                                                size: 'small',
+                                                className: 'bb-alternate-modal',
+                                                callback: function () {
+                                                    window.location.href = "/Admin/MyDesk";
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            $(".loadingImage").hide('fast');
+                                            alert(data.Message);
+                                        }
+                                    });
+                                } else {
+                                    $(".loadingImage").hide('fast');
+                                }
+                            }
+                        });
+
+
+                    }
+                    else {
+                        alert('Kindly Assign a DPR Resource for Inspection Activities');
+                    }
+                }
+
+            }
+
+        });
+
+
+
+
+
+        $('#DetermineInspectionResourceBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            if ($.trim($('#determineResourcecomment').val()) == "") {
+                alert("Kindly Enter your Reason for the Inspection Delegation");
+                $("#determineResourcecomment").focus();
+            }
+            else {
+
+                if ($("#DetermineInspectionResoureForm").valid()) {
+
+                    var officerValue = $("#determineInspectionResourceUser").val();
+                    var officerText = $("#determineInspectionResourceUser option:selected").text();
+
+
+                    console.info(officerValue);
+                    console.info(officerText);
+
+                    if (!isEmpty(officerValue)) {
+
+                        bootbox.confirm({
+                            message: "Do You Really Want To Assign Inspection Activities To " + officerText,
+                            size: 'small',
+                            className: 'bb-alternate-modal',
+                            buttons: {
+                                cancel: {
+                                    label: '<i class="fa fa-times"></i> Cancel'
+                                },
+                                confirm: {
+                                    label: '<i class="fa fa-check"></i> Confirm'
+                                }
+                            },
+                            callback: function (result) {
+                                if (result == true) {
+                                    $(".loadingImage").show('fast');
+
+                                    $.get('@Url.Action("DetermineInspectionResource")', { applicationId: $("#determineInspectionResourceAppId").val(), delegatedOfficer: officerValue, comment: $("#determineResourcecomment").val() }, function (data) {
+                                        console.log('before console');
+                                        var status = data.status;
+                                        console.log(status);
+                                        hideAndResetModal('#DetermineInspectionResourceModal');
+                                        if (status == 'success') {
+                                            $(".loadingImage").hide('fast');
+                                            bootbox.alert({
+                                                message: data.Message,
+                                                size: 'small',
+                                                className: 'bb-alternate-modal',
+                                                callback: function () {
+                                                    window.location.href = "/Admin/MyDesk";
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            $(".loadingImage").hide('fast');
+                                            alert(data.Message);
+                                        }
+                                    });
+                                } else {
+                                    $(".loadingImage").hide('fast');
+                                }
+                            }
+                        });
+
+
+                    }
+                    else {
+                        alert('Kindly Assign a DPR Resource for Inspection Activities om your Location');
+                    }
+                }
+
+            }
+
+        });
+
+
+
+
+
+
+
+        $('.RecommBtn').click(function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            $(".loadingImage").show('fast');
+            if ($.trim($('#Recomcomment').val()) == "") {
+                alert("Kindly Comment on the Recommendation");
+                $("#Recomcomment").focus();
+            }
+            else {
+                var url = '@Url.Action("ProcessUserAction")';
+                $.get(url, { applicationId: $("#RecomAppId").val(), useraction: 'Accept', processtype: 'NORMAL', comment: $("#Recomcomment").val() }, function (data) {
+                    console.log('before console');
+                    var status = data.status;
+                    console.log(status);
+
+                    hideAndResetModal('#RecommendationModal');
+
+                    if (status == 'success') {
+                        $(".loadingImage").hide('fast');
+                        bootbox.alert({
+                            message: data.Message,
+                            size: 'small',
+                            className: 'bb-alternate-modal',
+                            callback: function () {
+                                window.location.href = "/Admin/MyDesk";
+                            }
+                        });
+                    }
+                    else {
+                        $(".loadingImage").hide('fast');
+                        alert(data.Message);
+                    }
+                });
+            }
+        });
+
+
+
+
+
+
+        $(document).on('change', '.upLoad', function () {
+            var i = $(this).attr("data-i");
+            var dis = $("#filebtn" + i).attr("disabled");
+            if ($(this).val().length <= 0) {
+                $("#filebtn" + i).removeAttr("disabled");
+            }
+            else {
+                $("#filebtn" + i).attr("disabled", "disabled");
+            }
+        });
+
+        $(document).on('click', '.upLoad', function () {
+
+            var i = $(this).attr("data-i");
+            var did = $('#did_' + i).val();
+            var docName = $('#documentName-' + i).val();
+            var uid = $("#uid-" + i).val();
+
+            $(this).delay(500);
+            var filename = $('#fid_' + i).val();
+            filename = '@ViewBag.ApplicationId' + '_' + filename;
+
+            var url = '@ViewBag.UploadDocumentUrl';
+            url = url.replace("{0}", did).replace("{1}", '@ViewBag.ElpsUserId').replace("{2}", '@ViewBag.ApplicationEmail').replace("{3}", '@ViewBag.ApplicationHash').replace("{4}", filename).replace("{5}", '@ViewBag.ApplicationId');
+
+            var loc = '@Url.Action("DocUpload")' + "?elpsDocType=" + did;
+            var prefix = '@ViewBag.ElpsUrl';
+
+            jqXHR = $(this).fileupload({
+                url: url,
+                dataType: "json",
+                done: function (e, data) {
+                    $("#filebtn" + i).hide();
+                    var file = data.result;
+                    $("#fid-" + i).val(file.FileId);
+
+                    $.notify({
+                        icon: 'fa fa-file',
+                        message: '<strong>File ' + file.name + ' Uploaded Successfully</strong>'
+                    }, {
+                        delay: 4000,
+                        type: 'success',
+                        animate: {
+                            enter: 'animated zoomInDown',
+                            exit: 'animated zoomOutUp'
+                        }
+                    });
+
+
+                    if (file.name.indexOf('Specified document Not found') == -1) {
+                        var str = file.source.toLowerCase().replace("~", "");
+                        var src = str.match('.pdf$') ? '@Url.Content("~/Images/pdficon.png")' : prefix + str;
+                        var respContent = '<div style="float: left; width: 24%;"><img src="' + src + '" class="thumbnail" style="height: 40px;" />';
+                        respContent += '</div><div style="float: left; width: 24%;">' + file.name + '<br />';
+                        $("#file" + i).html(respContent);
+                        $("#fileId-" + i).prop('required', null);
+                    }
+                },
+                fail: function (e, data) {
+                    //alert("Error => " + e.message);
+                    console.log(e);
+                    console.log(data);
+
+                    var error = "";
+                    var errorThrown = data.errorThrown;
+                    var textStatus = data.textStatus;
+
+                    if (errorThrown == null) { errorThrown = ''; }
+                    if (textStatus == null) { textStatus = ''; }
+                    error = errorThrown + ' - ' + textStatus;
+
+
+                    $.notify({
+                        icon: 'fa fa-file',
+                        message: '<strong>File ' + e.name + ' failed to Upload</strong>'
+                    }, {
+                        delay: 4000,
+                        type: 'danger',
+                        animate: {
+                            enter: 'animated zoomInDown',
+                            exit: 'animated zoomOutUp'
+                        }
+                    });
+
+
+                    $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: ' + error + '<i class="elusive-remove" style="padding-left:10px;"/></p>')
+                              .appendTo('#file' + i);
+
+
+                    $("#filebtn" + i).removeAttr("disabled");
+                    var progBox = '#progress' + $(this).attr("data-i") + ' .progress-bar';
+
+                    $(progBox).css(
+                        'width',
+                        0 + '%'
+                    ).text("");
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    var progBox = '#progress' + $(this).attr("data-i") + ' .progress-bar';
+
+                    $(progBox).css(
+                        'width',
+                        progress + '%'
+                    ).text(progress + '%');
+                }
+
+            }).prop('disabled', !$.support.fileInput)
+                        .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        });
+
+        function loadModal() {
+            $('#myModal').modal({ show: true });
+        }
+        function moveToIndex() {
+            window.location.replace = '@Url.Action("MyDesk")';
+        }
+
+
+        function showApprovalForm(applicationId, useraction, reason) {
+            debugger;
+            $('#apprvheader').text(reason);
+            $('#apprvLicenseType').val('@Model.LicenseType.Description');
+            $('#apprvAppId').val('@Model.ApplicationId');
+            $('#apprvAppType').val('@Model.ApplicationTypeId');
+            $("#comment").val("");
+            var signatureimage = '@ViewBag.ChecksignatureImage';
+             var signaturerole = '@ViewBag.ChecksignatureRole';
+            var currentstage = '@Model.CurrentStageID';
+            var extrapaymentcount = '@ViewBag.ExtraPaymentCount';
+            if ((currentstage === "20" && useraction === "Accept") && ((signatureimage === null || signatureimage ==="") && signaturerole === "HOOD")) { alert("Your Electronic Signature is Unavailable for this Approval."); return false;}
+            if (extrapaymentcount > 0) { alert("Extra Payment Have Been Attached to This Application"); return false; }
+            else {
+                if (useraction === "Reject" || useraction === "RejectInspection" || useraction === "LRReject" || useraction === "LSReject" || useraction === "Rejectmk" || useraction === "Rejectopscon" || useraction === "Rejectzn") {
+                    $('#apprvRejectBtn').val(useraction);
+                    $('#commentDivRej').show();
+                    $('#apprvRejectBtn').show();
+                    $('#apprvAcceptBtn').hide();
+                    $(".alldocument").show("fast");
+                    $("#approvalModal").modal('show');
+
+                }
+                else if (useraction === "Accept" || useraction === "AcceptInspection" || useraction === "LRAccept" || useraction === "LSAccept") {
+                    $("#apprvAcceptBtn").val(useraction);
+
+                    $('#commentDivRej').hide();
+                    $('#apprvRejectBtn').hide();
+                    $(".alldocument").hide("fast");
+                    $('#apprvAcceptBtn').show();
+                    $("#approvalModal").modal('show');
+
+                }
+            }
+
+
+
+        }
+
+
+
+
+        $(".alldoc").ready(function () {//get all Document names populated in the dropdownlist
+            $.getJSON("/Admin/GetAllElpsDocTypes",
+                {},
+                function (datas) {
+                    $.each(datas,
+                        function (key, val) {
+                            $(".alldoc").append('<option value="' + val.docid + '">' + val.docname + ' , ' + '</option>');
+
+                        });
+                });
+        });
+
+
+
+        $(".appointmentOfficerList").ready(function () {//Populate staff for inspection
+            $.getJSON("/Admin/GetStaffForInspection",
+                {},
+                function (datas) {
+                    $.each(datas,
+                        function (key, val) {
+                            $(".appointmentOfficerList").append('<option value="' + val.staffnames + '">' + val.namerole + '</option>');
+
+                        });
+                });
+        });
+
+        function ScheduleAppointment(AppointHeader, AppointType, AppointVenue) {
+            debugger;
+            var html = "";
+            $('#appointheader').text(AppointHeader);
+            $('#appointLicenseType').val('@Model.LicenseType.Description');
+            $('#appointAppId').val('@Model.ApplicationId');
+            $('#appointType').val(AppointType);
+            $('#appointLocation').val(AppointVenue);
+
+
+
+            $(".appointDateTime").datetimepicker({
+                minDate: 0,
+                step: 1,
+                autoclose: true,
+                daysOfWeekDisabled: [0, 6],
+                onGenerate: function (ct) {
+                    jQuery(this).find('.xdsoft_date.xdsoft_weekend')
+                        .addClass('xdsoft_disabled');
+                },
+                onSelect: function (selected_date) {
+                }
+            });
+
+
+
+            $.getJSON("/Admin/GetUsersLocationByRole", { UserLocation: '@Model.CurrentOfficeLocation' },
+               function (datas) {
+                   $.each(datas,
+                       function (key, val) {
+                           html += "<option value=" + val.Userid + " >" + val.Description + "</option>";
+                       });
+                   $(".appointmentOfficerList").append(html);
+               });
+
+
+            $("#appointmentModal").modal('show');
+        }
+
+
+        function ScheduleAppointmentNew(AppointHeader, AppointType, AppointVenue) {
+            var html = "";
+            $('#appointheaderNew').text(AppointHeader);
+            $('#appointLicenseTypeNew').val('@Model.LicenseType.Description');
+            $('#appointAppId').val('@Model.ApplicationId');
+            $('#appointTypeNew').val(AppointType);
+            $('#appointLocationNew').val(AppointVenue);
+
+            //$('#appointDateTimeNew').datetimepicker({
+            //    format: 'dd/mm/yyyy hh:ii',
+            //    autoclose: true
+            //});
+
+            //$('#appointOfficerNew').val('CurrentLoggedUser');
+
+
+            $("#appointmentModalNew").modal('show');
+        }
+
+
+
+        function DelegateRevalidation(header, fromRole, toRole) {
+            debugger;
+            console.debug("here");
+            console.info(header);
+            var html = "";
+            $('#delegateheader').text(header);
+            $('#delegateLicenseType').val('@Model.LicenseType.Description');
+            $('#delegateAppId').val('@Model.ApplicationId');
+            $('#delegateCompanyName').val('@Model.ApplicantName');
+            console.debug("done");
+
+            $.getJSON("/Admin/GetDelegatedUser", { applicationId: '@Model.ApplicationId', fromRole: fromRole, toRole: toRole },
+                   function (datas) {
+                       $(".delegatestaff").append("<option></option>");
+
+                       $.each(datas,
+                           function (key, val) {
+                               console.debug(val.Key + " " + val.Description);
+                               html += "<option value=" + val.Value + " >" + val.Text + "</option>";
+                           });
+                       $(".delegatestaff").append(html);
+                   });
+
+
+
+            $("#DelegationModal").modal('show');
+        }
+
+
+
+
+
+
+
+
+        function DelegateVerification(header) {
+            console.info(header);
+            var html = "";
+            $('#delegateVerificationheader').text(header);
+            $('#delegateVerificationLicenseType').val('@Model.LicenseType.Description');
+            $('#delegateVerificationAppId').val('@Model.ApplicationId');
+            $('#delegateVerificationCompanyName').val('@Model.ApplicantName');
+            console.debug("done");
+
+            $.getJSON("/Admin/GetSupervisorAndOfficersByLocation", function (datas) {
+
+                $.each(datas,
+                    function (key, val) {
+                        console.debug(val.Userid + " " + val.Description);
+                        html += "<option value=" + val.Userid + " >" + val.Description + "</option>";
+                    });
+                $(".delegateVerificationOfficerList").append(html);
+            });
+
+            $("#DelegateVerificationModal").modal('show');
+        }
+
+
+
+        function DetermineInspectionType(header) {
+            console.info(header);
+
+            $('#DetermineInspectionTypeHeader').text(header);
+            $('#determineInspectionLicenseType').val('@Model.LicenseType.Description');
+            $('#determineInspectionAppId').val('@Model.ApplicationId');
+            $('#determineInspectionCompanyName').val('@Model.ApplicantName');
+            $('#determineInspectionState').val('@Model.StateMasterList.StateName');
+            console.debug("done");
+
+            $.getJSON("/Admin/GetInspectionTypeList", function (data) {
+                if (data != null) {
+                    $("#determineType").html("");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#determineType").append('<option value="' + data[i].Id + '">' + data[i].Description + '</option>');
+                    }
+                }
+            }).fail(function (jqxhr, textStatus, error) { alert("fail =>> " + textStatus + ", " + error); });
+
+
+            $("#DetermineInspectionTypeModal").modal('show');
+        }
+
+
+        function getInspectionAssignedUsers(inspectionId) {
+
+
+            console.info(inspectionId);
+
+            var strMethodUrl = '@Url.Action("GetAssignedInspectionTypeUser", "Admin")' + '?applicationId=' + '@Model.ApplicationId' + '&inspectionType=' + inspectionId;
+
+            $.getJSON(strMethodUrl, function (data) {
+                if (data != null) {
+                    $("#determineInspectionUser").html("");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#determineInspectionUser").append('<option value="' + data[i].Userid + '">' + data[i].Description + '</option>');
+                    }
+                }
+            }).fail(function (jqxhr, textStatus, error) { alert("fail =>> " + textStatus + ", " + error); });
+        }
+
+
+
+        function DetermineInspectionResource(header) {
+            console.info(header);
+
+            $('#DetermineInspectionResourceHeader').text(header);
+            $('#determineInspectionResourceType').val('@Model.LicenseType.Description');
+            $('#determineInspectionResourceAppId').val('@Model.ApplicationId');
+            $('#determineInspectionResourceCompanyName').val('@Model.ApplicantName');
+            $('#determineInspectionResourceState').val('@Model.StateMasterList.StateName');
+            console.debug("done");
+
+            $.getJSON("/Admin/GetNonAdminUsersByLocation", function (data) {
+                if (data != null) {
+                    $("#determineInspectionResourceUser").html("");
+                    for (var i = 0; i < data.length; i++) {
+                        $("#determineInspectionResourceUser").append('<option value="' + data[i].Userid + '">' + data[i].Description + '</option>');
+                    }
+                }
+            }).fail(function (jqxhr, textStatus, error) { alert("fail =>> " + textStatus + ", " + error); });
+
+
+            $("#DetermineInspectionResourceModal").modal('show');
+        }
+
+
+
+    </script>
+}

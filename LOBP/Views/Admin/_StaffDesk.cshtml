@@ -1,0 +1,52 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+@{
+    LOBP.DbEntities.LubeBlendingDBEntities dbCtxt = new LOBP.DbEntities.LubeBlendingDBEntities();
+}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">×</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h3 class="modal-title">Applications on @ViewBag.UserId desk</h3>
+    </div>
+    <div id="modal-body">
+        <div class="modal-body" style="max-height: 400px; overflow-y: scroll;">
+            <table class="table table-hover dataTable" style="height: 97%;">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Ref. No.</th>
+                        <th>Application Type</th>
+                        <th>Stage</th>
+                        <th>Date Added</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (LOBP.DbEntities.ApplicationRequest br in Model)
+                    {
+                        <tr class="">
+                            <td>@br.ApplicantName</td>
+                            <td>@br.ApplicationId</td>
+                            <td>@br.ApplicationTypeId</td>
+                            <td>@dbCtxt.WorkFlowStates.Where(w => w.StateID == br.CurrentStageID).FirstOrDefault().StateName.ToString()</td>
+                            <td>@br.AddedDate.Value.ToString("dd-MMM-yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <div class="clear"></div>
+        <div class="modal-footer">
+            <div class="txtcenter">
+                <div>
+                    <input type="button" data-dismiss="modal" value="Close" class="btn btn-default righty" style="margin: 0 0 0 15px;">
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

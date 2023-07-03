@@ -1,0 +1,145 @@
+﻿
+@{
+    ViewBag.Title = "Add Extra Payment";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+<div class="row">
+    <div class="pageTitle bg1">
+        <h2 class="lefty">Generate Extra Payment</h2>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="col-md-6 col-md-offset-2">
+    <div class="row">
+        @using (Html.BeginForm("AddExtraPayment", "Company", FormMethod.Post))
+        {
+
+
+            <div class="container">
+                <div class="paymentmade">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <input type="hidden" id="myappid" name="myappid" value="@ViewBag.ApplicationId" />
+                            <input type="hidden" id="status" name="status" value="Pending" />
+                            <input type="hidden" id="penaltytype" name="penaltytype" />
+                            <input type="number" style="display:none" id="subtotal" name="subtotal" />
+
+                            <label style="font-family:Cambria; font-weight:bold">Payment Type</label>
+                            <select class="form-control Penaltytxt" required="" id="Penaltytxt" style="width:600px" name="Penaltytxt"></select>
+                            <br />
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label style="font-family:Cambria; font-weight:bold">Qty</label>
+                            <input class="form-control" id="Qty" type="number" name="Qty" required="" /><br />
+
+                        </div>
+                        <div class="col-md-3">
+                            <label style="font-family:Cambria; font-weight:bold">Amount</label>
+                            <input class="form-control" id="penaltyamount" type="number" name="penaltyamount" style="width:510px" required="" readonly="readonly" /><br />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label style="font-family:Cambria; font-weight:bold">Description</label>
+                            <textarea cols="3" rows="3" class="form-control" id="penaltydescription" style="width:600px" name="penaltydescription" required=""></textarea>
+                        </div></div>
+
+                    </div>
+                </div>
+            <div class="row">
+                <div class="col-sm-offset-4">
+                    <div class="col-sm-4">
+                        <button type="submit" id="submitbtn" class="btn btn-success">Pay Now</button>
+                    </div>
+
+                </div>
+            </div>
+
+        }
+
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+
+        $("#Penaltytxt").change(function () {
+            debugger;
+            PenaltyText = $("#Penaltytxt option:selected").text();
+            $("#penaltytype").val(PenaltyText);
+
+            $.getJSON("/Company/GetPenaltyAmount",
+                { "Penalty": PenaltyText },
+                function (response) {
+
+                    if (response != null) {
+
+                        console.log(response);
+
+                        $.each(response, function (key, val) {
+
+                            $("#penaltyamount").val(val.PenaltyFee);
+                            $("#subtotal").val(val.PenaltyFee);
+                            $("#Qty").val(1);
+                        });
+                    }
+
+                });
+        });
+
+        $("#Qty").keyup(function () {
+
+            var subamt = $("#subtotal").val();
+            var qty = $("#Qty").val();
+            var totalamt = subamt * qty;
+            $("#penaltyamount").val(totalamt);
+
+            if (qty === "0" || qty.length == 0) {
+                $("#penaltyamount").val(0);
+                $("#submitbtn").attr("disabled", true);
+            } else {
+                $("#submitbtn").attr("disabled", false);
+            }
+        });
+
+
+
+        
+        $(".Penaltytxt").ready(function () {
+            var html = "";
+            debugger;
+            $(".Penaltytxt").html("");
+
+            $.getJSON("/Company/GetCalibrationFee",
+                {},
+                function (datas) {
+                    $(".Penaltytxt").append("<option></option>");
+                    $.each(datas,
+                        function (key, val) {
+                            html += "<option value=" + val.PenaltyType + ">" + val.PenaltyType + "</option>";
+                        });
+                    $(".Penaltytxt").append(html);
+                });
+        });
+
+
+
+    });
+    </script>
+    }

@@ -1,0 +1,201 @@
+﻿@model List<LOBP.DbEntities.Penalty>
+@{
+    ViewBag.Title = "AllPenalty";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content">
+
+
+
+    @using (Html.BeginForm("AllPenaltyEdit", "Admin", FormMethod.Post, new { id = "formid", role = "form", @class = "form-horizontal" }))
+    {
+        <div class="modal fade updaterecordmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+            <div class="modal-dialog modal" style="vertical-align: middle; margin:0 auto 0 30%; overflow-y:hidden; overflow-x:hidden; display:block; margin-top:50px" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Update Penalty Record</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-10">
+                                        <label>Penalty Code</label>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <input type="number" id="penaltycodeid" readonly name="penaltycodeid" />
+                                                <input type="number" id="penaltycode" name="penaltycode" class="form-control" />
+                                            </div>
+                                        </div>
+
+
+                                        <label>Penalty Type</label>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <input type="text" id="penaltytype" name="penaltytype" class="form-control" />
+                                            </div>
+                                        </div>
+
+
+
+                                        <label>Penalty Amount</label>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <input type="number" id="penaltyamount" name="penaltyamount" class="form-control" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success" onclick="updatepelnaltyrecord()"> Update Record</button>
+
+                        <!--<button class="btn btn-success" id="updatepelnaltyrecord" onclick="updatepelnaltyrecord()" style="margin-left:200px" type="button">-->@*<span class="glyphicon glyphicon-save"></span>*@ <!--Update Record</button>-->
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+
+
+
+
+
+
+
+
+    <h2>@ViewBag.Title</h2>
+
+    <table class="table table-striped table-bordered table-hover dataTable">
+        <thead>
+            <tr>
+
+                <th>Penalty Amount</th>
+                <th>Penalty Code</th>
+                <th>Penalty Type</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (LOBP.DbEntities.Penalty b in Model)
+            {
+                <tr>
+
+                    <td>@b.PenaltyAmount</td>
+                    <td>@b.PenaltyCode</td>
+                    <td>@b.PenaltyType</td>
+
+                    <td><button class="btn btn-success btn-xs" onclick="PenaltyJs('@b.PenaltyId','@b.PenaltyAmount','@b.PenaltyCode','@b.PenaltyType')" id="updatebtn"><span class="glyphicon glyphicon-eye-open"></span> Update</button></td>
+
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".dataTable").dataTable({
+                "aLengthMenu": [25, 50, 75, 100, 200],
+                'iDisplayLength': 25,
+                'dom': 'Blfrtip',
+                'columnDefs': [{ orderable: false, "targets": [-1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "Nothing found - sorry",
+                    "infoEmpty": "No records available",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+
+            //$(".updatepelnaltyrecord").click(function () {
+            //    debugger
+            //    var msg = confirm("Are you sure you want to update this record?");
+                //$(".updaterecordmodal").modal("hide");
+                //var penaltycodeid=  $("#penaltycodeid").val();
+                //var penaltyamount= $("#penaltyamount").val();
+                //var penaltycode = $("#penaltycode").val();
+                //var penaltytype= $("#penaltytype").val();
+
+                //if (msg === true) {
+                //    $.post("/Admin/AllPenaltyEdit", { "Penaltycodeid": penaltycodeid, "Penaltyamount": penaltyamount, "Penaltycode": penaltycode, "Penaltytype": penaltytype }, function (res) {
+                //        if (res.Status === "success") {
+                //            alert("Update was successful");
+
+                //            history.go(0);
+
+                //            $(".updaterecordmodal").modal("hide");
+                //        }
+                //        else {
+                //            alert("Something went wrong");
+                //        }
+                //    });
+                //}
+                //else {
+                //    return false;
+                //}
+
+            //});
+
+
+
+        });
+
+        function updatepelnaltyrecord() {
+            var msg = confirm("Are you sure you want to update this record?");
+            debugger;
+                $(".updaterecordmodal").modal("hide");
+                var penaltycodeid=  $("#penaltycodeid").val();
+                var penaltyamount= $("#penaltyamount").val();
+                var penaltycode = $("#penaltycode").val();
+                var penaltytype= $("#penaltytype").val();
+
+                if (msg === true) {
+                    $.post("/Admin/AllPenaltyEdit", { "Penaltycodeid": penaltycodeid, "Penaltyamount": penaltyamount, "Penaltycode": penaltycode, "Penaltytype": penaltytype }, function (res) {
+                        if (res.Status === "success") {
+                            alert("Update was successful");
+
+                            history.go(0);
+
+                            $(".updaterecordmodal").modal("hide");
+                        }
+                        else {
+                            alert("Something went wrong");
+                        }
+                    });
+                }
+                else {
+                    return false;
+                }
+
+        }
+
+
+
+        function PenaltyJs(PenaltyId, PenaltyAmount, PenaltyCode, PenaltyType) {
+            debugger;
+            $("#penaltycodeid").val(PenaltyId);
+            $("#penaltyamount").val(PenaltyAmount);
+            $("#penaltycode").val(PenaltyCode);
+            $("#penaltytype").val(PenaltyType);
+            $(".updaterecordmodal").modal('show');
+        };
+
+    </script>
+}
+

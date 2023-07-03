@@ -1,0 +1,126 @@
+﻿@model List<LOBP.Models.DocumentModel>
+
+    @{
+        ViewBag.Title = "Company Documents";
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    }
+
+
+    <div class="content">
+        <h2 class="lefty">@ViewBag.ApplicantName Document Library</h2>
+        <div class="righty">
+            <a href="@Url.Action("Companies")" class="btn btn-default">Back <i class="icon-arrow-left"></i></a>
+        </div>
+        <hr class="clear" />
+
+        <div class="">
+            <table class="table table-hover table-striped dataTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Document Type</th>
+                        <th style="width: 150px;">Document Image</th>
+                        <th style="width: 150px;">Date Added</th>
+                        <th style="width: 150px;">Date Modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int i = 1;}
+                    @foreach (LOBP.Models.DocumentModel doc in Model)
+                    {
+                        string source = doc.Source.Contains("https") ? doc.Source : "http://elps.dpr.gov.ng/" + doc.Source;
+
+                        <tr>
+                            <td>@(i++)</td>
+                            <td>@doc.DocumentTypeName</td>
+                            <td>
+                                @if (!doc.Source.Contains(".pdf"))
+                                {
+                                    <a href='@(source)' target="_blank">
+                                        <img src="@Url.Content("~/Images/pdficon.png")" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                             style="max-height: 40px; max-width: 40px; display: inline-block;" />
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href='@(source)' target="_blank" data-toggle="modal" role="button" class="imgSilent" data-name="@doc.DocumentTypeName">
+                                        <img src="@(source)" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                             style="max-height: 40px; max-width: 40px; display: inline-block" />
+                                    </a>
+                                }
+                            </td>
+                            <td>@doc.DateAdded.ToString("dd-MMM-yyyy")</td>
+                            <td>@doc.DateModified.ToString("dd-MMM-yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- modal -->
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div id="myModalBody">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h3 id="modal-title">Modal Title</h3>
+                    </div>
+                    <div class="modal-body" id="modalBody">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section scripts{
+        <script type="text/javascript">
+            function Loading() {
+                var loading = '<div class="busy"><img src="/Content/Images/loading.gif" /></div>';
+                return loading;
+            }
+            $(function () {
+                //$("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+                //$(".sidebar > ul > li > ul li a[href='/Company/All']").addClass("selected");
+
+
+                $("a.pop").click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr("data-url");
+                    $("#myModalBody").html(Loading());
+                    $.get(url, function (data) {
+                        $("#myModalBody").html(data);
+                    });
+                });
+
+                $("a.extPop").click(function (e) {
+                    e.preventDefault();
+                    var src = $(this).attr("data-url");
+                    $("#modal-title").html("Document: " + $(this).data("name"));
+                    $("#modalBody").html(Loading());
+                    var image = '<img src="' + src + '" style="position: relative; width: 100%;" />';
+                    $("#modalBody").html(image);
+                });
+
+
+                $(".dataTable").dataTable({
+                    "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                    'iDisplayLength': 10,
+                    columnDefs: [{ orderable: false, "targets": [-1] }],
+                    "language": {
+                        "lengthMenu": "Display  _MENU_ records per page",
+                        "zeroRecords": "Nothing found - sorry",
+                        "info": "Showing page _PAGE_ of _PAGES_",
+                        "infoEmpty": "No records available",
+                        "infoFiltered": "(filtered from _MAX_ total records)"
+                    }
+                });
+            });
+        </script>
+    }

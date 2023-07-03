@@ -1,0 +1,67 @@
+﻿@model List<LOBP.DbEntities.UserMaster>
+
+    @{
+        ViewBag.Title = "Companies";
+        Layout = "~/Views/Shared/_AdminLayout.cshtml";
+        var user = ((LOBP.DbEntities.UserMaster)Session["UserID"]);
+    }
+
+
+    <div class="content">
+        <h2 class="lefty">All Registered Companies</h2>
+        <hr class="clear" />
+
+        <table class="table table-striped customDT">
+            <thead>
+                <tr>
+                    <th style="width: 197px;">Company Name</th>
+                    <th style="width: 197px;">ElpsId</th>
+                    <th style="width: 100px;">RegNo</th>
+                    <th style="width: 200px;">CompanyEmail</th>
+                    <th style="width: 200px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (LOBP.DbEntities.UserMaster up in Model)
+                {
+                    <tr>
+                        <td><a href="@Url.Action("CompanyProfile", new { ApplicationId ="", CompanyEmail = up.UserId})">@up.FirstName</a> </td>
+                        <td>@up.ElpsId</td>
+                        <td>@up.CACNumber</td>
+                        <td>@up.UserId</td>
+                        <td>
+                            <a class="btn btn-xs btn-primary" href="@Url.Action("CompanyDocuments", new { compId = up.ElpsId })">Docs<i class="icon-doc"></i></a>
+                            <a class="btn btn-xs btn-info" href="@Url.Action("CompanyApplications", new { userID = up.UserId })">Apps<i class="icon-note"></i></a>
+                            <a class="btn btn-xs btn-success" href="@Url.Action("CompanyPermits", new { userId = up.UserId })">Permits<i class="icon-login"></i></a>
+                            @if (user.UserRoles.ToLower().Equals("support") || user.UserRoles.ToLower().Equals("superadmin"))
+                            {
+                                <a class="btn btn-xs btn-danger" href="@Url.Action("DeleteCompanyByEmail", new { email = up.UserId })">Delete<i class="icon-login"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    @section scripts{
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $("#lnk-Applications > a").addClass("selected").find(".act").addClass("selected");
+                $(".customDT").dataTable({
+                    "aLengthMenu": [25, 50, 75, 100, 200],
+                    'iDisplayLength': 25,
+                    columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                    "language": {
+                        "lengthMenu": "Display  _MENU_ records per page",
+                        "zeroRecords": "No record found",
+                        "info": "Showing page _PAGE_ of _PAGES_",
+                        "infoEmpty": "No Application on your Desk Currently",
+                        "infoFiltered": "(filtered from _MAX_ total records)"
+                    },
+                    "order": [[1, "desc"]]
+                });
+            });
+        </script>
+    }

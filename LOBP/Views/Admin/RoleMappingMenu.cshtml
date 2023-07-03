@@ -1,0 +1,253 @@
+﻿@model List<LOBP.DbEntities.RoleFunctionalityMapping>
+
+@{
+    ViewBag.Title = "Role Mapping Menu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content">
+
+
+
+    @using (Html.BeginForm("AddRoleMappingMenu", "Admin", FormMethod.Post, new { @id = "formid" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="modal fade addworkflowdmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+            <div class="modal-dialog modal" style="vertical-align: middle; margin:0 auto 0 30%; overflow-y:hidden; overflow-x:hidden; display:block; margin-top:50px" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Add Role Menu</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Role ID</label>
+                                    <div class="form-group">
+                                        <div class="col-sm-10">
+                                            <input class="form-control" id="txtRoleId" required name="txtRoleId" type="text" style="text-transform:uppercase" />
+                                        </div>
+                                    </div>
+
+                                    <label>Func Id</label>
+                                    <div class="form-group">
+                                        <div class="col-md-10">
+                                            <input type="text" id="txtFuncId" required name="txtFuncId" class="form-control" style="text-transform:uppercase" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="margin-left:200px"> <button class="btn btn-success" id="staffrolemappingaddrecord" type="button"><span class="glyphicon glyphicon-plus-sign"></span> Add Staff Role Menu</button></span>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <div class="modal fade updaterecordmodal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="calenderModalLabel">
+        <div class="modal-dialog modal" style="vertical-align: middle; margin:0 auto 0 30%; overflow-y:hidden; overflow-x:hidden; display:block; margin-top:50px" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-success" id="exampleModalLabel"><span class="glyphicon glyphicon-hand-down"></span> Update Staff Role Menu</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Role ID</label>
+                                <div class="form-group">
+                                    <div class="col-sm-10">
+                                        <input class="form-control" id="RoleId" required name="RoleId" type="text" readonly />
+                                    </div>
+                                </div>
+
+                                <label>Func Id</label>
+                                <div class="form-group">
+                                    <div class="col-md-10">
+                                        <input type="text" id="FuncId" required name="FuncId" class="form-control" style="text-transform:uppercase" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <span style="margin-left:200px"> <button class="btn btn-success" id="staffrolemappingupdaterecord"><span class="glyphicon glyphicon-save"></span> Update Record</button></span>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="row">
+        <div class="col-md-12" style="background-color:white">
+
+            <fieldset class="scheduler-border">
+                <legend class="scheduler-border">Staff Role Information</legend>
+                <button class="btn btn-xs btn-info" style="float:right" data-toggle="modal" data-target=".addworkflowdmodal"><span class="glyphicon glyphicon-plus"></span> Add Staff Role Menu</button>
+                <br />
+                <table class="table table-striped table-condensed table-responsive table-bordered customDT" id="mytable">
+                    <thead>
+                        <tr>
+                            <th><strong>RoleId</strong></th>
+                            <th><strong>Role Description</strong> </th>
+                            <th style="width:2px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(LOBP.DbEntities.RoleFunctionalityMapping n in Model)
+                        {
+                            <tr>
+                                <td>@n.RoleId</td>
+                                <td>@n.FuncId</td>
+                                <td><button class="btn btn-danger btn-xs" onclick='DeleteStaffRoleMappingJs("@n.RoleId")' id="deletebtn"><span class="glyphicon glyphicon-trash"></span> Delete</button></td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+    </div>
+
+    <div style="display:none" class="loadingImage">
+        <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+            <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+        </div>
+    </div>
+
+    <div id="modalMapDialog" style="display: none">
+        <div id="MapContainer" style="height: 430px; width: 100%;border: 5px solid green;"></div>
+    </div>
+
+</div>
+
+
+
+
+@section scripts{
+
+    <script type="text/javascript">
+
+        $(function () {
+
+            $(".customDT").dataTable({
+                "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                'iDisplayLength': 10,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No Record to Display Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+            $("#staffrolemappingupdaterecord").click(function () {
+                    var msg = confirm("Are you sure you want to update this record?");
+                $(".updaterecordmodal").modal("hide");
+               var staffrole = $("#RoleId").val();
+                var FuncId = $("#FuncId").val();
+                    if (msg === true) {
+                        $(".loadingImage").show('fast');
+                        $.post("/Admin/UpdateRoleMappingMenu", { "Roleid": staffrole, "Funcid": FuncId}, function (res) {
+                            if (res === "success") {
+                                alert("Update was successful");
+                                $(".updaterecordmodal").modal("hide");
+                                $(".loadingImage").hide('fast');
+                                history.go(0);
+                            }
+                            else {
+                                alert("Something went wrong");
+                                $(".loadingImage").hide('fast');
+                            }
+                        });
+                        $(".loadingImage").hide('fast');
+                    }
+                    else {
+                        return false;
+                    }
+
+
+                });
+
+
+
+            $("#staffrolemappingaddrecord").click(function () {
+                    if ($("#formid").valid()) {
+                        var msg = confirm("Are you sure you want to Add this record?");
+                      var RoleId = $("#txtRoleId").val();
+                        var FuncId = $("#txtFuncId").val();
+                        if (msg === true) {
+                            $(".loadingImage").show('fast');
+                            $.post("/Admin/AddRoleMappingMenu", { "Roleid": RoleId, "Funcid": FuncId}, function (res) {
+                                if (res === "success") {
+                                    alert("New record was successful");
+                                    $(".addworkflowdmodal").modal("hide");
+                                    $(".loadingImage").hide('fast');
+                                    history.go(0);
+                                }
+                                else {
+                                    alert("Something went wrong");
+                                    $(".loadingImage").hide('fast');
+                                }
+                            });
+                            $(".loadingImage").hide('fast');
+                        }
+                        else {
+                            return false;
+                        }
+
+                    }
+
+                });
+
+            });
+            function WorkFlowJs(StaffRole, Funcid) {
+                $(".loadingImage").show('fast');
+                $("#RoleId").val(StaffRole);
+                $("#FuncId").val(Funcid);
+                $(".updaterecordmodal").modal('show');
+                $(".loadingImage").hide('fast');
+            };
+
+
+        function DeleteStaffRoleMappingJs(RoleId) {
+            var msg = confirm("Are sure you want to delete staff role menu?");
+            if (msg === true) {
+                $(".loadingImage").show('fast');
+                $.post("/Admin/DeleteRoleMappingMenu", { "staffRoleid": RoleId }, function (res) {
+                    if (res === "success") {
+                        alert("staff role menu was successfully deleted");
+                        $(".loadingImage").hide('fast');
+                        history.go(0);
+                    } else {
+                        alert("something went wrong while trying to delete staff role menu");
+                        $(".loadingImage").hide('fast');
+
+                    }
+                });
+            }
+
+        };
+
+
+    </script>
+}
+
+

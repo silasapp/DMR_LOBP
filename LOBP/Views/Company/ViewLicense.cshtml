@@ -1,0 +1,20 @@
+﻿@model List<LOBP.DbEntities.ApplicationRequest>
+
+@{
+    ViewBag.Title = "ViewLicense";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+
+}
+<a id="licenseData" class="media" href="@Url.Content("~/Licenses/" + ViewBag.ApplicationId + ".pdf")"></a>
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.media.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery.metadata.js")"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('a.media').media({ width: 1000, height: 600 });
+        });
+    </script>
+
+}
+

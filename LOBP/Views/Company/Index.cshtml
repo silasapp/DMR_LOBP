@@ -1,0 +1,722 @@
+﻿@using LOBP.DbEntities
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+    var dbCtxt = new LubeBlendingDBEntities();
+
+}
+<div class="row xrow">
+    @if (ViewBag.ErrorMessage == "SUCCESS")
+    {
+        <div class="col-md-12 bg1">
+            <div class="pad-t">
+                <div class="col-md-4">
+
+                    <div class="welcome">
+                        <h4>WELCOME</h4>
+                        <h2>@ViewBag.CompanyName.ToUpper()</h2>
+                    </div>
+
+                </div>
+                <div class="col-md-8">
+                    <div class="col4_1x dTile" onclick="myhref('@Url.Action("MyApplications", "Company", new { type = "ALL" })');">
+                        <div class="tileHead">
+                            <h1 id="applicationsCount">@ViewBag.ApplicationCount</h1>
+                        </div>
+                        <div class="tileBase">
+                            <p>Total Application(s)</p>
+                        </div>
+                    </div>
+                    <div class="col4_1x dTile" onclick="myhref('@Url.Action("MyApplications", "Company", new { type = "PROC" })');">
+                        <div class="tileHead">
+                            <h1 id="processingCount">@ViewBag.ProcessedApplicationCount</h1>
+                        </div>
+                        <div class="tileBase">
+                            <p>Application(s) being Processed</p>
+                        </div>
+                    </div>
+                    <div class="col4_1x dTile" onclick="myhref('@Url.Action("ALLCompanyPermits", "Company")');">
+                        <div class="tileHead">
+                            <h1 id="totalCount">@ViewBag.TotalPermitCount</h1>
+                        </div>
+                        <div class="tileBase">
+                            <p>Total Permit(s)</p>
+                        </div>
+                    </div>
+                    <div class="col4_1x dTile" onclick="myhref('@Url.Action("ALLCompanyPermits", "Company", new { type = "EXP" })');">
+                        <div class="tileHead">
+                            <h1 id="expiringCount">@ViewBag.PermitExpiringCount</h1>
+                        </div>
+                        <div class="tileBase">
+                            <p>Permit(s) Expiring or Expired</p>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="padd-s">
+                <div class="btn-group btn-group-lg btn-group-justified">
+                    <a class="btn btn-success round" role="button" href="@Url.Action("ApplyForLicense")"><i class="fas fa-book  fa-lg" aria-hidden="true"></i>&nbsp;&nbsp;Apply For License</a>
+                    <a class="btn btn-primary round" role="button" href="@Url.Action("CompanyProfile")"><i class="fas fa-building fa-lg" aria-hidden="true"></i>&nbsp;&nbsp;Company Profile</a>
+                    <a class="btn btn-default round" role="button" href="@Url.Action("MyDocuments")"><i class="fas fa-folder-open fa-lg" aria-hidden="true"></i>&nbsp;&nbsp;Company Documents</a>
+                    <a class="btn btn-warning round" role="button" href="@Url.Action("ALLCompanyPermits")"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i>&nbsp;&nbsp;View License/Approval</a>
+                </div>
+            </div>
+        </div>
+        <hr style="margin: 0 0 20px 0; padding: 0;" />
+        <div class="modal fade" id="modalPopup">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                </div>
+            </div>
+        </div>
+        <div id="coverScreen" class="LockOn" style="display: none;"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+        if (ViewBag.Allcomments.Count > 0)
+        {
+            foreach (var ah in ViewBag.Allcomments)
+            {
+                if (TempData["Acceptcomment"].ToString() == "Reject" || TempData["Acceptcomment"].ToString() == "Rejectmk" || TempData["Acceptcomment"].ToString() == "Deny")
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-danger alert-dismissable text-center" style="height:auto" role="alert">
+                                <span class="glyphicon glyphicon-exclamation-sign"></span>Application With the Reference Number @ah.ApplicationID, Has Been Rejected. Reason For Rejection=> @ah.Comment.<br /><br />
+
+                                PLEASE COMPLETE YOUR APPLICATION BY CLICKING  <a class="btn btn-warning btn-xs round" href="#" onclick="javascript:ProceedWithApplication('RouteApplication','@ah.ApplicationID','Application Form')">Document Upload/Application Form</a>
+
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div><br /><br /><br />
+                }
+
+            }
+        }
+
+
+
+        if (ViewBag.ExtraPay != null && ViewBag.LoggedInUser == ViewBag.ExtraPaymentEmail)
+        {
+
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger alert-dismissible center-block" style="height:auto" role="alert" id="welcomealert" align="center">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <i class="fa fa-money fa-border" aria-hidden="true"></i>
+                        YOU ARE REQUIRED TO MAKE EXTRA PAYMENT OF @ViewBag.ExtraPaymentAmount NAIRA FOR THE APPLICATION WITH REFERENCE NUMBER (@ViewBag.ExtraPaymentAPPID) BY CLICKING
+                        <a class="btn btn-warning btn-xs round" href="/Company/MakeExtraPayment">Extra Payment</a>
+                    </div>
+                </div>
+            </div>
+            <br />
+        }
+
+
+
+
+
+        if (ViewBag.legacystage == 46)
+        {
+            if (TempData["Rejectcomment"] != null)
+            {
+
+                if (TempData["Acceptcomment"].ToString() == "LSReject" || TempData["Acceptcomment"].ToString() == "Reject")
+                {
+                    <div class="col-md-12">
+                        <div class="alert alert-danger alert-mini alert-dismissable text-center col-md-12" style="height:auto" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign"></span> Reason For Rejection => @TempData["Rejectcomment"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true" style="margin-left:-50px">&times;</span>
+                            </button>
+                        </div>
+                    </div><br />
+                }
+            }
+            @*<div class="col-md-12">
+                    <div class="alert alert-danger  alert-mini alert-dismissable text-center col-md-12" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                        PLEASE COMPLETE YOUR LEGACY LICENSE PROCESSES BY CLICKING
+                        <a class="btn btn-warning btn-xs round" href="#" onclick="javascript:MoveToAction('LegacyApplication','@ViewBag.legacyappid')">Upload Legacy Document</a>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true" style="margin-left:-50px">&times;</span>
+                        </button>
+                    </div>
+                </div><br />*@
+
+        }
+
+
+
+
+
+        //foreach (KeyValuePair<string, int> item in ViewBag.StageReferenceList)
+        if (ViewBag.AllApplicationStageDetails.Count > 0)
+        {
+            foreach (var item in ViewBag.AllApplicationStageDetails)
+
+            {
+                @*if (ViewBag.Mistdocheck < 5 && item.LicenseTypeId == "LTO" && item.CurrentStageID < 5)
+                        {
+                    <div class="col-md-12">
+                        <div class="alert btn-info alert-dismissible center-block" role="alert" align="center" style="height:auto">
+                            <i class="fas fa-file-alt fa-2x" aria-hidden="true"></i>
+                            PLEASE PROVIDE MISTDO TRAINED STAFF BY CLICKING <a href="/Company/Mistdo?ApplicationId=@item.ApplicationId" class="btn btn-success btn-xs round">MISTDO</a>.
+                        </div>
+                    </div>
+                        }
+                        else
+                        {*@
+                if ((item.CurrentStageID == 1) && (TempData["Acceptcomment"].ToString() != "Reject" && TempData["Acceptcomment"].ToString() != "Rejectmk"))
+                {
+                    <div class="col-md-12">
+                        <div class="alert alert-info alert-dismissible center-block" role="alert" align="center">
+                            <i class="fas fa-book-reader fa-2x" aria-hidden="true"></i>
+                            KINDLY PROCEED WITH APPLICATION REFERENCE <a href="javascript:ProceedWithApplication('RouteApplication','@item.ApplicationId','Application Form/Document Upload')" class="alert-link">@item.ApplicationId</a> TO COMPLETE THE FORM AND UPLOAD/CHANGE REQUIRED LICENSE/APPROVAL DOCUMENTS
+                        </div>
+                    </div><br />
+                }
+
+                if (item.CurrentStageID == 2 || (item.CurrentStageID == 1 && (TempData["Acceptcomment"].ToString() == "Reject" || TempData["Acceptcomment"].ToString() == "Rejectmk")))
+                {
+                    <div class="col-md-12">
+                        <div class="alert alert-info alert-dismissible center-block" role="alert" align="center">
+                            <i class="fas fa-book-reader fa-2x" aria-hidden="true"></i>
+                            KINDLY PROCEED WITH APPLICATION REFERENCE <a href="javascript:ProceedWithApplication('RouteApplication','@item.ApplicationId','Application Form')" class="alert-link">@item.ApplicationId</a> TO COMPLETE THE REQUIRED LICENSE/APPROVAL DOCUMENTS
+                        </div>
+                    </div><br />
+                }
+
+                if (item.CurrentStageID == 3)
+                {
+                    <div class="col-md-12">
+                        <div class="alert btn-warning alert-dismissible center-block" role="alert" align="center">
+                            `
+                            <i class="fas fa-money-bill-alt fa-2x" aria-hidden="true"></i>
+                            PROCEED WITH APPLICATION REFERENCE <a href="javascript:ProceedWithApplication('RouteApplication','@item.ApplicationId','Charge Summary')" class="alert-link">@item.ApplicationId</a> TO FINALIZE APPLICATION
+                        </div>
+                    </div><br />
+                }
+                if (item.CurrentStageID == 4)
+                {
+                    <div class="col-md-12">
+                        <div class="alert btn-info alert-dismissible center-block" role="alert" align="center">
+                            <i class="fab fa-amazon-pay fa-2x" aria-hidden="true"></i>
+                            PROCEED WITH APPLICATION REFERENCE <a href="javascript:ProceedWithApplication('RouteApplication','@item.ApplicationId','Payment')" class="alert-link">@item.ApplicationId</a> TO FINALIZE PENDING PAYMENT
+                        </div>
+                    </div><br />
+                }
+                //}
+                if (item.CurrentStageID == 5)
+                {
+                    <div class="col-md-12">
+                        <div class="alert btn-info alert-dismissible center-block" role="alert" align="center">
+                            <i class="fas fa-file-alt fa-2x" aria-hidden="true"></i>
+                            YOUR APPLICATION WITH THE REFERENCE NUMBER @item.ApplicationId IS BEING PROCCESSED AT THE MOMENT, YOU WILL BE NOTIFIED WHEN NECCESSAY.
+                        </div>
+                    </div><br />
+                }
+                if (item.CurrentStageID == 46)
+                {
+                    <div class="col-md-12">
+                        <div class="alert btn-info alert-dismissible center-block" role="alert" align="center" style="margin-bottom:12px">
+                            PLEASE COMPLETE YOUR LEGACY LICENSE PROCESSES FOR @item.ApplicationId BY CLICKING
+                            @*<a class="btn btn-warning btn-xs round" href="#" onclick="javascript:MoveToAction('LegacyApplication','@ViewBag.legacyappid')">Upload Legacy Document</a>*@
+                            <a class="btn btn-success btn-xs round" href="@Url.Action("LegacyApplication", new { LicenseTypeId = ViewBag.LicenseCodes, ReferenceId = item.ApplicationId })">Upload Legacy Document</a>
+
+                        </div>
+                    </div><br />
+                }
+                if (item.CurrentStageID == 47)
+                {
+                    <div class="col-md-12">
+                        <div class="alert btn-info alert-dismissible center-block" role="alert" align="center" style="margin-bottom:12px">
+                            YOUR LEGACY APPLICATION WITH THE REFERENCE NUMBER @item.ApplicationId IS BEING PROCCESSED AT THE MOMENT.
+                        </div>
+                    </div><br />
+                }
+
+
+
+                if (item.CurrentStageID == 25)
+                {
+                    <div class="alert alert-info">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <i class="fa fa-info-circle fa-border" aria-hidden="true"></i>
+                        <span>YOUR LEGACY LICENSE WAS SUCCESSFULLY SUBMITTED, YOU WILL BE NOTIFIED WHEN NECCESSARY.</span>
+                    </div>
+                }
+            }
+
+            @*if (item.Value == 27)
+                {
+                    <div class="alert alert-success" id="approvedlegacy">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <i class="fa fa-info-circle fa-border" aria-hidden="true"></i>
+                        <span>YOUR LEGACY LICENSE/PERMIT HAS BEEN APPROVED.</span>
+                    </div>
+                }*@
+
+        }
+
+
+
+        //if (ViewBag.Checkscheduleexpiry != null)
+        //{
+
+        if (ViewBag.ScheduleReference.Count > 0)
+        {
+            foreach (var item1 in ViewBag.ScheduleReference)
+            {
+                DateTime expirydate = Convert.ToDateTime(item1.SchduleExpiryDate).Date;
+
+                if (item1.CurrentStageID == 10 && expirydate < DateTime.Now.Date)
+                {
+                    <div class="col-md-12">
+                        <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <i class="fa fa-exclamation-triangle fa-border fa-spin" aria-hidden="true"></i>
+                            YOUR INSPECTION SCHEDULED EXPIRED AFTER 72 HOURS FROM THE SCHEDULED DATE, INSPECTION WILL BE RESCHEDULED.
+                        </div>
+                    </div><br />
+                    }
+
+
+                    if (item1.CurrentStageID == 10 && expirydate >= DateTime.Now.Date)
+                    {
+                    <div class="col-md-12">
+                        <div class="alert alert-default alert-dismissible center-block" role="alert" align="center">
+
+
+                            
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <i class="fa fa-info-circle fa-border" aria-hidden="true"></i>
+                                <span>INSPECTION HAS BEEN SCHEDULED, KINDLY CLICK</span> <a href="javascript:showAppointmentDetail('@item1.ApplicationId', 'Inspection Form')" class="btn btn-success btn-sm round">ACCEPT</a> <span> TO CONFIRM</span> <strong>INSPECTION</strong> DATE & TIME.
+                            </div> <br />
+
+                            
+                            <text><br /><br /><br /><br /><br /><br /></text>
+                            
+                        </div>
+                    </div>
+                    }
+                    }
+
+                }
+            //}
+
+
+
+
+
+
+            <div class="row xrow" style="">
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3>Recent Notifications</h3>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-hover table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Type</th>
+                                        <th>Message</th>
+                                        <th>Elapsed Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (LOBP.Models.CompanyMessage mm in ViewBag.AllMessages)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <i class="glyphicon glyphicon-envelope unred"></i>
+                                            </td>
+                                            <td>
+                                                <span>@mm.MessageType</span>
+                                            </td>
+                                            <td>
+                                                @if (mm.MessageType == "Info")
+                                                {
+                                                    <a href="#" onclick="javascript:showMessageDetail('@mm.ApplicationId','@mm.MessageId')">
+                                                        @mm.Message
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" onclick="javascript:showMessageDetail('@mm.ApplicationId','@mm.MessageId')">
+                                                        <strong style="color:red;font-size:18px;">@mm.Message</strong>
+                                                    </a>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span>@mm.Date</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th>Type</th>
+                                        <th>Message</th>
+                                        <th>Elapsed Time</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div>
+                        <div id="mobSwitch"></div>
+                        <h4 class="pad-t">Need Help?</h4>
+                        <div class="list-group">
+                            <a href="#" class="list-group-item active">
+                                Enquiry
+                            </a>
+                            <a href="https://ems.dpr.gov.ng/Tickets/New" target="_blank" class="flash list-group-item"><span style="color:seagreen">Complain/Enquiries</span></a>
+                            <a href="#" class="list-group-item">FAQs</a>
+                            <a href="#" class="list-group-item">Video Guide</a>
+                            <a href="#" class="list-group-item">Live Chat</a>
+                            <a href="#" class="list-group-item">Guide Lines</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+        else
+        {
+            <div class="col-md-12">
+                <div class="alert alert-danger alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <i class="fa fa-exclamation-triangle fa-border" aria-hidden="true"></i>
+                    <strong>@ViewBag.ErrorMessage</strong>
+                </div>
+            </div>
+        }
+    </div>
+<div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="notmodalheader"></h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="notLicenseType" name="notLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Transaction Date</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="notTxnDate" name="notTxnDate" readonly style="border: 0px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Message</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="notMessage" name="notMessage" readonly style="border: 0px;">@ViewBag.Message</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center" id="appointheader"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="AppointmentApprovalForm" class="form-horizontal">
+                    <input type="hidden" id="appointAppID" name="appointAppID">
+                    <input type="hidden" id="appointType" name="appointType">
+                    <input type="hidden" id="inspectionType" name="inspectionType">
+                    <div class="form-group">
+                        <label class="control-label col-md-3">License Type</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="appointLicenseType" name="appointLicenseType" readonly style="border: 0px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Inspection Date</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="appointDate" name="appointDate" readonly style="border: 0px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Proposed Venue</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="2" id="appointvenue" name="appointvenue" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Contact Details</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="appointcontactdetail" name="appointcontactdetail" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Comment</label>
+                        <div class="col-md-9">
+                            <textarea class="form-control" rows="3" id="appointcomment" name="appointcomment" required></textarea>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="modal-footer">
+                        <div class="btn btn-danger btn-sm round approvalbtn" value="Change Appointment">Reject Appointment</div>
+                        @*<button class="btn btn-warning round approvalbtn" type="button" value="Change Appointment" />*@
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                        <div class="btn btn-success btn-sm round approvalbtn" value="Confirm Appointment">Confirm Appointment</div>
+                        @*<input class="btn btn-info round approvalbtn" type="button" value="Confirm Appointment" />*@
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div style="display:none" class="loadingImage">
+    <div id="load" style="width: 100%; height: 100%; top:0; left:0; position:fixed; display:block; opacity:0.7; background-color:#fff; z-index:99; text-align:center">
+        <img id="loading-image" style="position:absolute; top:100px; left:50%; z-index:100" src="~/Images/spinning.gif" />
+    </div>
+</div>
+
+
+<style>
+    .modal-dialog {
+        width: 500px;
+    }
+
+    .btn.round {
+        border-radius: 50px;
+    }
+</style>
+
+
+@section scripts{
+    <script type="text/javascript">
+       // $("#approvedlegacy").delay(30000).fadeOut(500);
+
+        $(document).ready(function () {
+
+            //console.log('button clicked');
+
+
+            $('.approvalbtn').click(function () {
+               // e.preventDefault();
+                debugger;
+                $(".loadingImage").show('fast');
+            var confirmAction = "";
+            var confirmMessage = "";
+            var btnValue = $(this).attr('value');
+
+            if (btnValue == "Change Appointment") {
+                confirmAction = "Reject";
+                confirmMessage = "Do you want to Change the Appointment?";
+            } else {
+                confirmAction = "Accept";
+                confirmMessage = "Do you want to Confirm the Appointment?";
+            }
+
+            console.log('confirmAction :' + confirmAction);
+            console.log('confirmMessage :' + confirmMessage);
+
+            if ($("#AppointmentApprovalForm").valid()) {
+
+                bootbox.confirm({
+                    message: confirmMessage,
+                    size: 'small',
+                    className: 'bb-alternate-modal',
+                    buttons: {
+                        cancel: {
+                            label: '<i class="fa fa-times"></i> Cancel'
+                        },
+                        confirm: {
+                            label: '<i class="fa fa-check"></i> Confirm'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result == true) {
+                            $('#appointmentModal').modal('hide');
+                            $.get('@Url.Action("ConfirmAppointment")', { ApplicationId: $("#appointAppID").val(), AppointmentType: $("#appointType").val(), UserAction: confirmAction, ContactDetail: $("#appointcontactdetail").val(), Comment: $("#appointcomment").val() }, function (data) {
+                                console.log('before console');
+                                var status = data.status;
+                                if (status == 'success') {
+                                    bootbox.alert({
+                                        message: data.Message,
+                                        size: 'small',
+                                        className: 'bb-alternate-modal',
+                                        callback: function () {
+                                            window.location.href = "/Company";
+                                        }
+                                    });
+                                    $(".loadingImage").hide('fast');
+                                }
+                                else {
+                                    $(".loadingImage").hide('fast');
+                                    alert(data.Message);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        });
+
+
+        function hideAndResetModal(modalID) {
+            $(modalID).modal('hide');
+            $(modalID).on('hidden.bs.modal', function () {
+                $(modalID).find('form').trigger('reset');
+            });
+        }
+
+        function myhref(web) {
+            window.location.replace = web;
+        }
+
+        function ProceedWithApplication(ActionName, ApplicationID, Description) {
+
+            bootbox.confirm({
+                message: "Do You Want To Proceed With " + Description + "?",
+                size: 'small',
+                className: 'bb-alternate-modal',
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function (result) {
+                    if (result == true) {
+                        var url = '@Url.Action("replace")';
+                        url = url.replace("replace", ActionName);
+                        window.location.href = url + "?ApplicationId=" + ApplicationID;
+                    }
+                }
+            });
+        }
+
+
+                    function showMessageDetail(applicationId, notificationid) {
+                        $(".loadingImage").show('fast');
+            var url = '@Url.Action("GetMessageDetail")';
+            $.get(url, { ApplicationId: applicationId, MessageId: notificationid })
+         .fail(function (data) {
+             alert("Network Error");
+         })
+        .done(function (data) {
+            if (data.Status == "success") {
+                $('#notmodalheader').text("Message Details");
+                $('#notLicenseType').val(data.LicenseDesc);
+                $('#notTxnDate').val(data.MessageDate);
+                $('#notMessage').val(data.Message);
+
+                $("#notificationModal").modal('show');
+                $(".loadingImage").hide('fast');
+            }
+            else {
+                console.debug("here");
+                console.debug(data.Status);
+                console.debug(data.Message);
+                console.debug(data.AppDescription);
+                alert(data.Message);
+                $(".loadingImage").hide('fast');
+            }
+        });
+        }
+
+                    function showAppointmentDetail(ApplicationId, Header) {
+                        $(".loadingImage").show('fast');
+            $.get('@Url.Action("GetAppointmentDetail")', { ApplicationId: ApplicationId })
+         .fail(function (data) {
+             alert("Network Error");
+         })
+                .done(function (data) {
+                    debugger;
+            if (data.Status == "success") {
+                $('#appointheader').text(Header);
+                $('#appointLicenseType').val(data.LicenseDesc);
+                $('#appointDate').val(data.AppointDate);
+                $('#appointvenue').val(data.AppointVenue);
+                $('#appointcontactdetail').val(data.ContactDetails);
+
+                $('#appointType').val(data.AppointType);
+                $('#appointAppID').val(ApplicationId);
+                $('#inspectionType').val(data.InspectionType);
+                $("#appointmentModal").modal('show');
+                $(".loadingImage").hide('fast');
+            }
+            else {
+                console.debug("here");
+                alert(data.Message);
+                $(".loadingImage").hide('fast');
+            }
+        });
+
+
+
+        }
+
+    </script>
+}

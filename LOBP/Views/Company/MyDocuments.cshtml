@@ -1,0 +1,205 @@
+﻿@model List<LOBP.Models.DocumentModel>
+
+@{
+    ViewBag.Title = "Company Documents";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+<div class="row">
+    <div class="pageTitle bg1">
+        <h2 class="lefty">Document Library</h2>
+        <div class="clear"></div>
+    </div>
+</div>
+
+@if (ViewBag.ResponseMessage == "SUCCESS")
+{
+    <div class="row xrow">
+        <div class="col-sm-11">
+            <div class="">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">Document Type</th>
+                            <th style="width: 10%;">Document Image</th>
+                            <th style="width: 15%;">Date Added</th>
+                            <th style="width: 15%;">Date Modified</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (LOBP.Models.DocumentModel d in Model)
+                        {
+                            string source = d.Source.Contains("https") ? d.Source : "http://elps.dpr.gov.ng/" + d.Source;
+                            <tr>
+                                <td>@d.DocumentTypeName</td>
+                                @if (d.DocumentName.Contains(".pdf"))
+                                {
+                                    <td>
+                                        <a href='@(source)' target="_blank">
+                                            <img src="@Url.Content("~/Images/pdficon.png")" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                                 style="max-height: 40px; max-width: 40px; display: inline-block;" />
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        <a href='@(source)' target="_blank" data-toggle="modal" role="button" class="imgSilent" data-name="@d.DocumentTypeName">
+                                            <img src="@(source)" class="thumbnail img-thumbnail" data-toggle="tooltip" data-placement="bottom" data-original-title="Uploaded Document"
+                                                 style="max-height: 40px; max-width: 40px; display: inline-block" />
+                                        </a>
+                                    </td>
+                                }
+                                <td>@d.DateAdded.ToString("dd-MMM-yyyy")</td>
+                                <td>
+                                    @if (d.DateModified.ToString("dd-MMM-yyyy") != "01-Jan-1753")
+                                    {@d.DateModified.ToString("dd-MMM-yyyy")}
+                                </td>
+                                <td><a href="@Url.Action("UpdateDocument", new { fileId = d.FileId, docId = d.DocId, name = d.DocumentName, src = source})" class="btn btn-default btn-xs">Update</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-md-12">
+        <div class="alert alert-warning alert-dismissible center-block" role="alert" id="welcomealert" align="center">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <i class="fa fa-exclamation-triangle fa-2x fa-border fa-spin " aria-hidden="true"></i>
+            <strong>@MvcHtmlString.Create(ViewBag.ResponseMessage)</strong>
+        </div>
+    </div>
+
+}
+
+
+
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="myModalBody">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3 id="myModalLabel">Modal Title</h3>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <p>One fine body&hellip;</p>
+            </div>
+
+
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="@Url.Content("~/Scripts/jquery.ui.widget.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.iframe-transport.js")" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $(".imgSilent").click(function (e) {
+                $("#myModalBody").html(Loading());
+                e.preventDefault();
+                var src = $(this).find("img").attr("src");
+                var name = $(this).find("img").attr("alt");
+                var md = $("#imgModal").html();
+                $("#myModalBody").html(md);
+                $("#modalBody").html("<img src=\"" + src + "\" alt=\"\" />");
+                $("#myModalLabel").text(name);
+
+            });
+
+            $(".silent").click(function (e) {
+                e.preventDefault();
+                var url = $(this).data("url");
+                $("#myModalBody").html(Loading());
+                $.get(url, function (data) {
+                    $("#myModalBody").html(data);
+                });
+            });
+
+            $("a.extPop").click(function (e) {
+                e.preventDefault();
+                var src = $(this).attr("data-url");
+                $("#modal-title").html("Document: " + $(this).data("name"));
+                $("#modalBody").html(Loading());
+                var image = '<img src="' + src + '" style="position: relative; width: 100%;" />';
+                $("#modalBody").html(image);
+            });
+
+            $(".dataTable").dataTable({
+                columnDefs: [{ orderable: false, "targets": -1 }]
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+
+            'use strict';
+
+
+            $(document.body).on("click", '.upLoad', function () {
+                //alert("Alert is here");
+
+                var dtypId = $(this).data("doctypid");
+                var compId = $(this).data("compid");
+
+                var loc = '/CompanyDocument/UploadFile?docTypId=' + dtypId + '&compId=' + compId;
+                var me = $(this);
+
+                $(this).fileupload({
+                    dataType: 'json',
+                    url: loc,
+                    done: function (e, data) {
+
+                        $("#uploadBtn").hide();
+                        me.removeAttr("required");
+                        $.each(data.result, function (index, file) {
+
+                            $('<p/>').text(file.name).appendTo("#fileName");
+                            $("#doneBtn").removeClass("hide");
+                            $("#cancelBtn").addClass("hide");
+                        });
+                    },
+                    progressall: function (e, data) {
+                        //alert(uid);
+                        var progress = parseInt(data.loaded / data.total * 100, 10);
+                        var progBox = '#progress .progress-bar';
+
+                        $(progBox).css(
+                            'width',
+                            progress + '%'
+                        ).text(progress + '%');
+                    }
+                }).prop('disabled', !$.support.fileInput)
+                    .parent().addClass($.support.fileInput ? undefined : 'disabled')
+            }).bind('fileuploadadded', function (e, data) {
+                alert("File Upload complete");
+            });
+        });
+    </script>
+
+    <script id="imgModal" type="text/x-handlebars-template">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <h3 id="myModalLabel"></h3>
+        </div>
+        <div class="modal-body" id="modalBody">
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal">Close</button>
+        </div>
+    </script>
+}

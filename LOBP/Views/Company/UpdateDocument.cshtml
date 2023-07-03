@@ -1,0 +1,194 @@
+﻿@{
+    ViewBag.Title = "UpdateDocument";
+    Layout = "~/Views/Shared/_CompanyLayout.cshtml";
+}
+
+<div class="row">
+    <div class="pageTitle bg1">
+        <h3 class="lefty">Document Update</h3>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="col-sm-12">
+    <table class="table dataTable">
+        <thead>
+            <tr>
+                <th style="width: 7%;">#</th>
+                <th style="width: 30%;">Document Name</th>
+                <th style="width: 20%;">Select Document</th>
+                <th>Upload Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>
+                    @ViewBag.DocumentName
+                </td>
+                <td>
+                    <span class="btn btn-success fileinput-button" id="filebtn1">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        <span>&nbsp;Select file (Max 4MB)</span>
+                        <input type="file" id="fileId-1" name="docs" class="upLoad" data-uid="@ViewBag.DocId" data-i="1"
+                               accept="image/jpeg, application/pdf">
+                    </span>
+                    <input type="hidden" name="docs[1].Id" value="@ViewBag.DocId" />
+                    <input type="hidden" name="uid-1" id="uid-1" value="@ViewBag.UniqueId" />
+                    <input type="hidden" name="docs[1].FileId" id="fid-1" value="@ViewBag.FileId" class="fileid" />
+                    <input type="hidden" name="docs[1].DocTypId" id="did_1" value="@ViewBag.DocId" />
+                    <div id='file1' class="files"></div>
+                </td>
+                <td>
+                    <div id="progress1" class="progress">
+                        <div class="progress-bar progress-bar-success progress-bar-striped"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+@section scripts{
+    <script src="@Url.Content("~/Scripts/jquery.ui.widget.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.iframe-transport.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.fileupload.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            var jqXHR;
+
+            $(".upLoad").on("change", function () {
+                var i = $(this).attr("data-i");
+                var fp = $("#fileId-" + i)[0].files[0];
+                var extension = fp.name.split('.').pop();
+
+                if (fp.size > 4194304 || fp.fileSize > 4194304) {
+                    alert("Allowed File Size (Max. 4MB)");
+                    jqXHR.abort();
+                }
+
+                else if (extension.indexOf("pdf") != 0 && extension.indexOf("jpg") != 0 && extension.indexOf("jpeg") != 0) {
+                    alert("Attached File Must be PDF Documents or JPEG Images");
+                    jqXHR.abort();
+                }
+
+                var dis = $("#filebtn" + i).attr("disabled");
+                if ($(this).val().length <= 0) {
+                    $("#filebtn" + i).removeAttr("disabled");
+                }
+                else {
+                    $("#filebtn" + i).attr("disabled", "disabled");
+                }
+            });
+
+            $(".dataTable").dataTable({
+                "aLengthMenu": [10, 25, 50, 75, 100, 200],
+                'iDisplayLength': 10,
+                columnDefs: [{ orderable: false, "targets": [0, -1] }],
+                "language": {
+                    "lengthMenu": "Display  _MENU_ records per page",
+                    "zeroRecords": "No record found",
+                    "info": "Showing page _PAGE_ of _PAGES_",
+                    "infoEmpty": "No License on your Desk Currently",
+                    "infoFiltered": "(filtered from _MAX_ total records)"
+                },
+                "order": [[1, "desc"]]
+            });
+
+            $('.upLoad').click(function () {
+                var i = $(this).attr("data-i");
+                var did = $('#did_' + i).val();
+                var docName = $('#documentName-' + i).val();
+                var uid = $("#uid-" + i).val();
+                var fileId = $("#fid-" + i).val();
+
+                $(this).delay(500);
+                var filename = $('input[id=fileId-' + i + ']').val().split('.').pop();
+
+                var url = '@ViewBag.UpdateFileUrl';
+                url = url.replace("{0}", did).replace("{1}", '@ViewBag.ElpsId').replace("{2}", fileId);
+        
+                var loc = '@Url.Action("DocUpload")' + "?elpsDocType=" + did + '&fileId=' + fileId;
+                var prefix = '@ViewBag.ElpsUrl';
+
+                jqXHR = $(this).fileupload({
+                    url: url,
+                    dataType: "json",
+                    done: function (e, data) {
+                        $("#filebtn" + i).hide();
+                        var file = data.result;
+                        $("#fid-" + i).val(file.FileId);
+
+                        $.notify({
+                            icon: 'fa fa-file',
+                            message: '<strong>File ' + file.name + ' Uploaded Successfully</strong>'
+                        }, {
+                            delay: 4000,
+                            type: 'info',
+                            animate: {
+                                enter: 'animated zoomInDown',
+                                exit: 'animated zoomOutUp'
+                            }
+                        });
+
+
+                        var str = file.source.toLowerCase().replace("~", "");
+                        var src = str.match('.pdf$') ? '@Url.Content("~/Images/pdficon.png")' : prefix + str;
+                        var respContent = '<div style="float: left; width: 24%;"><img src="' + src + '" class="thumbnail" style="height: 40px;" />';
+                        //respContent += '</div><div style="float: left; width: 24%;">' + file.name + '<br />';
+                        //$("#file" + i).html(respContent);
+
+                        //Redirect Back to MyDocument Page
+                        var url = '@Url.Action("MyDocuments")';
+                        window.location.href = url;
+                    },
+                    fail: function (e, data) {
+                        var error = "";
+                        var errorThrown = data.errorThrown;
+                        var textStatus = data.textStatus;
+
+                        if (errorThrown == null) { errorThrown = ''; }
+                        if (textStatus == null) { textStatus = ''; }
+                        error = errorThrown + ' - ' + textStatus;
+
+                        $.notify({
+                            icon: 'fa fa-file',
+                            message: '<strong>File ' + file.name + ' failed to Upload</strong>'
+                        }, {
+                            delay: 4000,
+                            type: 'danger',
+                            animate: {
+                                enter: 'animated zoomInDown',
+                                exit: 'animated zoomOutUp'
+                            }
+                        });
+
+                        $('<p style="color: red; font-style: italics; font-size: 12px;">Upload file error: ' + error + '<i class="elusive-remove" style="padding-left:10px;"/></p>')
+                                   .appendTo('#file' + i);
+
+                        $("#filebtn" + i).removeAttr("disabled");
+                        var progBox = '#progress' + $(this).attr("data-i") + ' .progress-bar';
+
+                        $(progBox).css(
+                            'width',
+                            0 + '%'
+                        ).text("");
+                    },
+                    progressall: function (e, data) {
+                        var progress = parseInt(data.loaded / data.total * 100, 10);
+                        var progBox = '#progress' + $(this).attr("data-i") + ' .progress-bar';
+
+                        $(progBox).css(
+                            'width',
+                            progress + '%'
+                        ).text(progress + '%');
+                    }
+
+                }).prop('disabled', !$.support.fileInput)
+                    .parent().addClass($.support.fileInput ? undefined : 'disabled');
+            });
+        });
+    </script>
+}
